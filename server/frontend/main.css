@@ -1,0 +1,135 @@
+
+body {
+	margin: 0;
+	background-color: #fff;
+	color: #fff;
+	font-family: Monospace;
+	font-size: 13px;
+    line-height: 24px;
+    display: flex;
+    flex-flow: row wrap;
+    max-width: 65em;
+    border: 2px;
+    overflow: scroll;
+    position: fixed;
+    left: 200px;
+    bottom: 100px;
+}
+
+#ard{
+    width: 15%;
+    height: auto;
+    flex-direction: row;
+    flex-wrap: wrap;
+    
+    
+}
+
+#zdf{
+    width: 15%;
+    height: auto;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+#phoenix{
+    width: 15%;
+    height: auto;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+#dreisat{
+    width: 15%;
+    height: auto;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+#ndr{
+    width: 15%;
+    height: auto;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+#wdr{
+    width: 15%;
+    height: auto;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+#mdr{
+    width: 15%;
+    height: auto;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+#rbb{
+    width: 15%;
+    height: auto;
+    flex-direction: row;
+}
+
+#hr{
+    width: 15%;
+    height: auto;
+    flex-direction: row;
+}
+
+#orf{
+    width: 15%;
+    height: auto;
+    flex-direction: row;
+}
+
+#sr{
+    width: 15%;
+    height: auto;
+    flex-direction: row;
+}
+
+#srf{
+    width: 15%;
+    height: auto;
+    flex-direction: row;
+}
+
+#swr{
+    width: 15%;
+    height: auto;
+    flex-direction: row;
+}
+
+#arte{
+    width:15%;
+    height: auto;
+    flex-direction: row;
+}
+
+#kika{
+    width: 15%;
+    height: auto;
+    flex-direction: row;
+}
+
+#br{
+    width: 15%;
+    height: auto;
+    flex-direction: row;
+}
+
+#rb{
+    width: 15%;
+    height: auto;
+    flex-direction: row;
+}
+
+#DW{
+    width: 15%;
+    height: auto;
+    flex-direction: row;
+}
+

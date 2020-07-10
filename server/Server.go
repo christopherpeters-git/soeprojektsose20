@@ -21,7 +21,7 @@ var IncomingPostUserRequestUrl = "/login/"
 var InternalServerErrorResponse = "Internal server error - see logs"
 
 //db connection names
-var userDBconnectionName = "videoDB"
+var userDBconnectionName = "users"
 
 //Paths
 var crawlerDirName = "crawler"
@@ -30,28 +30,34 @@ var videoJsonPath = crawlerDirName + "/good.json"
 //**********************</Constants>**********************************
 
 type Video struct {
-	channel     string
-	title       string
-	show        string
-	releaseDate string
-	duration    string
-	link        string
-	pageLink    string
-	fileName    string //Shouldnt be used
+	Channel     string `json:"channel"`
+	Title       string `json:"title"`
+	Show        string `json:"show"`
+	ReleaseDate string `json:"releaseDate"`
+	Duration    string `json:"duration"`
+	Link        string `json:"link"`
+	PageLink    string `json:"pageLink"`
+	FileName    string `json:"fileName"` //Shouldnt be used
 }
 
-//User credentials
-type UserEntry struct {
+type User struct {
+	Id             string
+	Name           string
+	Username       string
+	passwordHash   string
+	FavoriteVideos []Video
+}
+
+type DB_Video struct {
+	videoLink string
+	views     int
+}
+
+type DB_User struct {
+	id           string
+	name         string
 	username     string
 	passwordHash string
-	//sessionId    uint64
-}
-
-//User data (favorites, ...)
-type UserData struct {
-	username       string
-	name           string
-	favoriteVideos string
 }
 
 var videos = make([]Video, 0)
@@ -122,14 +128,14 @@ func parseVideosFromJson() {
 
 	for _, videoEntry := range data {
 		video := Video{
-			channel:     videoEntry[0],
-			title:       videoEntry[1],
-			show:        videoEntry[2],
-			releaseDate: videoEntry[3],
-			duration:    videoEntry[4],
-			link:        videoEntry[5],
-			pageLink:    videoEntry[6],
-			fileName:    videoEntry[7],
+			Channel:     videoEntry[0],
+			Title:       videoEntry[1],
+			Show:        videoEntry[2],
+			ReleaseDate: videoEntry[3],
+			Duration:    videoEntry[4],
+			Link:        videoEntry[5],
+			PageLink:    videoEntry[6],
+			FileName:    videoEntry[7],
 		}
 		videos = append(videos, video)
 	}
@@ -154,7 +160,7 @@ func parseVideosFromJson() {
 func handleGetVideos(w http.ResponseWriter, r *http.Request) {
 	log.Print("Answering handleGetVideos request...")
 	//Writing the result set to the responseWriter as a json-string
-	resultSetInBytes, err := json.MarshalIndent(videos, "", "   ")
+	resultSetInBytes, err := json.MarshalIndent(videos, "", " ")
 	if err != nil {
 		reportError(w, 500, InternalServerErrorResponse, "Marshaling failed: \n"+err.Error())
 		return
@@ -169,6 +175,7 @@ func handleGetUserCookie(w http.ResponseWriter, r *http.Request) {
 	//Post requst with user credentials
 }
 
+//TODO
 func handleGetUserInformation(w http.ResponseWriter, r *http.Request) {
 	//Unter der Annahme, dass kein login cookie verwendet wird
 
@@ -195,16 +202,16 @@ func handleGetUserInformation(w http.ResponseWriter, r *http.Request) {
 		reportError(w, 500, InternalServerErrorResponse, "Sql query failed: \n"+err.Error())
 		return
 	}
-	var userCredentials UserEntry
+	var user User
 	if rows.Next() {
-		err := rows.Scan(&userCredentials.username, &userCredentials.passwordHash)
+		err := rows.Scan(&user.Id, &user.Name, &user.Username, &user.passwordHash)
 		if err != nil {
 			reportError(w, 500, InternalServerErrorResponse, "Scanning rows failed: \n"+err.Error())
 			return
 		}
-		log.Println("User from Query: username: " + userCredentials.username + " name: " + userCredentials.passwordHash)
+		log.Println("User from Query: username: " + user.Username + " passwordhash: " + user.passwordHash)
 		//Compare found password hash with incoming password hash
-		err = bcrypt.CompareHashAndPassword([]byte(userCredentials.passwordHash), []byte(incomingPassword))
+		err = bcrypt.CompareHashAndPassword([]byte(user.passwordHash), []byte(incomingPassword))
 		if err != nil {
 			reportError(w, 400, "Wrong password", "Wrong password: \n"+err.Error())
 			return
@@ -212,36 +219,42 @@ func handleGetUserInformation(w http.ResponseWriter, r *http.Request) {
 			log.Println("Entered Password is correct")
 		}
 	} else {
-		reportError(w, 404, "Wrong username", "Empty sql result set: \n"+err.Error())
+		reportError(w, 404, "Wrong username", "Empty sql result set \n")
 		return
 	}
 
 	//Getting the informations about the user
-	rows, err = userDB.Query("select * from userinformations where username = ?", incomingUsername)
+	rows, err = userDB.Query("select * from User_has_favorite_videos where User_Username = ?", incomingUsername)
 	if err != nil {
 		reportError(w, 500, InternalServerErrorResponse, "Sql query failed: \n"+err.Error())
 		return
 	}
-	var userInformation UserData
-	if rows.Next() {
-		err := rows.Scan(&userInformation.username, &userInformation.name, &userInformation.favoriteVideos)
+	user.FavoriteVideos = make([]Video, 0)
+	var username string
+	var videoStr string
+	for rows.Next() {
+		err := rows.Scan(&username, &videoStr)
 		if err != nil {
 			reportError(w, 500, InternalServerErrorResponse, "Scanning rows failed: \n"+err.Error())
 			return
 		}
-	} else {
-		reportError(w, 500, InternalServerErrorResponse, "Empty sql result set: \n"+err.Error())
-		return
+		var video Video
+		err = json.Unmarshal([]byte(videoStr), &video)
+		if err != nil {
+			reportError(w, 500, InternalServerErrorResponse, "Scanning rows failed: \n"+err.Error())
+			return
+		}
+		user.FavoriteVideos = append(user.FavoriteVideos, video)
 	}
 
 	//Writing the result set to the responseWriter as a json-string
-	userinformationInBytes, err := json.MarshalIndent(userInformation, "", "   ")
+	userInBytes, err := json.MarshalIndent(user, "", "   ")
 	if err != nil {
 		reportError(w, 500, InternalServerErrorResponse, "Marshaling failed: \n"+err.Error())
 		return
 	}
 	w.WriteHeader(200)
-	w.Write(userinformationInBytes)
+	w.Write(userInBytes)
 	log.Print("Answered handleGetUserInformation request successfully...")
 }
 

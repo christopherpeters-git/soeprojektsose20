@@ -8,9 +8,17 @@ CREATE TABLE User (
     PRIMARY KEY(Id)
 );
 
-CREATE TABLE Favorite_Videos (
-    User_Username varchar(255) NOT NULL,
+CREATE TABLE Videos (
     VideoLink varchar(255) NOT NULL,
-    PRIMARY KEY(User_Username),
-    FOREIGN KEY (User_Username) REFERENCES User(Username)
+    Views int DEFAULT 0 NOT NULL,
+    PRIMARY KEY(VideoLink)
 );
+
+CREATE TABLE User_has_favorite_Videos (
+    User_Username varchar(255) NOT NULL,
+    Videos_VideoLink varchar(255) NOT NULL,
+    PRIMARY KEY(User_Username),
+    FOREIGN KEY (User_Username) REFERENCES User(Username),
+    FOREIGN KEY (Videos_VideoLink) REFERENCES Videos(VideoLink)
+);
+

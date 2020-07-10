@@ -18,7 +18,18 @@ class video {
 function init() {
 
     //intialisiere Rest der Seite
+    searchOnEnter();
+}
 
+
+function searchOnEnter() {
+    const inputSearch = document.getElementById("searchInput");
+    inputSearch.addEventListener("keyup", function (event) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            document.getElementById("iconSearchbar").click();
+        }
+    })
 }
 
 function createAjaxRequest(){
@@ -42,10 +53,8 @@ function requestVideos() {
     }
     request.open("GET",getJsonVideoTargetUrl,true);
     request.send();
-
-
 }
 
 function searchThroughDatabase() {
-
+    console.log("Starte Suche...");
 }

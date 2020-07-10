@@ -1,0 +1,36 @@
+Copyright 2014-2017, Markus Koschany
+
+MediathekDirekt is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+
+MediathekDirekt incorporates the following software which is differently
+licensed:
+
+mediathek.py is Copyright 2014-2015, martin776, Markus Koschany and licensed
+under the GNU General Public License 3 or (at your option) any later version.
+
+The jQuery library is Copyright 2005, 2014 jQuery Foundation, Inc. and other
+contributors and covered by the MIT/Expat license. See COPYING.jquery for
+further information.
+
+DataTables is Copyright (c) 2008-2013 SpryMedia Limited and licensed under the
+MIT/Expat license. See COPYING.datatables for further information. This
+includes all images except mediathekdirekt.png and mediathekdirekt.svg which
+are Copyright 2014, martin776 and licensed under the GNU General Public License
+3 or (at your option) any later version.
+
+Moment.js is Copyright 2011-2014 Tim Wood, Iskren Chernev and Moment.js
+contributors and licensed under the MIT/Expat license. See COPYING.moment for
+further information.
+

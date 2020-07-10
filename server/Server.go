@@ -1,42 +1,50 @@
 package main
 
 import (
+	lib "./library"
 	"database/sql"
 	"encoding/json"
 	_ "github.com/go-sql-driver/mysql"
 	"golang.org/x/crypto/bcrypt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
-	"strconv"
 )
 
 //**********************<Constants>**********************************
 //URL's
-var IncomingGetVideosRequestUrl = "/getVideos"
-var IncomingPostUserRequestUrl = "/getUser"
+var IncomingGetVideosRequestUrl = "/getVideos/"
+var IncomingPostUserRequestUrl = "/login/"
 
 //Error messages
 var InternalServerErrorResponse = "Internal server error - see logs"
 
-//DBConnection names
-var videoDBconnectionName = "videoDB"
+//db connection names
 var userDBconnectionName = "videoDB"
+
+//Paths
+var crawlerDirName = "crawler"
+var videoJsonPath = crawlerDirName + "/good.json"
 
 //**********************</Constants>**********************************
 
 type Video struct {
-	id   uint64
-	name string
-	url  string
-	//TODO
+	channel     string
+	title       string
+	show        string
+	releaseDate string
+	duration    string
+	link        string
+	pageLink    string
+	fileName    string //Shouldnt be used
 }
 
 //User credentials
 type UserEntry struct {
 	username     string
 	passwordHash string
-	sessionId    uint64
+	//sessionId    uint64
 }
 
 //User data (favorites, ...)
@@ -46,7 +54,7 @@ type UserData struct {
 	favoriteVideos string
 }
 
-//var videos[] Video = make([]Video,0)	WENN VIDEOS AM ANFANG GELADEN WERDEN
+var videos = make([]Video, 0)
 
 var dbConnections = make(map[string]*sql.DB)
 
@@ -60,13 +68,17 @@ func main() {
 	defer f.Close()
 	log.SetOutput(f)
 
-	//TODO start crawler
-
-	initDataBaseConnection("mysql", "user", "pwd", "localhost:???", videoDBconnectionName, videoDBconnectionName)
-	initDataBaseConnection("mysql", "user", "pwd", "localhost:???", userDBconnectionName, userDBconnectionName)
+	//Start crawler
+	err = lib.DownloadJson(crawlerDirName, videoJsonPath)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	parseVideosFromJson()
+	//Connect do database
+	defer initDataBaseConnection("mysql", "root", "soe2020", "localhost:3306", userDBconnectionName, userDBconnectionName).Close()
 	log.Print("Server has started...")
 
-	http.Handle("/", http.FileServer(http.Dir("frontend/")))
+	http.Handle("/", http.FileServer(http.Dir("test_frontend/")))
 	http.HandleFunc(IncomingGetVideosRequestUrl, handleGetVideos)
 	http.HandleFunc(IncomingPostUserRequestUrl, handleGetUserInformation)
 	err = http.ListenAndServe(":80", nil)
@@ -76,16 +88,17 @@ func main() {
 }
 
 //**************************************<Helpers>************************************************************************
-func initDataBaseConnection(driverName string, user string, password string, url string, dbName string, idName string) {
+func initDataBaseConnection(driverName string, user string, password string, url string, dbName string, idName string) *sql.DB {
 	//Open and check the sql-databse connection
 	db, err := sql.Open(driverName,
 		user+":"+password+"@tcp("+url+")/"+dbName)
 	if err != nil {
 		log.Fatal("Database connection failed: " + err.Error())
-		return
+		return nil
 	}
 	//defer db.Close() //???????
 	dbConnections[idName] = db
+	return db
 }
 
 func reportError(w http.ResponseWriter, statusCode int, responseMessage string, logMessage string) {
@@ -93,38 +106,53 @@ func reportError(w http.ResponseWriter, statusCode int, responseMessage string, 
 	log.Println(logMessage)
 }
 
+func parseVideosFromJson() {
+	data := make([][]string, 0)
+	byteValue, err := ioutil.ReadFile(videoJsonPath)
+	if err != nil {
+		log.Println("Parsing failed: " + err.Error())
+		return
+	}
+
+	err = json.Unmarshal(byteValue, &data)
+	if err != nil {
+		log.Println("Parsing failed: " + err.Error())
+		return
+	}
+
+	for _, videoEntry := range data {
+		video := Video{
+			channel:     videoEntry[0],
+			title:       videoEntry[1],
+			show:        videoEntry[2],
+			releaseDate: videoEntry[3],
+			duration:    videoEntry[4],
+			link:        videoEntry[5],
+			pageLink:    videoEntry[6],
+			fileName:    videoEntry[7],
+		}
+		videos = append(videos, video)
+	}
+
+	//Testing
+	//for _, a := range videos{
+	//	log.Print(a.channel)
+	//	log.Print(a.duration)
+	//	log.Print(a.fileName)
+	//	log.Print(a.link)
+	//	log.Print(a.pageLink)
+	//	log.Print(a.releaseDate)
+	//	log.Print(a.show)
+	//	log.Print(a.title)
+	//	log.Println()
+	//}
+}
+
 //**************************************</Helpers>************************************************************************
 
 //**************************************<Handlers>***********************************************************************
 func handleGetVideos(w http.ResponseWriter, r *http.Request) {
 	log.Print("Answering handleGetVideos request...")
-
-	//Checking db connection
-	videoDb := dbConnections[videoDBconnectionName]
-	err := videoDb.Ping()
-	if err != nil {
-		reportError(w, 500, InternalServerErrorResponse, "Database connection failed: \n"+err.Error())
-		return
-	}
-
-	//Getting the results
-	var videos = make([]Video, 0)
-	rows, err := videoDb.Query("select * from videos")
-	if err != nil {
-		reportError(w, 500, InternalServerErrorResponse, "Sql query failed: \n"+err.Error())
-		return
-	}
-	for rows.Next() {
-		var video Video
-		err := rows.Scan(&video.id, &video.name, &video.url)
-		if err != nil {
-			reportError(w, 500, InternalServerErrorResponse, "Scanning rows failed: \n"+err.Error())
-			return
-		}
-		log.Println("Video from Query: id: " + strconv.FormatUint(video.id, 10) + " name: " + video.name + " url: " + video.url)
-		videos = append(videos, video)
-	}
-
 	//Writing the result set to the responseWriter as a json-string
 	resultSetInBytes, err := json.MarshalIndent(videos, "", "   ")
 	if err != nil {
@@ -169,7 +197,7 @@ func handleGetUserInformation(w http.ResponseWriter, r *http.Request) {
 	}
 	var userCredentials UserEntry
 	if rows.Next() {
-		err := rows.Scan(&userCredentials.username, &userCredentials.passwordHash, &userCredentials.sessionId)
+		err := rows.Scan(&userCredentials.username, &userCredentials.passwordHash)
 		if err != nil {
 			reportError(w, 500, InternalServerErrorResponse, "Scanning rows failed: \n"+err.Error())
 			return

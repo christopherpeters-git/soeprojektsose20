@@ -2,7 +2,7 @@ const getJsonVideoTargetUrl = "localhost:80/getVideos/";
 let videosJson;
 
 
-class video {
+class Video {
     constructor(channel,title,show,releaseDate,duration,link,pageLink,fileName) {
         this.channel = channel;
         this.title = title;
@@ -12,6 +12,22 @@ class video {
         this.link = link;
         this.pageLink = pageLink;
         this.fileName = fileName;
+    }
+    checkAttributes(searchArray,results) {
+        let titleLower = this.title.toLowerCase();
+        let showLower = this.show.toLowerCase();
+
+        for(let i = 0;i<searchArray.length;i++) {
+            let currentSubstring = searchArray[i];
+            if(titleLower.includes(currentSubstring) || showLower.includes(currentSubstring)) {
+                for(let j = 0; j<results.length;j++) {
+                    if(this === results[j]) {
+                        return;
+                    }
+                }
+                results.push(this);
+            }
+        }
     }
 }
 
@@ -55,6 +71,30 @@ function requestVideos() {
     request.send();
 }
 
+
 function searchThroughDatabase() {
     console.log("Starte Suche...");
+    let searchInput = document.getElementById("searchInput");
+    if(searchInput === "") {
+        console.log("Leerer Eintrag, keine Suche durchgeführt");
+        return;
+    }
+    searchInput.toLowerCase();
+    if(checkIfChannel(searchInput)) {
+        return;
+    }
+    let searchArray = searchInput.split(" ");
+    let currentVideo = new Video("","","","","","","","");
+    let results = [];
+    for(currentVideo of videosJson) {
+        currentVideo.checkAttributes(searchArray,results);
+    }
 }
+
+//******************************HelperFunctionsSearchbar**********************************************
+
+function checkIfChannel(searchInput) {
+    //TODO
+    return false;
+}
+

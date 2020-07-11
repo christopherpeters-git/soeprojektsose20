@@ -1,11 +1,11 @@
 function init() {
-
+    const senderlist = document.getElementsByClassName("Senderliste");
 }
 
 
 
 
-function openCity(evt, cityName) {
+function open_L_R(evt, cityName) {
     // Declare all variables
     var i, tabcontent, tablinks;
 

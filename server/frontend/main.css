@@ -2,6 +2,16 @@
 body {
 
 }
+#v_blocker{
+    top: 0px;
+    left: 0px;
+    position: fixed;
+    background-color: #cccccc;
+    opacity: 0.3;
+    width:4000px;
+    height:4000px;
+
+}
 .sender{
     width: 20%;
     height: 25%;
@@ -9,15 +19,18 @@ body {
     border-radius:10%;
 
 }
+.sender:hover{
+    opacity: 0.2;
+}
 .Senderliste{
     clear:both;
     width: 80%;
-    margin-top: 5%;
+    padding-top:2%;
     margin-left: 20%;
 }
 
-#Screen{
-
+#Login_Screen{
+    background-image: url("Sender-Logos/4236532-background-images.jpg");
     background-color: white;
     position: absolute;
     z-index: 10;
@@ -27,17 +40,27 @@ body {
     border-style: groove;
 }
 
+#main_site{
+    /*visibility: hidden;*/
+}
 
+.Searchbar{
+    margin-left: 20%;
+}
 
-
-
+#logout_btn{
+    cursor: pointer;
+}
+#fav_btn{
+    cursor: pointer;
+}
 /* ##################### Für Login/Registrieren #################################### */
 
 
 input[type=text], input[type=password] {
     width: 100%;
     padding: 12px 20px;
-    margin: 8px 0;
+
     display: inline-block;
     border: 1px solid #ccc;
     box-sizing: border-box;
@@ -45,8 +68,8 @@ input[type=text], input[type=password] {
 }
 
 button {
-    background-color: #4CAF50;
-
+    background-color: #313131;
+    color: white;
     padding: 14px 20px;
     margin: 8px 0;
     border: none;
@@ -70,12 +93,19 @@ span.psw {
 }
 
 /* Change styles for span and cancel button on extra small screens */
-@media screen and (max-width: 300px) {
+@media screen and (max-width: 400px) {
     span.psw {
         display: block;
         float: none;
     }
-    .cancelbtn {
+    #Login_Screen{
+        width: 40%;
+        margin-left: 40%;
+    }
+    #fav_btn{
+        width: 100%;
+    }
+    #logout_btn{
         width: 100%;
     }
 }
@@ -83,8 +113,7 @@ span.psw {
 
 .tab {
     overflow: hidden;
-    border: 1px solid #ccc;
-    background-color: #f1f1f1;
+    background-image: url("Sender-Logos/4236532-background-images.jpg");
 }
 
 /* Style the buttons that are used to open the tab content */
@@ -96,6 +125,7 @@ span.psw {
     cursor: pointer;
     padding: 14px 16px;
     transition: 0.3s;
+    width: 50%;
 }
 
 /* Change background color of buttons on hover */

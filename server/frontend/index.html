@@ -1,27 +1,28 @@
+<html lang="de">
+<head>
 
-<html lang= "de">
-    <head>
-        
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-        <link type="text/css" rel="stylesheet" href="main.css">
-        <script src="js/main.js"></script>
-    </head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <link type="text/css" rel="stylesheet" href="main.css">
+    <script src="js/main.js"></script>
+</head>
 
-    <body>
-    <div id="Screen">
+<body>
+<div id="v_blocker">
+</div>
+<div id="Login_Screen">
     <div class="tab">
-        <button id="defaultOpener" class="tablinks" onclick="openCity(event, 'logins')" >Login</button>
-        <button class="tablinks" onclick="openCity(event, 'registrieren')">Registieren</button>
+        <button id="defaultOpener" class="tablinks" onclick="open_L_R(event, 'logins')">Login</button>
+        <button class="tablinks" onclick="open_L_R(event, 'registrieren')">Registieren</button>
     </div>
 
-    <div id="logins"  class="tabcontent">
+    <div id="logins" class="tabcontent">
         <form action="/login/" method="post">
             <div class="container">
-                <label for="uname"><b>Username</b></label>
+                <label for="uname" style="color: white"><b>Username</b></label>
                 <input type="text" placeholder="Enter Username" name="uname" required>
 
-                <label for="psw"><b>Password</b></label>
+                <label for="psw" style="color: white"><b>Password</b></label>
                 <input type="password" placeholder="Enter Password" name="psw" required>
 
                 <button type="submit">Login</button>
@@ -29,14 +30,19 @@
         </form>
     </div>
     <div class="tabcontent" id="registrieren">
+        <div class="container">
+            hier kommt noch etwas
+        </div>
+    </div>
+</div>
+<script>
+    document.getElementById('defaultOpener').click();
+</script>
 
-    </div>
-    </div>
-    <script>
-        document.getElementById('defaultOpener').click();
-    </script>
+
+<div id="main_site">
     <div id="favorite" style="width: 10%;float: left">
-        <img src="Sender-Logos/favoritenlite.JPG" style="width: 50px">
+        <img id="fav_btn" src="Sender-Logos/favoritenlite.JPG" width="30%">
     </div>
 
     <div class="Searchbar" style="width: 50%;float: left">
@@ -44,10 +50,10 @@
     </div>
 
     <div id="logout" style="width: 10%;float: right">
-        <img src="Sender-Logos/logout.png" style="width: 50px; margin-left: 80px" >
+        <img id="logout_btn" src="Sender-Logos/logout.png" width="30%;" style="float: right;">
     </div>
 
-    <div class="Senderliste" onload="init()" >
+    <div class="Senderliste">
         <from>
             <input id="ard" type="image" src="Sender-Logos/ard.png" class="sender">
             <input id="zdf" type="image" src="Sender-Logos/zdf.png" class="sender">
@@ -69,8 +75,8 @@
             <input id="DW" type="image" src="Sender-Logos/DW.png" class="sender">
         </from>
     </div>
-    </body>
-
+</div>
+</body>
 
 
 </html>

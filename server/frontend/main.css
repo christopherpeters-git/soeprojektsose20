@@ -1,135 +1,115 @@
 
 body {
-	margin: 0;
-	background-color: #fff;
-	color: #fff;
-	font-family: Monospace;
-	font-size: 13px;
-    line-height: 24px;
-    display: flex;
-    flex-flow: row wrap;
-    max-width: 65em;
-    border: 2px;
-    overflow: scroll;
-    position: fixed;
-    left: 200px;
-    bottom: 100px;
+
+}
+.sender{
+    width: 20%;
+    height: 25%;
+    border-style: groove;
+    border-radius:10%;
+
+}
+.Senderliste{
+    clear:both;
+    width: 80%;
+    margin-top: 5%;
+    margin-left: 20%;
 }
 
-#ard{
-    width: 15%;
-    height: auto;
-    flex-direction: row;
-    flex-wrap: wrap;
-    
-    
+#Screen{
+
+    background-color: white;
+    position: absolute;
+    z-index: 10;
+    width: 20%;
+    margin-left: 45%;
+    margin-top: 10%;
+    border-style: groove;
 }
 
-#zdf{
-    width: 15%;
-    height: auto;
-    flex-direction: row;
-    flex-wrap: wrap;
+input[type=text], input[type=password] {
+    width: 100%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+
 }
 
-#phoenix{
-    width: 15%;
-    height: auto;
-    flex-direction: row;
-    flex-wrap: wrap;
+button {
+    background-color: #4CAF50;
+
+    padding: 14px 20px;
+    margin: 8px 0;
+    border: none;
+    cursor: pointer;
+    width: 100%;
 }
 
-#dreisat{
-    width: 15%;
-    height: auto;
-    flex-direction: row;
-    flex-wrap: wrap;
+button:hover {
+    opacity: 0.8;
 }
 
-#ndr{
-    width: 15%;
-    height: auto;
-    flex-direction: row;
-    flex-wrap: wrap;
+
+
+.container {
+    padding: 16px;
 }
 
-#wdr{
-    width: 15%;
-    height: auto;
-    flex-direction: row;
-    flex-wrap: wrap;
+span.psw {
+    float: right;
+    padding-top: 16px;
 }
 
-#mdr{
-    width: 15%;
-    height: auto;
-    flex-direction: row;
-    flex-wrap: wrap;
+/* Change styles for span and cancel button on extra small screens */
+@media screen and (max-width: 300px) {
+    span.psw {
+        display: block;
+        float: none;
+    }
+    .cancelbtn {
+        width: 100%;
+    }
 }
 
-#rbb{
-    width: 15%;
-    height: auto;
-    flex-direction: row;
+
+
+
+.tab {
+    overflow: hidden;
+    border: 1px solid #ccc;
+    background-color: #f1f1f1;
 }
 
-#hr{
-    width: 15%;
-    height: auto;
-    flex-direction: row;
+/* Style the buttons that are used to open the tab content */
+.tab button {
+    background-color: inherit;
+    float: left;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 14px 16px;
+    transition: 0.3s;
 }
 
-#orf{
-    width: 15%;
-    height: auto;
-    flex-direction: row;
+/* Change background color of buttons on hover */
+.tab button:hover {
+    background-color: #ddd;
 }
 
-#sr{
-    width: 15%;
-    height: auto;
-    flex-direction: row;
+/* Create an active/current tablink class */
+.tab button.active {
+    background-color: #ccc;
 }
 
-#srf{
-    width: 15%;
-    height: auto;
-    flex-direction: row;
+/* Style the tab content */
+.tabcontent {
+    display: none;
+    padding: 6px 12px;
+    border: 1px solid black;
+    border-top: none;
 }
 
-#swr{
-    width: 15%;
-    height: auto;
-    flex-direction: row;
-}
 
-#arte{
-    width:15%;
-    height: auto;
-    flex-direction: row;
-}
-
-#kika{
-    width: 15%;
-    height: auto;
-    flex-direction: row;
-}
-
-#br{
-    width: 15%;
-    height: auto;
-    flex-direction: row;
-}
-
-#rb{
-    width: 15%;
-    height: auto;
-    flex-direction: row;
-}
-
-#DW{
-    width: 15%;
-    height: auto;
-    flex-direction: row;
-}
 

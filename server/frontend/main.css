@@ -27,6 +27,13 @@ body {
     border-style: groove;
 }
 
+
+
+
+
+/* ##################### Für Login/Registrieren #################################### */
+
+
 input[type=text], input[type=password] {
     width: 100%;
     padding: 12px 20px;
@@ -72,8 +79,6 @@ span.psw {
         width: 100%;
     }
 }
-
-
 
 
 .tab {

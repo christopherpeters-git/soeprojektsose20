@@ -176,11 +176,6 @@ func handleGetVideos(w http.ResponseWriter, r *http.Request) {
 	log.Print("Answered handleGetVideos request successfully...")
 }
 
-func handleGetUserCookie(w http.ResponseWriter, r *http.Request) {
-	//TODO
-	//Post requst with user credentials
-}
-
 //TODO
 func handleGetUserInformation(w http.ResponseWriter, r *http.Request) {
 	//Unter der Annahme, dass kein login cookie verwendet wird

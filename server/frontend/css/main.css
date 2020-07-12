@@ -30,7 +30,7 @@ body {
 }
 
 #Login_Screen{
-    background-image: url("Sender-Logos/4236532-background-images.jpg");
+    background-image: url("../Sender-Logos/4236532-background-images.jpg");
     background-color: white;
     position: absolute;
     z-index: 10;
@@ -113,7 +113,7 @@ span.psw {
 
 .tab {
     overflow: hidden;
-    background-image: url("Sender-Logos/4236532-background-images.jpg");
+    background-image: url("../Sender-Logos/4236532-background-images.jpg");
 }
 
 /* Style the buttons that are used to open the tab content */

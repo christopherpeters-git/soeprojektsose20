@@ -74,7 +74,7 @@ function requestVideos() {
 
 function searchThroughDatabase() {
     console.log("Starte Suche...");
-    let searchInput = document.getElementById("searchInput");
+    let searchInput = document.getElementById("searchInput").value;
     if(searchInput === "") {
         console.log("Leerer Eintrag, keine Suche durchgeführt");
         return;

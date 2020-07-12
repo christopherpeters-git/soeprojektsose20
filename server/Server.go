@@ -22,12 +22,13 @@ import (
 //URL's
 var IncomingGetVideosRequestUrl = "/getVideos/"
 var IncomingPostUserRequestUrl = "/login/"
+var IncomingPostRegisterRequestUrl = "/register/"
 
 //Error messages
 var InternalServerErrorResponse = "Internal server error - see logs"
 
 //db connection names
-var userDBconnectionName = "users"
+var userDBconnectionName = "userdb"
 
 //Paths
 var crawlerDirName = "crawler"
@@ -88,11 +89,12 @@ func main() {
 	parseVideosFromJson()
 	//Connect do database
 	defer initDataBaseConnection("mysql", "root", "soe2020", "localhost:3306", userDBconnectionName, userDBconnectionName).Close()
-	log.Print("Server has started...")
 
+	log.Print("Server has started...")
 	http.Handle("/", http.FileServer(http.Dir("test_frontend/")))
 	http.HandleFunc(IncomingGetVideosRequestUrl, handleGetVideos)
 	http.HandleFunc(IncomingPostUserRequestUrl, handleGetUserInformation)
+	http.HandleFunc(IncomingPostRegisterRequestUrl, handleRegisterUser)
 	err = http.ListenAndServe(":80", nil)
 	if err != nil {
 		log.Fatal("Starting Server failed: " + err.Error())
@@ -163,6 +165,67 @@ func parseVideosFromJson() {
 //**************************************</Helpers>************************************************************************
 
 //**************************************<Handlers>***********************************************************************
+func handleRegisterUser(w http.ResponseWriter, r *http.Request) {
+	log.Print("answering handleRegisterUser request ...")
+
+	//Checking db connection
+	userDB := dbConnections[userDBconnectionName]
+	err := userDB.Ping()
+	if err != nil {
+		reportError(w, 500, InternalServerErrorResponse, "Database connection failed: \n"+err.Error())
+		return
+	}
+	//Parse username and password from request
+	err = r.ParseForm()
+	if err != nil {
+		reportError(w, 400, "Invalid request parameters", "Parameter parsing error: "+err.Error())
+
+	}
+	incomingUsername := r.FormValue("usernameInput")
+	incomingName := r.FormValue("nameInput")
+	incomingPassword := r.FormValue("passwordInput")
+	//Check if any of the recieved information is empty
+	if len(incomingUsername) < 1 || len(incomingName) < 1 || len(incomingPassword) < 1 {
+		reportError(w, 400, "Send Information must not be empty", "one or more received strings is empty\n")
+		return
+	}
+	//Get userdata from db for comparison
+	rows, err := userDB.Query("select * from users where username = ?", incomingUsername)
+	if err != nil {
+		reportError(w, 500, InternalServerErrorResponse, "Sql query failed: \n"+err.Error())
+		return
+	}
+	//Check if username is in use
+	var user DB_User
+	for rows.Next() {
+		err = rows.Scan(&user.id, &user.name, &user.username, &user.passwordHash)
+		if err != nil {
+			reportError(w, 500, InternalServerErrorResponse, "Scanning rows failed: \n"+err.Error())
+			return
+		}
+		if user.username == incomingUsername {
+			reportError(w, 400, "Username taken", "Username taken: "+user.username)
+			return
+		}
+	}
+	//Hash incoming password
+	passwordHash, err := bcrypt.GenerateFromPassword([]byte(incomingPassword), bcrypt.MinCost)
+	log.Printf("User created: Name: %s username: %s passwordhash: %s", incomingName, incomingUsername, string(passwordHash))
+	if err != nil {
+		reportError(w, 500, InternalServerErrorResponse, "Hashing password '"+incomingPassword+"' failed: \n"+err.Error())
+		return
+	}
+	//Create user in database
+	_, err = userDB.Exec("INSERT INTO users (Name,Username,PasswordHash)\nValues(?,?,?)", incomingName, incomingUsername, string(passwordHash))
+	if err != nil {
+		reportError(w, 500, InternalServerErrorResponse, "SQL insert failed: \n"+err.Error())
+		return
+	}
+	w.WriteHeader(200)
+	w.Write([]byte("Created a new User account"))
+	log.Print("answered handleRegisterUser request successfully")
+}
+
 func handleGetVideos(w http.ResponseWriter, r *http.Request) {
 	log.Print("Answering handleGetVideos request...")
 	//Writing the result set to the responseWriter as a json-string
@@ -178,8 +241,6 @@ func handleGetVideos(w http.ResponseWriter, r *http.Request) {
 
 //TODO
 func handleGetUserInformation(w http.ResponseWriter, r *http.Request) {
-	//Unter der Annahme, dass kein login cookie verwendet wird
-
 	log.Print("answering handleGetUserInformation request ...")
 
 	//Checking db connection
@@ -193,12 +254,11 @@ func handleGetUserInformation(w http.ResponseWriter, r *http.Request) {
 	err = r.ParseForm()
 	if err != nil {
 		reportError(w, 400, "Invalid request parameters", "Parameter parsing error: "+err.Error())
-
 	}
 	incomingUsername := r.FormValue("username")
 	incomingPassword := r.FormValue("password")
 	//Get userdata from db for comparison
-	rows, err := userDB.Query("select * from user where username = ?", incomingUsername)
+	rows, err := userDB.Query("select * from users where username = ?", incomingUsername)
 	if err != nil {
 		reportError(w, 500, InternalServerErrorResponse, "Sql query failed: \n"+err.Error())
 		return
@@ -220,7 +280,7 @@ func handleGetUserInformation(w http.ResponseWriter, r *http.Request) {
 			log.Println("Entered Password is correct")
 		}
 	} else {
-		reportError(w, 404, "Wrong username", "Empty sql result set \n")
+		reportError(w, 404, "User not found", "Empty sql result set \n")
 		return
 	}
 

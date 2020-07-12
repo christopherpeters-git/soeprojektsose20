@@ -3,7 +3,6 @@ body{
 }
 
 #upperBody{
-    z-index: 2;
     width: 100%;
     margin: auto;
     text-align: center;
@@ -22,9 +21,7 @@ body{
 }
 
 #iconSearchbar{
-    height: 33px;
-    position: relative;
-    top: 11px;
+
     margin: auto;
     cursor: pointer;
     border-radius: 5px;

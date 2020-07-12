@@ -1,1 +1,83 @@
+<html lang="de">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <link type="text/css" rel="stylesheet" href="css/main.css">
+    <link type="text/css" rel="stylesheet" href="css/index.css">
+    <script src="js/main.js"></script>
+</head>
 
+<body>
+<div id="v_blocker">
+</div>
+<div id="Login_Screen">
+    <div class="tab">
+        <button id="defaultOpener" class="tablinks" onclick="open_L_R(event, 'logins')">Login</button>
+        <button class="tablinks" onclick="open_L_R(event, 'registrieren')">Registieren</button>
+    </div>
+
+    <div id="logins" class="tabcontent">
+        <form action="/login/" method="post">
+            <div class="container">
+                <label for="uname" style="color: white"><b>Username</b></label>
+                <input type="text" placeholder="Enter Username" name="uname" required>
+
+                <label for="psw" style="color: white"><b>Password</b></label>
+                <input type="password" placeholder="Enter Password" name="psw" required>
+
+                <button type="submit">Login</button>
+            </div>
+        </form>
+    </div>
+    <div class="tabcontent" id="registrieren">
+        <div class="container">
+            hier kommt noch etwas
+        </div>
+    </div>
+</div>
+<script>
+    document.getElementById('defaultOpener').click();
+</script>
+
+
+<div id="main_site">
+    <div id="favorite" style="width: 10%;float: left">
+        <img id="fav_btn" src="Sender-Logos/favoritenlite.JPG" width="30%">
+    </div>
+
+    <div class="Searchbar" style="width: 50%;float: left">
+        <input id="searchInput" type="text" placeholder="Suchbegriff eingeben" size="70" style="position: center">
+        <img src="media/images/icon_Search.png" id="iconSearchbar" onclick="searchThroughDatabase()" title="Suche starten">
+    </div>
+
+    <div id="logout" style="width: 10%;float: right">
+        <img id="logout_btn" src="Sender-Logos/logout.png" width="30%;" style="float: right;">
+    </div>
+
+    <div class="Senderliste">
+        <from>
+            <input id="ard" type="image" src="Sender-Logos/ard.png" class="sender">
+            <input id="zdf" type="image" src="Sender-Logos/zdf.png" class="sender">
+            <input id="phoenix" type="image" src="Sender-Logos/phoenix.png" class="sender">
+            <input id="dreisat" type="image" src="Sender-Logos/3sat.png" class="sender">
+            <input id="ndr" type="image" src="Sender-Logos/ndr.png" class="sender">
+            <input id="wdr" type="image" src="Sender-Logos/wdr.png" class="sender">
+            <input id="mdr" type="image" src="Sender-Logos/mdr.png" class="sender">
+            <input id="rbb" type="image" src="Sender-Logos/rbb.png" class="sender">
+            <input id="hr" type="image" src="Sender-Logos/hr.png" class="sender">
+            <input id="orf" type="image" src="Sender-Logos/orf.png" class="sender">
+            <input id="sr" type="image" src="Sender-Logos/sr.png" class="sender">
+            <input id="srf" type="image" src="Sender-Logos/SRF.PNG" class="sender">
+            <input id="swr" type="image" src="Sender-Logos/swr.png" class="sender">
+            <input id="arte" type="image" src="Sender-Logos/arte.png" class="sender">
+            <input id="kika" type="image" src="Sender-Logos/Kika.PNG" class="sender">
+            <input id="br" type="image" src="Sender-Logos/br.png" class="sender">
+            <input id="rb" type="image" src="Sender-Logos/radio bremen.png" class="sender">
+            <input id="DW" type="image" src="Sender-Logos/DW.png" class="sender">
+        </from>
+    </div>
+</div>
+</body>
+
+
+</html>

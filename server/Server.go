@@ -1,5 +1,11 @@
 package main
 
+//TODO
+/*
+-Beim Start: Video sortieren nach Namen, dann nach shows
+-Server gibt nur Videos von channel wieder, welcher in der request übergebenwird
+*/
+
 import (
 	lib "./library"
 	"database/sql"

@@ -1,6 +1,4 @@
-function init() {
-    const senderlist = document.getElementsByClassName("Senderliste");
-}
+
 
 
 

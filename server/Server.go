@@ -44,7 +44,7 @@ type Video struct {
 	Duration    string `json:"duration"`
 	Link        string `json:"link"`
 	PageLink    string `json:"pageLink"`
-	FileName    string `json:"fileName"` //Shouldnt be used
+	FileName    string `json:"fileName"`
 }
 
 type User struct {
@@ -179,7 +179,7 @@ func handleRegisterUser(w http.ResponseWriter, r *http.Request) {
 	err = r.ParseForm()
 	if err != nil {
 		reportError(w, 400, "Invalid request parameters", "Parameter parsing error: "+err.Error())
-
+		return
 	}
 	incomingUsername := r.FormValue("usernameInput")
 	incomingName := r.FormValue("nameInput")
@@ -223,7 +223,7 @@ func handleRegisterUser(w http.ResponseWriter, r *http.Request) {
 	}
 	w.WriteHeader(200)
 	w.Write([]byte("Created a new User account"))
-	log.Print("answered handleRegisterUser request successfully")
+	log.Println("answered handleRegisterUser request successfully")
 }
 
 func handleGetVideos(w http.ResponseWriter, r *http.Request) {
@@ -255,8 +255,8 @@ func handleGetUserInformation(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		reportError(w, 400, "Invalid request parameters", "Parameter parsing error: "+err.Error())
 	}
-	incomingUsername := r.FormValue("username")
-	incomingPassword := r.FormValue("password")
+	incomingUsername := r.FormValue("usernameInput")
+	incomingPassword := r.FormValue("passwordInput")
 	//Get userdata from db for comparison
 	rows, err := userDB.Query("select * from users where username = ?", incomingUsername)
 	if err != nil {
@@ -285,7 +285,7 @@ func handleGetUserInformation(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//Getting the informations about the user
-	rows, err = userDB.Query("select * from User_has_favorite_videos where User_Username = ?", incomingUsername)
+	rows, err = userDB.Query("select * from user_has_favorite_videos where Users_Username = ?", incomingUsername)
 	if err != nil {
 		reportError(w, 500, InternalServerErrorResponse, "Sql query failed: \n"+err.Error())
 		return

@@ -2,7 +2,6 @@ package main
 
 //TODO
 /*
--Beim Start: Video sortieren nach Namen, dann nach shows
 -Server gibt nur Videos von channel wieder, welcher in der request übergebenwird
 */
 
@@ -20,19 +19,23 @@ import (
 
 //**********************<Constants>**********************************
 //URL's
-var IncomingGetVideosRequestUrl = "/getVideos/"
-var IncomingPostUserRequestUrl = "/login/"
-var IncomingPostRegisterRequestUrl = "/register/"
+const IncomingGetVideosRequestUrl = "/getVideos/"
+const IncomingPostUserRequestUrl = "/login/"
+const IncomingPostRegisterRequestUrl = "/register/"
+const IncomingGetVideosFromChannelRequestUrl = "/getVideoByChannel"
+
+//Parameter
+const channelNameParameter = "channel"
 
 //Error messages
-var InternalServerErrorResponse = "Internal server error - see logs"
+const internalServerErrorResponse = "Internal server error - see logs"
 
 //db connection names
-var userDBconnectionName = "userdb"
+const userDBconnectionName = "userdb"
 
 //Paths
-var crawlerDirName = "crawler"
-var videoJsonPath = crawlerDirName + "/good.json"
+const crawlerDirName = "crawler"
+const videoJsonPath = crawlerDirName + "/good.json"
 
 //**********************</Constants>**********************************
 
@@ -67,7 +70,8 @@ type DB_User struct {
 	passwordHash string
 }
 
-var videos = make([]Video, 0)
+var allVideos = make([]Video, 0)
+var videosSortedAfterChannels = make(map[string]map[string][]Video)
 
 var dbConnections = make(map[string]*sql.DB)
 
@@ -87,12 +91,14 @@ func main() {
 		log.Fatal(err.Error())
 	}
 	parseVideosFromJson()
+	sortByChannelAndShow()
 	//Connect do database
 	defer initDataBaseConnection("mysql", "root", "soe2020", "localhost:3306", userDBconnectionName, userDBconnectionName).Close()
 
 	log.Print("Server has started...")
 	http.Handle("/", http.FileServer(http.Dir("test_frontend/")))
-	http.HandleFunc(IncomingGetVideosRequestUrl, handleGetVideos)
+	http.HandleFunc(IncomingGetVideosRequestUrl, handleGetAllVideos)
+	http.HandleFunc(IncomingGetVideosFromChannelRequestUrl, handleGetVideosFromChannel)
 	http.HandleFunc(IncomingPostUserRequestUrl, handleGetUserInformation)
 	http.HandleFunc(IncomingPostRegisterRequestUrl, handleRegisterUser)
 	err = http.ListenAndServe(":80", nil)
@@ -102,6 +108,30 @@ func main() {
 }
 
 //**************************************<Helpers>************************************************************************
+//Sorts allVideos after Channels and Shows and loads them into a map
+func sortByChannelAndShow() { //channel          //show Array
+	log.Println("Started sorting...")
+	for _, video := range allVideos {
+		if videosSortedAfterChannels[video.Channel] == nil {
+			videosSortedAfterChannels[video.Channel] = make(map[string][]Video)
+		}
+		if videosSortedAfterChannels[video.Channel][video.Show] == nil {
+			videosSortedAfterChannels[video.Channel][video.Show] = make([]Video, 0)
+		}
+		videosSortedAfterChannels[video.Channel][video.Show] = append(videosSortedAfterChannels[video.Channel][video.Show], video)
+	}
+	//for k,v := range videosSortedAfterChannels{
+	//   log.Println("key: "+ k)
+	//   for k1, v1 := range v{
+	//       log.Print(" show"+ k1)
+	//       for _,v2 := range v1{
+	//           log.Print(" "+ v2.Title)
+	//       }
+	//   }
+	//}
+	log.Println("Sorting finished!")
+}
+
 func initDataBaseConnection(driverName string, user string, password string, url string, dbName string, idName string) *sql.DB {
 	//Open and check the sql-databse connection
 	db, err := sql.Open(driverName,
@@ -145,11 +175,11 @@ func parseVideosFromJson() {
 			PageLink:    videoEntry[6],
 			FileName:    videoEntry[7],
 		}
-		videos = append(videos, video)
+		allVideos = append(allVideos, video)
 	}
 
 	//Testing
-	//for _, a := range videos{
+	//for _, a := range allVideos{
 	//	log.Print(a.channel)
 	//	log.Print(a.duration)
 	//	log.Print(a.fileName)
@@ -165,6 +195,25 @@ func parseVideosFromJson() {
 //**************************************</Helpers>************************************************************************
 
 //**************************************<Handlers>***********************************************************************
+func handleGetVideosFromChannel(w http.ResponseWriter, r *http.Request) {
+	log.Print("Answering handleGetAllVideos request started...")
+	queryResults, ok := r.URL.Query()[channelNameParameter]
+	if !ok || len(queryResults) < 1 {
+		reportError(w, 400, "url parameter unkown", "Cant find parameter "+channelNameParameter)
+		return
+	}
+	channel := queryResults[0]
+	log.Println("Content of parameter '" + channelNameParameter + "': " + channel)
+	resultSetInBytes, err := json.MarshalIndent(videosSortedAfterChannels[channel], "", " ")
+	if err != nil {
+		reportError(w, 500, internalServerErrorResponse, "Marshaling failed: \n"+err.Error())
+		return
+	}
+	w.WriteHeader(200)
+	w.Write(resultSetInBytes)
+	log.Print("Answered handleGetAllVideos request successfully...")
+}
+
 func handleRegisterUser(w http.ResponseWriter, r *http.Request) {
 	log.Print("answering handleRegisterUser request ...")
 
@@ -172,7 +221,7 @@ func handleRegisterUser(w http.ResponseWriter, r *http.Request) {
 	userDB := dbConnections[userDBconnectionName]
 	err := userDB.Ping()
 	if err != nil {
-		reportError(w, 500, InternalServerErrorResponse, "Database connection failed: \n"+err.Error())
+		reportError(w, 500, internalServerErrorResponse, "Database connection failed: \n"+err.Error())
 		return
 	}
 	//Parse username and password from request
@@ -192,7 +241,7 @@ func handleRegisterUser(w http.ResponseWriter, r *http.Request) {
 	//Get userdata from db for comparison
 	rows, err := userDB.Query("select * from users where username = ?", incomingUsername)
 	if err != nil {
-		reportError(w, 500, InternalServerErrorResponse, "Sql query failed: \n"+err.Error())
+		reportError(w, 500, internalServerErrorResponse, "Sql query failed: \n"+err.Error())
 		return
 	}
 	//Check if username is in use
@@ -200,7 +249,7 @@ func handleRegisterUser(w http.ResponseWriter, r *http.Request) {
 	for rows.Next() {
 		err = rows.Scan(&user.id, &user.name, &user.username, &user.passwordHash)
 		if err != nil {
-			reportError(w, 500, InternalServerErrorResponse, "Scanning rows failed: \n"+err.Error())
+			reportError(w, 500, internalServerErrorResponse, "Scanning rows failed: \n"+err.Error())
 			return
 		}
 		if user.username == incomingUsername {
@@ -212,13 +261,13 @@ func handleRegisterUser(w http.ResponseWriter, r *http.Request) {
 	passwordHash, err := bcrypt.GenerateFromPassword([]byte(incomingPassword), bcrypt.MinCost)
 	log.Printf("User created: Name: %s username: %s passwordhash: %s", incomingName, incomingUsername, string(passwordHash))
 	if err != nil {
-		reportError(w, 500, InternalServerErrorResponse, "Hashing password '"+incomingPassword+"' failed: \n"+err.Error())
+		reportError(w, 500, internalServerErrorResponse, "Hashing password '"+incomingPassword+"' failed: \n"+err.Error())
 		return
 	}
 	//Create user in database
 	_, err = userDB.Exec("INSERT INTO users (Name,Username,PasswordHash)\nValues(?,?,?)", incomingName, incomingUsername, string(passwordHash))
 	if err != nil {
-		reportError(w, 500, InternalServerErrorResponse, "SQL insert failed: \n"+err.Error())
+		reportError(w, 500, internalServerErrorResponse, "SQL insert failed: \n"+err.Error())
 		return
 	}
 	w.WriteHeader(200)
@@ -226,20 +275,19 @@ func handleRegisterUser(w http.ResponseWriter, r *http.Request) {
 	log.Println("answered handleRegisterUser request successfully")
 }
 
-func handleGetVideos(w http.ResponseWriter, r *http.Request) {
-	log.Print("Answering handleGetVideos request...")
+func handleGetAllVideos(w http.ResponseWriter, r *http.Request) {
+	log.Print("Answering handleGetAllVideos request...")
 	//Writing the result set to the responseWriter as a json-string
-	resultSetInBytes, err := json.MarshalIndent(videos, "", " ")
+	resultSetInBytes, err := json.MarshalIndent(allVideos, "", " ")
 	if err != nil {
-		reportError(w, 500, InternalServerErrorResponse, "Marshaling failed: \n"+err.Error())
+		reportError(w, 500, internalServerErrorResponse, "Marshaling failed: \n"+err.Error())
 		return
 	}
 	w.WriteHeader(200)
 	w.Write(resultSetInBytes)
-	log.Print("Answered handleGetVideos request successfully...")
+	log.Print("Answered handleGetAllVideos request successfully...")
 }
 
-//TODO
 func handleGetUserInformation(w http.ResponseWriter, r *http.Request) {
 	log.Print("answering handleGetUserInformation request ...")
 
@@ -247,7 +295,7 @@ func handleGetUserInformation(w http.ResponseWriter, r *http.Request) {
 	userDB := dbConnections[userDBconnectionName]
 	err := userDB.Ping()
 	if err != nil {
-		reportError(w, 500, InternalServerErrorResponse, "Database connection failed: \n"+err.Error())
+		reportError(w, 500, internalServerErrorResponse, "Database connection failed: \n"+err.Error())
 		return
 	}
 	//Parse username and password from request
@@ -260,14 +308,14 @@ func handleGetUserInformation(w http.ResponseWriter, r *http.Request) {
 	//Get userdata from db for comparison
 	rows, err := userDB.Query("select * from users where username = ?", incomingUsername)
 	if err != nil {
-		reportError(w, 500, InternalServerErrorResponse, "Sql query failed: \n"+err.Error())
+		reportError(w, 500, internalServerErrorResponse, "Sql query failed: \n"+err.Error())
 		return
 	}
 	var user User
 	if rows.Next() {
 		err := rows.Scan(&user.Id, &user.Name, &user.Username, &user.passwordHash)
 		if err != nil {
-			reportError(w, 500, InternalServerErrorResponse, "Scanning rows failed: \n"+err.Error())
+			reportError(w, 500, internalServerErrorResponse, "Scanning rows failed: \n"+err.Error())
 			return
 		}
 		log.Println("User from Query: username: " + user.Username + " passwordhash: " + user.passwordHash)
@@ -287,7 +335,7 @@ func handleGetUserInformation(w http.ResponseWriter, r *http.Request) {
 	//Getting the informations about the user
 	rows, err = userDB.Query("select * from user_has_favorite_videos where Users_Username = ?", incomingUsername)
 	if err != nil {
-		reportError(w, 500, InternalServerErrorResponse, "Sql query failed: \n"+err.Error())
+		reportError(w, 500, internalServerErrorResponse, "Sql query failed: \n"+err.Error())
 		return
 	}
 	user.FavoriteVideos = make([]Video, 0)
@@ -296,13 +344,13 @@ func handleGetUserInformation(w http.ResponseWriter, r *http.Request) {
 	for rows.Next() {
 		err := rows.Scan(&username, &videoStr)
 		if err != nil {
-			reportError(w, 500, InternalServerErrorResponse, "Scanning rows failed: \n"+err.Error())
+			reportError(w, 500, internalServerErrorResponse, "Scanning rows failed: \n"+err.Error())
 			return
 		}
 		var video Video
 		err = json.Unmarshal([]byte(videoStr), &video)
 		if err != nil {
-			reportError(w, 500, InternalServerErrorResponse, "Scanning rows failed: \n"+err.Error())
+			reportError(w, 500, internalServerErrorResponse, "Scanning rows failed: \n"+err.Error())
 			return
 		}
 		user.FavoriteVideos = append(user.FavoriteVideos, video)
@@ -311,7 +359,7 @@ func handleGetUserInformation(w http.ResponseWriter, r *http.Request) {
 	//Writing the result set to the responseWriter as a json-string
 	userInBytes, err := json.MarshalIndent(user, "", "   ")
 	if err != nil {
-		reportError(w, 500, InternalServerErrorResponse, "Marshaling failed: \n"+err.Error())
+		reportError(w, 500, internalServerErrorResponse, "Marshaling failed: \n"+err.Error())
 		return
 	}
 	w.WriteHeader(200)

@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Test</title>
+    <script src = "test.js"></script>
 </head>
 <body>
     <h2>Login</h2>
@@ -12,20 +13,25 @@
         <input type="text" id="usernameInput" name="usernameInput" value="Username"><br>
         <label for="passwordInput">Password:</label><br>
         <input type="text" id="passwordInput" name="passwordInput" value="Passwort"><br><br>
-        <input type="submit" value="Submit">
+        <input type="button" onclick="sendPostLoginRequest()">
     </form>
 
     <h2>Register</h2>
 
     <form action="/register/" method="post">
         <label for="nameInput">First and last name:</label><br>
-        <input type="text" id="nameInput" name="nameInput" value="First and last name"><br>
+        <input type="text" id="nameInput2" name="nameInput" value="First and last name"><br>
         <label for="passwordInput">Password:</label><br>
         <label for="usernameInput">Username:</label><br>
-        <input type="text" id="usernameInput" name="usernameInput" value="Username"><br>
+        <input type="text" id="usernameInput2" name="usernameInput" value="Username"><br>
         <label for="passwordInput">Password:</label><br>
-        <input type="text" id="passwordInput" name="passwordInput" value="Passwort"><br><br>
-        <input type="submit" value="Submit">
+        <input type="text" id="passwordInput2" name="passwordInput" value="Passwort"><br><br>
+        <input type="button" onclick="sendPostRegisterRequest()">
     </form>
+
+    <button onclick="sendPostFavoriteRequest()"> favorite</button>
+
+
+    <button onclick="sendGetClickedVideos()"> click</button>
 </body>
 </html>

@@ -301,7 +301,7 @@ func handlePostAddVideoToFavorites(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	log.Println("Video: " + incomingVideo)
-	_, err = userDB.Exec("INSERT INTO user_has_favorite_videos (Users_Username,Videos_Video) \n Values(?,?)", incomingUsername, incomingVideo)
+	_, err = userDB.Exec("INSERT INTO user_has_favorite_videos (Users_Username,Video) \n Values(?,?)", incomingUsername, incomingVideo)
 	if err != nil {
 		reportError(w, 500, InternalServerErrorResponse, "SQL insert failed: \n"+err.Error())
 		return
@@ -444,7 +444,7 @@ func handleGetUserInformation(w http.ResponseWriter, r *http.Request) {
 		var video Video
 		err = json.Unmarshal([]byte(videoStr), &video)
 		if err != nil {
-			reportError(w, 500, InternalServerErrorResponse, "Scanning rows failed: \n"+err.Error())
+			reportError(w, 500, InternalServerErrorResponse, "unmarshalling failed: \n"+err.Error())
 			return
 		}
 		user.FavoriteVideos = append(user.FavoriteVideos, video)

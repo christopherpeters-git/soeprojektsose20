@@ -113,6 +113,6 @@ function sendGetClickedVideos(){
         }
     }
 
-    request.open("GET","/clickVideo",true);
-    request.send("?videoTitle="+"\"Plan B\" für Bayern");
+    request.open("GET","/clickVideo" +"?videoTitle="+"\"Plan B\" für Bayern",true);
+    request.send();
 }

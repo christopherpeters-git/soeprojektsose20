@@ -15,6 +15,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 )
 
 //**********************<Constants>**********************************
@@ -102,7 +103,7 @@ func main() {
 	http.Handle("/", http.FileServer(http.Dir("test_frontend/")))
 	http.HandleFunc(IncomingGetVideosRequestUrl, handleGetAllVideos)
 	http.HandleFunc(IncomingGetVideosFromChannelRequestUrl, handleGetVideosFromChannel)
-	http.HandleFunc(IncomingPostUserRequestUrl, handleGetUserInformation)
+	http.HandleFunc(IncomingPostUserRequestUrl, handlePostLoadUserInformation)
 	http.HandleFunc(IncomingPostAddToFavoritesRequestUrl, handlePostAddVideoToFavorites)
 	http.HandleFunc(IncomingGetVideoClickedRequestUrl, handleGetVideoClicked)
 	http.HandleFunc(IncomingPostRegisterRequestUrl, handleRegisterUser)
@@ -231,7 +232,7 @@ func loginUser(w http.ResponseWriter, userDB *sql.DB, user *User, incomingUserna
 //**************************************<Handlers>***********************************************************************
 func handleGetVideoClicked(w http.ResponseWriter, r *http.Request) {
 	log.Println("Answering handleGetVideoClicked request started...")
-
+	viewcount := 0
 	//Checking db connection
 	userDB := dbConnections[UserDBconnectionName]
 	err := userDB.Ping()
@@ -261,7 +262,8 @@ func handleGetVideoClicked(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		tempViews++
-		_, err = userDB.Exec("UPDATE videos SET Views = ? WHERE name = ?", tempViews, tempTitle)
+		viewcount = tempViews
+		_, err = userDB.Exec("UPDATE videos SET Views = ? WHERE VideoTitle = ?", tempViews, tempTitle)
 		if err != nil {
 			reportError(w, 500, InternalServerErrorResponse, "SQL update failed: \n"+err.Error())
 			return
@@ -269,11 +271,14 @@ func handleGetVideoClicked(w http.ResponseWriter, r *http.Request) {
 	} else {
 		_, err = userDB.Exec("INSERT INTO videos (VideoTitle,Views) \n Values(?,?) ", title, 1)
 		if err != nil {
+			viewcount = 1
 			reportError(w, 500, InternalServerErrorResponse, "SQL update failed: \n"+err.Error())
 			return
 		}
 	}
+	viewCountStr := strconv.Itoa(viewcount)
 	w.WriteHeader(200)
+	w.Write([]byte(viewCountStr))
 	log.Println("Answered handleGetVideoClicked successfully")
 }
 
@@ -404,8 +409,8 @@ func handleGetAllVideos(w http.ResponseWriter, r *http.Request) {
 	log.Print("Answered handleGetAllVideos request successfully...")
 }
 
-func handleGetUserInformation(w http.ResponseWriter, r *http.Request) {
-	log.Print("answering handleGetUserInformation request ...")
+func handlePostLoadUserInformation(w http.ResponseWriter, r *http.Request) {
+	log.Print("answering handlePostLoadUserInformation request ...")
 
 	//Checking db connection
 	userDB := dbConnections[UserDBconnectionName]
@@ -458,7 +463,7 @@ func handleGetUserInformation(w http.ResponseWriter, r *http.Request) {
 	}
 	w.WriteHeader(200)
 	w.Write(userInBytes)
-	log.Print("Answered handleGetUserInformation request successfully...")
+	log.Print("Answered handlePostLoadUserInformation request successfully...")
 }
 
 //**************************************</Handlers>***********************************************************************

@@ -1,6 +1,6 @@
-CREATE DATABASE users;
-USE users;
-CREATE TABLE User (
+CREATE DATABASE userdb;
+USE userdb;
+CREATE TABLE users (
     Id int NOT NULL AUTO_INCREMENT,
     Name varchar(255) NOT NULL,
     Username varchar(255) NOT NULL UNIQUE,
@@ -8,17 +8,16 @@ CREATE TABLE User (
     PRIMARY KEY(Id)
 );
 
-CREATE TABLE Videos (
+CREATE TABLE videos (
     Video varchar(510) NOT NULL,
     Views int DEFAULT 0 NOT NULL,
     PRIMARY KEY(Video)
 );
 
-CREATE TABLE User_has_favorite_Videos (
-    User_Username varchar(255) NOT NULL,
+CREATE TABLE user_has_favorite_videos (
+    Users_Username varchar(255) NOT NULL,
     Videos_Video varchar(510) NOT NULL,
-    PRIMARY KEY(User_Username),
-    FOREIGN KEY (User_Username) REFERENCES User(Username),
+    PRIMARY KEY(Users_Username),
+    FOREIGN KEY (Users_Username) REFERENCES users(Username),
     FOREIGN KEY (Videos_Video) REFERENCES Videos(Video)
 );
-

@@ -5,10 +5,25 @@
     <title>Test</title>
 </head>
 <body>
+    <h2>Login</h2>
+
     <form action="/login/" method="post">
-        <label for="usernameInput">First name:</label><br>
+        <label for="usernameInput">Username:</label><br>
         <input type="text" id="usernameInput" name="usernameInput" value="Username"><br>
-        <label for="passwordInput">Last name:</label><br>
+        <label for="passwordInput">Password:</label><br>
+        <input type="text" id="passwordInput" name="passwordInput" value="Passwort"><br><br>
+        <input type="submit" value="Submit">
+    </form>
+
+    <h2>Register</h2>
+
+    <form action="/register/" method="post">
+        <label for="nameInput">First and last name:</label><br>
+        <input type="text" id="nameInput" name="nameInput" value="First and last name"><br>
+        <label for="passwordInput">Password:</label><br>
+        <label for="usernameInput">Username:</label><br>
+        <input type="text" id="usernameInput" name="usernameInput" value="Username"><br>
+        <label for="passwordInput">Password:</label><br>
         <input type="text" id="passwordInput" name="passwordInput" value="Passwort"><br><br>
         <input type="submit" value="Submit">
     </form>

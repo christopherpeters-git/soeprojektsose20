@@ -35,6 +35,23 @@ function createAjaxRequest(){
     return request;
 }
 
+function sendGetSearchRequest(){
+    const request = createAjaxRequest();
+    const searchString = document.getElementById("searchInput").value;
+    request.onreadystatechange = function () {
+        if(4 === this.readyState){
+            if(200 === this.status){
+                alert(this.responseText);
+            }else{
+                alert(this.status + ":" + this.responseText);
+            }
+        }
+    }
+
+    request.open("GET","/search" +"?search="+searchString,true);
+    request.send();
+}
+
 function sendPostLoginRequest(){
     const usernameInput = document.getElementById("usernameInput").value;
     const passwordInput = document.getElementById("passwordInput").value;

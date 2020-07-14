@@ -16,20 +16,24 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 )
 
 //**********************<Constants>**********************************
 //URL's
-const IncomingGetVideosRequestUrl = "/getVideos/"
 const IncomingPostUserRequestUrl = "/login/"
 const IncomingPostRegisterRequestUrl = "/register/"
+const IncomingPostAddToFavoritesRequestUrl = "/addToFavorites/"
+
+const IncomingGetSearchRequestUrl = "/search"
 const IncomingGetVideosFromChannelRequestUrl = "/getVideoByChannel"
 const IncomingGetVideoClickedRequestUrl = "/clickVideo"
-const IncomingPostAddToFavoritesRequestUrl = "/addToFavorites/"
+const IncomingGetVideosRequestUrl = "/getVideos/"
 
 //Parameter
 const ChannelNameParameter = "channel"
 const VideoTitleParameter = "videoTitle"
+const VideoSearchParameter = "search"
 
 //Error messages
 const InternalServerErrorResponse = "Internal server error - see logs"
@@ -101,6 +105,7 @@ func main() {
 
 	log.Print("Server has started...")
 	http.Handle("/", http.FileServer(http.Dir("test_frontend/")))
+	http.HandleFunc(IncomingGetSearchRequestUrl, handleGetSearchVideos)
 	http.HandleFunc(IncomingGetVideosRequestUrl, handleGetAllVideos)
 	http.HandleFunc(IncomingGetVideosFromChannelRequestUrl, handleGetVideosFromChannel)
 	http.HandleFunc(IncomingPostUserRequestUrl, handlePostLoadUserInformation)
@@ -230,9 +235,73 @@ func loginUser(w http.ResponseWriter, userDB *sql.DB, user *User, incomingUserna
 //**************************************</Helpers>************************************************************************
 
 //**************************************<Handlers>***********************************************************************
+func handleGetSearchVideos(w http.ResponseWriter, r *http.Request) {
+	log.Println("Answering handleGetSearchVideos request started...")
+	queryResults, ok := r.URL.Query()[VideoSearchParameter]
+	if !ok || len(queryResults) < 1 {
+		reportError(w, 400, "url parameter unkown", "Cant find parameter "+VideoTitleParameter)
+		return
+	}
+	searchString := queryResults[0]
+	searchResult := make([]Video, 0)
+	videosFound := false
+	if searchString == "" || searchString == " " {
+		videosFound = true
+	}
+	//Check if searchstring is a channel
+	for k, v := range videosSortedAfterChannels {
+		if strings.EqualFold(k, searchString) {
+			for _, v2 := range v {
+				for _, video := range v2 {
+					searchResult = append(searchResult, video)
+				}
+			}
+			videosFound = true
+			break
+		}
+	}
+	//Check if searchstring is a show
+	if !videosFound {
+		for _, v := range videosSortedAfterChannels {
+			for k2, v2 := range v {
+				if strings.EqualFold(k2, searchString) {
+					searchResult = v2
+					videosFound = true
+					break
+				}
+			}
+		}
+	}
+	//Search for a substring
+	if !videosFound {
+		lowerSearchString := strings.ToLower(searchString)
+		for _, v := range videosSortedAfterChannels {
+			for _, v2 := range v {
+				for _, video := range v2 {
+					if strings.Contains(strings.ToLower(video.Title), lowerSearchString) {
+						searchResult = append(searchResult, video)
+						videosFound = true
+					}
+				}
+			}
+		}
+	}
+	if !videosFound {
+		log.Println("No Video found with: '" + searchString + "'!")
+	}
+	videosFoundJson, err := json.MarshalIndent(searchResult, "", " ")
+	if err != nil {
+		reportError(w, 500, InternalServerErrorResponse, "Marshaling failed: \n"+err.Error())
+		return
+	}
+	w.WriteHeader(200)
+	w.Write(videosFoundJson)
+	log.Println("Answered handleGetSearchVideos successfully")
+}
+
 func handleGetVideoClicked(w http.ResponseWriter, r *http.Request) {
 	log.Println("Answering handleGetVideoClicked request started...")
-	viewcount := 0
+	viewCount := 1
 	//Checking db connection
 	userDB := dbConnections[UserDBconnectionName]
 	err := userDB.Ping()
@@ -247,7 +316,7 @@ func handleGetVideoClicked(w http.ResponseWriter, r *http.Request) {
 	}
 	title := queryResults[0]
 	log.Println("Content of parameter '" + ChannelNameParameter + "': " + title)
-	//Get
+	//Get videos from db
 	rows, err := userDB.Query("select * from videos where VideoTitle = ?", title)
 	if err != nil {
 		reportError(w, 500, InternalServerErrorResponse, "Sql query failed: \n"+err.Error())
@@ -262,7 +331,7 @@ func handleGetVideoClicked(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		tempViews++
-		viewcount = tempViews
+		viewCount = tempViews
 		_, err = userDB.Exec("UPDATE videos SET Views = ? WHERE VideoTitle = ?", tempViews, tempTitle)
 		if err != nil {
 			reportError(w, 500, InternalServerErrorResponse, "SQL update failed: \n"+err.Error())
@@ -271,12 +340,12 @@ func handleGetVideoClicked(w http.ResponseWriter, r *http.Request) {
 	} else {
 		_, err = userDB.Exec("INSERT INTO videos (VideoTitle,Views) \n Values(?,?) ", title, 1)
 		if err != nil {
-			viewcount = 1
+			viewCount = 1
 			reportError(w, 500, InternalServerErrorResponse, "SQL update failed: \n"+err.Error())
 			return
 		}
 	}
-	viewCountStr := strconv.Itoa(viewcount)
+	viewCountStr := strconv.Itoa(viewCount)
 	w.WriteHeader(200)
 	w.Write([]byte(viewCountStr))
 	log.Println("Answered handleGetVideoClicked successfully")

@@ -10,9 +10,6 @@ class User{
 
 }
 
-let username;
-let password;
-
 const video =  {
     "channel": "ARD",
     "title": "\"Plan B\" für Bayern",
@@ -45,8 +42,6 @@ function sendPostLoginRequest(){
                 alert(this.responseText)
                 let user = new User("","","",null);
                 user = JSON.parse(this.responseText);
-                username = usernameInput;
-                password = passwordInput;
                 console.log(user);
             }else{
                 alert(this.status + ":" + this.responseText);
@@ -81,8 +76,7 @@ function sendPostRegisterRequest(){
 }
 
 function sendPostFavoriteRequest(){
-    const usernameInput = username;
-    const passwordInput = password;
+
     const request = createAjaxRequest();
     request.onreadystatechange = function () {
         if(4 === this.readyState){
@@ -96,7 +90,7 @@ function sendPostFavoriteRequest(){
     request.open("POST",/addToFavorites/,true);
     request.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
     console.log("" + usernameInput + " " + passwordInput);
-    request.send("usernameInput="+usernameInput+"&"+"passwordInput="+passwordInput+"&"+"video="+JSON.stringify(video));
+    request.send("video="+JSON.stringify(video));
 }
 
 

@@ -18,8 +18,8 @@ import (
 	"net/http"
 	"os"
 	"strconv"
-	"time"
 	"strings"
+	"time"
 )
 
 //**********************<Constants>**********************************
@@ -76,11 +76,6 @@ type User struct {
 	FavoriteVideos []Video
 }
 
-type DB_Video struct {
-	videoLink string
-	views     int
-}
-
 type DB_User struct {
 	id           string
 	name         string
@@ -91,7 +86,6 @@ type DB_User struct {
 
 var allVideos = make([]Video, 0)
 var videosSortedAfterChannels = make(map[string]map[string][]Video)
-
 var dbConnections = make(map[string]*sql.DB)
 
 func main() {
@@ -580,26 +574,19 @@ func handlePostLogin(w http.ResponseWriter, r *http.Request) {
 		reportError(w, 500, InternalServerErrorResponse, "Database connection failed: \n"+err.Error())
 		return
 	}
-	validCookieFound, err := isUserLoggedInWithACookie(r, userDB, &user)
+
+	//Parse username and password from request
+	err = r.ParseForm()
 	if err != nil {
-		reportError(w, 500, InternalServerErrorResponse, "Cookie validation failed: \n"+err.Error())
+		reportError(w, 400, "Invalid request parameters", "Parameter parsing error: "+err.Error())
+	}
+	incomingUsername := r.FormValue("usernameInput")
+	incomingPassword := r.FormValue("passwordInput")
+
+	if !loginUser(w, userDB, &user, incomingUsername, incomingPassword) {
 		return
 	}
 
-	log.Println("No cookie found with name: " + authCookieName)
-	if !validCookieFound {
-		//Parse username and password from request
-		err = r.ParseForm()
-		if err != nil {
-			reportError(w, 400, "Invalid request parameters", "Parameter parsing error: "+err.Error())
-		}
-		incomingUsername := r.FormValue("usernameInput")
-		incomingPassword := r.FormValue("passwordInput")
-
-		if !loginUser(w, userDB, &user, incomingUsername, incomingPassword) {
-			return
-		}
-	}
 	//Getting the informations about the user
 	rows, err := userDB.Query("select * from user_has_favorite_videos where Users_Username = ?", user.Username)
 	if err != nil {

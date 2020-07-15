@@ -9,14 +9,17 @@ import (
 	lib "./library"
 	"database/sql"
 	"encoding/json"
+	"errors"
 	_ "github.com/go-sql-driver/mysql"
 	"golang.org/x/crypto/bcrypt"
 	"io/ioutil"
 	"log"
+	"math/rand"
 	"net/http"
 	"os"
 	"strconv"
 	"strings"
+	"time"
 )
 
 //**********************<Constants>**********************************
@@ -24,6 +27,7 @@ import (
 const IncomingPostUserRequestUrl = "/login/"
 const IncomingPostRegisterRequestUrl = "/register/"
 const IncomingPostAddToFavoritesRequestUrl = "/addToFavorites/"
+const IncomingPostLogoutRequestUrl = "/logout/"
 
 const IncomingGetSearchRequestUrl = "/search"
 const IncomingGetVideosFromChannelRequestUrl = "/getVideoByChannel"
@@ -45,6 +49,11 @@ const UserDBconnectionName = "userdb"
 const CrawlerDirName = "crawler"
 const VideoJsonPath = CrawlerDirName + "/good.json"
 
+//Characters allowed in SessionID
+const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+
+const authCookieName = "mediathekauth"
+
 //**********************</Constants>**********************************
 
 type Video struct {
@@ -63,12 +72,8 @@ type User struct {
 	Name           string
 	Username       string
 	passwordHash   string
+	sessionId      string
 	FavoriteVideos []Video
-}
-
-type DB_Video struct {
-	videoLink string
-	views     int
 }
 
 type DB_User struct {
@@ -76,11 +81,11 @@ type DB_User struct {
 	name         string
 	username     string
 	passwordHash string
+	sessionId    string
 }
 
 var allVideos = make([]Video, 0)
 var videosSortedAfterChannels = make(map[string]map[string][]Video)
-
 var dbConnections = make(map[string]*sql.DB)
 
 func main() {
@@ -108,10 +113,11 @@ func main() {
 	http.HandleFunc(IncomingGetSearchRequestUrl, handleGetSearchVideos)
 	http.HandleFunc(IncomingGetVideosRequestUrl, handleGetAllVideos)
 	http.HandleFunc(IncomingGetVideosFromChannelRequestUrl, handleGetVideosFromChannel)
-	http.HandleFunc(IncomingPostUserRequestUrl, handlePostLoadUserInformation)
+	http.HandleFunc(IncomingPostUserRequestUrl, handlePostLogin)
 	http.HandleFunc(IncomingPostAddToFavoritesRequestUrl, handlePostAddVideoToFavorites)
 	http.HandleFunc(IncomingGetVideoClickedRequestUrl, handleGetVideoClicked)
-	http.HandleFunc(IncomingPostRegisterRequestUrl, handleRegisterUser)
+	http.HandleFunc(IncomingPostRegisterRequestUrl, handlePostRegisterUser)
+	http.HandleFunc(IncomingPostLogoutRequestUrl, handlePostLogout)
 	err = http.ListenAndServe(":80", nil)
 	if err != nil {
 		log.Fatal("Starting Server failed: " + err.Error())
@@ -119,6 +125,15 @@ func main() {
 }
 
 //**************************************<Helpers>************************************************************************
+//Generate random session id
+func generateSessionId(n int) string {
+	b := make([]byte, n)
+	for i := range b {
+		b[i] = letterBytes[rand.Intn(len(letterBytes))]
+	}
+	return string(b)
+}
+
 //Sorts allVideos after Channels and Shows and loads them into a map
 func sortByChannelAndShow() { //channel          //show Array
 	log.Println("Started sorting...")
@@ -188,19 +203,34 @@ func parseVideosFromJson() {
 		}
 		allVideos = append(allVideos, video)
 	}
+}
 
-	//Testing
-	//for _, a := range allVideos{
-	//	log.Print(a.channel)
-	//	log.Print(a.duration)
-	//	log.Print(a.fileName)
-	//	log.Print(a.link)
-	//	log.Print(a.pageLink)
-	//	log.Print(a.releaseDate)
-	//	log.Print(a.show)
-	//	log.Print(a.title)
-	//	log.Println()
-	//}
+//Checks if a request has a valid cookie and writes to user if valid cookies exists
+func isUserLoggedInWithACookie(r *http.Request, userDB *sql.DB, user *User) (bool, error) {
+	//Check if there is a cookie in the request
+	cookie, err := r.Cookie(authCookieName)
+	if err == nil {
+		if cookie.Value == "0" {
+			return false, nil
+		}
+		rows, err := userDB.Query("Select * from Users where Session_Id = ?", cookie.Value)
+		if err != nil {
+			return false, errors.New("SQL query failed: \n" + err.Error())
+		}
+		if rows.Next() {
+			err := rows.Scan(&user.Id, &user.Name, &user.Username, &user.passwordHash, &user.sessionId)
+			if err != nil {
+				return false, errors.New("Scanning rows failed: \n" + err.Error())
+			}
+		} else {
+			log.Println("No such SessionId found")
+			return false, nil
+		}
+		return true, nil
+	} else {
+		log.Println("No cookie found with name " + authCookieName)
+		return false, nil
+	}
 }
 
 func loginUser(w http.ResponseWriter, userDB *sql.DB, user *User, incomingUsername string, incomingPassword string) bool {
@@ -211,7 +241,7 @@ func loginUser(w http.ResponseWriter, userDB *sql.DB, user *User, incomingUserna
 		return false
 	}
 	if rows.Next() {
-		err := rows.Scan(&user.Id, &user.Name, &user.Username, &user.passwordHash)
+		err := rows.Scan(&user.Id, &user.Name, &user.Username, &user.passwordHash, &user.sessionId)
 		if err != nil {
 			reportError(w, 500, InternalServerErrorResponse, "Scanning rows failed: \n"+err.Error())
 			return false
@@ -225,6 +255,27 @@ func loginUser(w http.ResponseWriter, userDB *sql.DB, user *User, incomingUserna
 		} else {
 			log.Println("Entered Password is correct")
 		}
+		//Generating and inserting a new SessionId in the db
+		sessionId := generateSessionId(255)
+		_, err = userDB.Exec("UPDATE users set Session_Id = ? where username = ?", sessionId, incomingUsername)
+		if err != nil {
+			reportError(w, 500, InternalServerErrorResponse, "Updating sql failed: \n"+err.Error())
+			return false
+		}
+		expire := time.Now().AddDate(0, 0, 2)
+		cookie := http.Cookie{
+			Name:       authCookieName,
+			Value:      sessionId,
+			Path:       "/",
+			Domain:     "localhost",
+			Expires:    expire,
+			RawExpires: expire.Format(time.UnixDate),
+			MaxAge:     172800,
+			Secure:     false,
+			HttpOnly:   true,
+			SameSite:   http.SameSiteLaxMode,
+		}
+		http.SetCookie(w, &cookie)
 	} else {
 		reportError(w, 404, "User not found", "Empty sql result set \n")
 		return false
@@ -235,6 +286,32 @@ func loginUser(w http.ResponseWriter, userDB *sql.DB, user *User, incomingUserna
 //**************************************</Helpers>************************************************************************
 
 //**************************************<Handlers>***********************************************************************
+func handlePostLogout(w http.ResponseWriter, r *http.Request) {
+	log.Println("Answering handlePostLogout request started...")
+	userDB := dbConnections[UserDBconnectionName]
+	err := userDB.Ping()
+	if err != nil {
+		reportError(w, 500, InternalServerErrorResponse, "Database connection failed: \n"+err.Error())
+		return
+	}
+	var user User
+	isCookieValid, err := isUserLoggedInWithACookie(r, userDB, &user)
+	if !isCookieValid {
+		if err != nil {
+			reportError(w, 401, "Authentication failed", "Database connection failed: \n"+err.Error())
+			return
+		}
+	}
+	_, err = userDB.Exec("UPDATE users SET session_id = '0' WHERE username = ?", user.Username)
+	if err != nil {
+		reportError(w, 500, InternalServerErrorResponse, "SQL update failed: \n"+err.Error())
+		return
+	}
+	w.WriteHeader(200)
+	w.Write([]byte("Logged out"))
+	log.Println("Answered handlePostLogout successfully")
+}
+
 func handleGetSearchVideos(w http.ResponseWriter, r *http.Request) {
 	log.Println("Answering handleGetSearchVideos request started...")
 	queryResults, ok := r.URL.Query()[VideoSearchParameter]
@@ -311,7 +388,7 @@ func handleGetVideoClicked(w http.ResponseWriter, r *http.Request) {
 	}
 	queryResults, ok := r.URL.Query()[VideoTitleParameter]
 	if !ok || len(queryResults) < 1 {
-		reportError(w, 400, "url parameter unkown", "Cant find parameter "+VideoTitleParameter)
+		reportError(w, 400, "url parameter unknown", "Cant find parameter "+VideoTitleParameter)
 		return
 	}
 	title := queryResults[0]
@@ -360,22 +437,30 @@ func handlePostAddVideoToFavorites(w http.ResponseWriter, r *http.Request) {
 		reportError(w, 500, InternalServerErrorResponse, "Database connection failed: \n"+err.Error())
 		return
 	}
-	//Parse username and password from request
-	err = r.ParseForm()
-	if err != nil {
-		reportError(w, 400, "Invalid request parameters", "Parameter parsing error: "+err.Error())
-		return
-	}
-	incomingUsername := r.FormValue("usernameInput")
-	incomingPassword := r.FormValue("passwordInput")
 	incomingVideo := r.FormValue("video")
-
 	var user User
-	if !loginUser(w, userDB, &user, incomingUsername, incomingPassword) {
+	isCookieValid, err := isUserLoggedInWithACookie(r, userDB, &user)
+	if err != nil {
+		reportError(w, 500, InternalServerErrorResponse, "Cookie validation failed: \n"+err.Error())
 		return
 	}
-	log.Println("Video: " + incomingVideo)
-	_, err = userDB.Exec("INSERT INTO user_has_favorite_videos (Users_Username,Video) \n Values(?,?)", incomingUsername, incomingVideo)
+	if !isCookieValid {
+		w.WriteHeader(401)
+		w.Write([]byte("Access denied"))
+		return
+	}
+	//Check if video is already in favorites
+	rows, err := userDB.Query("Select * from user_has_favorite_videos where Users_Username = ? and Video = ?", user.Username, incomingVideo)
+	if err != nil {
+		reportError(w, 500, InternalServerErrorResponse, "SQL query checking for username and video failed: \n"+err.Error())
+		return
+	}
+	if rows.Next() {
+		reportError(w, 400, "Video is already favorite", "Video is already in favorites: \n")
+		return
+	}
+	//Insert new video for the user
+	_, err = userDB.Exec("INSERT INTO user_has_favorite_videos (Users_Username,Video) \n Values(?,?)", user.Username, incomingVideo)
 	if err != nil {
 		reportError(w, 500, InternalServerErrorResponse, "SQL insert failed: \n"+err.Error())
 		return
@@ -389,7 +474,7 @@ func handleGetVideosFromChannel(w http.ResponseWriter, r *http.Request) {
 	log.Println("Answering handleGetAllVideos request started...")
 	queryResults, ok := r.URL.Query()[ChannelNameParameter]
 	if !ok || len(queryResults) < 1 {
-		reportError(w, 400, "url parameter unkown", "Cant find parameter "+ChannelNameParameter)
+		reportError(w, 400, "url parameter unknown", "Cant find parameter "+ChannelNameParameter)
 		return
 	}
 	channel := queryResults[0]
@@ -404,8 +489,8 @@ func handleGetVideosFromChannel(w http.ResponseWriter, r *http.Request) {
 	log.Println("Answered handleGetAllVideos request successfully...")
 }
 
-func handleRegisterUser(w http.ResponseWriter, r *http.Request) {
-	log.Print("answering handleRegisterUser request ...")
+func handlePostRegisterUser(w http.ResponseWriter, r *http.Request) {
+	log.Print("answering handlePostRegisterUser request ...")
 
 	//Checking db connection
 	userDB := dbConnections[UserDBconnectionName]
@@ -437,13 +522,13 @@ func handleRegisterUser(w http.ResponseWriter, r *http.Request) {
 	//Check if username is in use
 	var user DB_User
 	for rows.Next() {
-		err = rows.Scan(&user.id, &user.name, &user.username, &user.passwordHash)
+		err = rows.Scan(&user.id, &user.name, &user.username, &user.passwordHash, &user.sessionId)
 		if err != nil {
 			reportError(w, 500, InternalServerErrorResponse, "Scanning rows failed: \n"+err.Error())
 			return
 		}
 		if user.username == incomingUsername {
-			reportError(w, 400, "Username taken", "Username taken: "+user.username)
+			reportError(w, 400, "User already exists", "Username taken: "+user.username)
 			return
 		}
 	}
@@ -462,7 +547,7 @@ func handleRegisterUser(w http.ResponseWriter, r *http.Request) {
 	}
 	w.WriteHeader(200)
 	w.Write([]byte("Created a new User account"))
-	log.Println("answered handleRegisterUser request successfully")
+	log.Println("answered handlePostRegisterUser request successfully")
 }
 
 func handleGetAllVideos(w http.ResponseWriter, r *http.Request) {
@@ -478,16 +563,18 @@ func handleGetAllVideos(w http.ResponseWriter, r *http.Request) {
 	log.Print("Answered handleGetAllVideos request successfully...")
 }
 
-func handlePostLoadUserInformation(w http.ResponseWriter, r *http.Request) {
-	log.Print("answering handlePostLoadUserInformation request ...")
+func handlePostLogin(w http.ResponseWriter, r *http.Request) {
+	log.Print("answering handlePostLogin request ...")
 
 	//Checking db connection
 	userDB := dbConnections[UserDBconnectionName]
+	var user User
 	err := userDB.Ping()
 	if err != nil {
 		reportError(w, 500, InternalServerErrorResponse, "Database connection failed: \n"+err.Error())
 		return
 	}
+
 	//Parse username and password from request
 	err = r.ParseForm()
 	if err != nil {
@@ -495,13 +582,13 @@ func handlePostLoadUserInformation(w http.ResponseWriter, r *http.Request) {
 	}
 	incomingUsername := r.FormValue("usernameInput")
 	incomingPassword := r.FormValue("passwordInput")
-	var user User
+
 	if !loginUser(w, userDB, &user, incomingUsername, incomingPassword) {
 		return
 	}
 
 	//Getting the informations about the user
-	rows, err := userDB.Query("select * from user_has_favorite_videos where Users_Username = ?", incomingUsername)
+	rows, err := userDB.Query("select * from user_has_favorite_videos where Users_Username = ?", user.Username)
 	if err != nil {
 		reportError(w, 500, InternalServerErrorResponse, "Sql query failed: \n"+err.Error())
 		return
@@ -532,7 +619,7 @@ func handlePostLoadUserInformation(w http.ResponseWriter, r *http.Request) {
 	}
 	w.WriteHeader(200)
 	w.Write(userInBytes)
-	log.Print("Answered handlePostLoadUserInformation request successfully...")
+	log.Print("Answered handlePostLogin request successfully...")
 }
 
 //**************************************</Handlers>***********************************************************************

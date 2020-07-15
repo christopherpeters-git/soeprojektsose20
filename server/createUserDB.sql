@@ -5,6 +5,7 @@ CREATE TABLE users (
     Name varchar(255) NOT NULL,
     Username varchar(255) NOT NULL UNIQUE,
     PasswordHash varchar(255) NOT NULL,
+    Session_Id varchar(255) NOT NULL DEFAULT 0,
     PRIMARY KEY(Id)
 );
 

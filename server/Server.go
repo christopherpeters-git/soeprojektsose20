@@ -86,6 +86,7 @@ type DB_User struct {
 
 var allVideos = make([]Video, 0)
 var videosSortedAfterChannels = make(map[string]map[string][]Video)
+
 var dbConnections = make(map[string]*sql.DB)
 
 func main() {
@@ -156,6 +157,7 @@ func sortByChannelAndShow() { //channel          //show Array
 	//   }
 	//}
 	log.Println("Sorting finished!")
+
 }
 
 func initDataBaseConnection(driverName string, user string, password string, url string, dbName string, idName string) *sql.DB {
@@ -281,6 +283,18 @@ func loginUser(w http.ResponseWriter, userDB *sql.DB, user *User, incomingUserna
 		return false
 	}
 	return true
+}
+
+func convertMapToArray(incomingChannel string) []Video {
+	var channelArray []Video
+	var channelMap = videosSortedAfterChannels[incomingChannel]
+	for _, e := range channelMap {
+		for ew := range e {
+			channelArray = append(channelArray, e[ew])
+		}
+	}
+
+	return channelArray
 }
 
 //**************************************</Helpers>************************************************************************
@@ -479,7 +493,7 @@ func handleGetVideosFromChannel(w http.ResponseWriter, r *http.Request) {
 	}
 	channel := queryResults[0]
 	log.Println("Content of parameter '" + ChannelNameParameter + "': " + channel)
-	resultSetInBytes, err := json.MarshalIndent(videosSortedAfterChannels[channel], "", " ")
+	resultSetInBytes, err := json.MarshalIndent(convertMapToArray(channel), "", " ")
 	if err != nil {
 		reportError(w, 500, InternalServerErrorResponse, "Marshaling failed: \n"+err.Error())
 		return

@@ -10,9 +10,6 @@ class User{
 
 }
 
-let username;
-let password;
-
 const video =  {
     "channel": "ARD",
     "title": "\"Plan B\" für Bayern",
@@ -35,6 +32,23 @@ function createAjaxRequest(){
     return request;
 }
 
+function sendGetSearchRequest(){
+    const request = createAjaxRequest();
+    const searchString = document.getElementById("searchInput").value;
+    request.onreadystatechange = function () {
+        if(4 === this.readyState){
+            if(200 === this.status){
+                alert(this.responseText);
+            }else{
+                alert(this.status + ":" + this.responseText);
+            }
+        }
+    }
+
+    request.open("GET","/search" +"?search="+searchString,true);
+    request.send();
+}
+
 function sendPostLoginRequest(){
     const usernameInput = document.getElementById("usernameInput").value;
     const passwordInput = document.getElementById("passwordInput").value;
@@ -45,8 +59,6 @@ function sendPostLoginRequest(){
                 alert(this.responseText)
                 let user = new User("","","",null);
                 user = JSON.parse(this.responseText);
-                username = usernameInput;
-                password = passwordInput;
                 console.log(user);
             }else{
                 alert(this.status + ":" + this.responseText);
@@ -57,6 +69,23 @@ function sendPostLoginRequest(){
     request.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
     console.log("" + usernameInput + " " + passwordInput);
     request.send("usernameInput="+usernameInput+"&"+"passwordInput="+passwordInput);
+}
+
+function sendPostLogoutRequest(){
+    const request = createAjaxRequest();
+    request.onreadystatechange = function () {
+        if(4 === this.readyState){
+            if(200 === this.status){
+                alert(this.responseText)
+
+            }else{
+                alert(this.status + ":" + this.responseText);
+            }
+        }
+    }
+    request.open("POST",/logout/,true);
+    request.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+    request.send("dummy=dummy");
 }
 
 function sendPostRegisterRequest(){
@@ -81,22 +110,20 @@ function sendPostRegisterRequest(){
 }
 
 function sendPostFavoriteRequest(){
-    const usernameInput = username;
-    const passwordInput = password;
     const request = createAjaxRequest();
     request.onreadystatechange = function () {
         if(4 === this.readyState){
             if(200 === this.status){
-                alert(this.responseText)
+                alert(this.responseText);
             }else{
                 alert(this.status + ":" + this.responseText);
             }
+            console.log(this);
         }
     }
     request.open("POST",/addToFavorites/,true);
     request.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
-    console.log("" + usernameInput + " " + passwordInput);
-    request.send("usernameInput="+usernameInput+"&"+"passwordInput="+passwordInput+"&"+"video="+JSON.stringify(video));
+    request.send("video="+JSON.stringify(video));
 }
 
 

@@ -6,6 +6,7 @@ const (
 	IncomingPostRegisterRequestUrl         = "/register/"
 	IncomingPostAddToFavoritesRequestUrl   = "/addToFavorites/"
 	IncomingPostLogoutRequestUrl           = "/logout/"
+	IncomingPostCookieAUthRequestUrl       = "/cookieAuth/"
 	IncomingGetSearchRequestUrl            = "/search"
 	IncomingGetVideosFromChannelRequestUrl = "/getVideoByChannel"
 	IncomingGetVideoClickedRequestUrl      = "/clickVideo"
@@ -21,7 +22,8 @@ const (
 
 //Error messages
 const (
-	InternalServerErrorResponse = "Internal server error - see logs"
+	InternalServerErrorResponse  = "Internal server error - see logs"
+	AuthenticationFailedResponse = "Authentication failed"
 )
 
 //db connection names

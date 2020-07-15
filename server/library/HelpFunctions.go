@@ -12,6 +12,31 @@ import (
 	"time"
 )
 
+func FillUserVideoArray(user *User, userDB *sql.DB) error {
+	//Getting the informations about the user
+	rows, err := userDB.Query("select * from user_has_favorite_videos where Users_Username = ?", user.Username)
+	if err != nil {
+		return errors.New("SQL query failed: \n" + err.Error())
+	}
+	user.FavoriteVideos = make([]Video, 0)
+	var username string
+	var videoStr string
+	for rows.Next() {
+		err := rows.Scan(&username, &videoStr)
+		if err != nil {
+			return errors.New("Scanning rows failed: \n" + err.Error())
+		}
+		var video Video
+		err = json.Unmarshal([]byte(videoStr), &video)
+		if err != nil {
+			return errors.New("unmarshalling failed: \n" + err.Error())
+		}
+		user.FavoriteVideos = append(user.FavoriteVideos, video)
+	}
+	return nil
+}
+
+//Converts a Videoarray map to an video array
 func ConvertMapToArray(mapToConvert map[string][]Video) []Video {
 	var channelArray []Video
 	var channelMap = mapToConvert
@@ -49,6 +74,7 @@ func SortByChannelAndShow(allVideos []Video) map[string]map[string][]Video { //c
 	return videosSortedAfterChannels
 }
 
+//Starts a connection to a database and adds it to the connection map
 func InitDataBaseConnection(dbConnections map[string]*sql.DB, driverName string, user string, password string, url string, dbName string, idName string) *sql.DB {
 	//Open and check the sql-databse connection
 	db, err := sql.Open(driverName,
@@ -62,6 +88,7 @@ func InitDataBaseConnection(dbConnections map[string]*sql.DB, driverName string,
 	return db
 }
 
+//Reports an error and prints to the log
 func ReportError(w http.ResponseWriter, statusCode int, responseMessage string, logMessage string) {
 	http.Error(w, responseMessage, statusCode)
 	log.Println(logMessage)

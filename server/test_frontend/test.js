@@ -32,6 +32,22 @@ function createAjaxRequest(){
     return request;
 }
 
+function sendPostCookieAuthRequest(){
+    const request = createAjaxRequest();
+    request.onreadystatechange = function () {
+        if(4 === this.readyState){
+            if(200 === this.status){
+                alert(this.responseText)
+            }else{
+                alert(this.status + ":" + this.responseText);
+            }
+        }
+    }
+    request.open("POST","/cookieAuth/",true);
+    request.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+    request.send("dummy=dummy");
+}
+
 function sendGetSearchRequest(){
     const request = createAjaxRequest();
     const searchString = document.getElementById("searchInput").value;

@@ -47,13 +47,46 @@ func main() {
 	http.HandleFunc(lib.IncomingGetVideoClickedRequestUrl, handleGetVideoClicked)
 	http.HandleFunc(lib.IncomingPostRegisterRequestUrl, handlePostRegisterUser)
 	http.HandleFunc(lib.IncomingPostLogoutRequestUrl, handlePostLogout)
+	http.HandleFunc(lib.IncomingPostCookieAUthRequestUrl, handleCookieAuth)
 	err = http.ListenAndServe(":80", nil)
 	if err != nil {
 		log.Fatal("Starting Server failed: " + err.Error())
 	}
 }
 
-//**************************************<Handlers>***********************************************************************
+func handleCookieAuth(w http.ResponseWriter, r *http.Request) {
+	log.Println("Answering handleCookieAuth request started...")
+	userDB := dbConnections[lib.UserDBconnectionName]
+	err := userDB.Ping()
+	if err != nil {
+		lib.ReportError(w, 500, lib.InternalServerErrorResponse, "Database connection failed: \n"+err.Error())
+		return
+	}
+	var user lib.User
+	isCookieValid, err := lib.IsUserLoggedInWithACookie(r, userDB, &user)
+	if err != nil {
+		lib.ReportError(w, 500, lib.InternalServerErrorResponse, "Cookie validation failed: \n"+err.Error())
+		return
+	}
+	if !isCookieValid {
+		lib.ReportError(w, 401, lib.AuthenticationFailedResponse, "No valid Cookie found: \n")
+		return
+	}
+	err = lib.FillUserVideoArray(&user, userDB)
+	if err != nil {
+		lib.ReportError(w, 500, lib.InternalServerErrorResponse, "Failed filling the favorite videos array: \n"+err.Error())
+		return
+	}
+	userInBytes, err := json.MarshalIndent(user, "", "   ")
+	if err != nil {
+		lib.ReportError(w, 500, lib.InternalServerErrorResponse, "Marshaling failed: \n"+err.Error())
+		return
+	}
+	w.WriteHeader(200)
+	w.Write(userInBytes)
+	log.Println("Answered handleCookieAuth successfully")
+}
+
 func handlePostLogout(w http.ResponseWriter, r *http.Request) {
 	log.Println("Answering handlePostLogout request started...")
 	userDB := dbConnections[lib.UserDBconnectionName]
@@ -66,7 +99,7 @@ func handlePostLogout(w http.ResponseWriter, r *http.Request) {
 	isCookieValid, err := lib.IsUserLoggedInWithACookie(r, userDB, &user)
 	if !isCookieValid {
 		if err != nil {
-			lib.ReportError(w, 401, "Authentication failed", "Database connection failed: \n"+err.Error())
+			lib.ReportError(w, 401, lib.AuthenticationFailedResponse, "Database connection failed: \n"+err.Error())
 			return
 		}
 	}
@@ -355,30 +388,11 @@ func handlePostLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//Getting the informations about the user
-	rows, err := userDB.Query("select * from user_has_favorite_videos where Users_Username = ?", user.Username)
+	err = lib.FillUserVideoArray(&user, userDB)
 	if err != nil {
-		lib.ReportError(w, 500, lib.InternalServerErrorResponse, "Sql query failed: \n"+err.Error())
+		lib.ReportError(w, 500, lib.InternalServerErrorResponse, "Failed filling the favorite videos array: \n"+err.Error())
 		return
 	}
-	user.FavoriteVideos = make([]lib.Video, 0)
-	var username string
-	var videoStr string
-	for rows.Next() {
-		err := rows.Scan(&username, &videoStr)
-		if err != nil {
-			lib.ReportError(w, 500, lib.InternalServerErrorResponse, "Scanning rows failed: \n"+err.Error())
-			return
-		}
-		var video lib.Video
-		err = json.Unmarshal([]byte(videoStr), &video)
-		if err != nil {
-			lib.ReportError(w, 500, lib.InternalServerErrorResponse, "unmarshalling failed: \n"+err.Error())
-			return
-		}
-		user.FavoriteVideos = append(user.FavoriteVideos, video)
-	}
-
 	//Writing the result set to the responseWriter as a json-string
 	userInBytes, err := json.MarshalIndent(user, "", "   ")
 	if err != nil {
@@ -389,5 +403,3 @@ func handlePostLogin(w http.ResponseWriter, r *http.Request) {
 	w.Write(userInBytes)
 	log.Print("Answered handlePostLogin request successfully...")
 }
-
-//**************************************</Handlers>***********************************************************************

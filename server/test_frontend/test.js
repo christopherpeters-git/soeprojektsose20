@@ -54,6 +54,23 @@ function sendPostLoginRequest(){
     request.send("usernameInput="+usernameInput+"&"+"passwordInput="+passwordInput);
 }
 
+function sendPostLogoutRequest(){
+    const request = createAjaxRequest();
+    request.onreadystatechange = function () {
+        if(4 === this.readyState){
+            if(200 === this.status){
+                alert(this.responseText)
+
+            }else{
+                alert(this.status + ":" + this.responseText);
+            }
+        }
+    }
+    request.open("POST",/logout/,true);
+    request.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+    request.send("dummy=dummy");
+}
+
 function sendPostRegisterRequest(){
     const name = document.getElementById("nameInput2").value;
     const usernameInput = document.getElementById("usernameInput2").value;

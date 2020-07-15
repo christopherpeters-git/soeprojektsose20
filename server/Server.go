@@ -288,7 +288,7 @@ func loginUser(w http.ResponseWriter, userDB *sql.DB, user *User, incomingUserna
 
 //**************************************<Handlers>***********************************************************************
 func handlePostLogout(w http.ResponseWriter, r *http.Request) {
-	log.Println("Answering handleGetVideoClicked request started...")
+	log.Println("Answering handlePostLogout request started...")
 	userDB := dbConnections[UserDBconnectionName]
 	err := userDB.Ping()
 	if err != nil {
@@ -303,8 +303,14 @@ func handlePostLogout(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-
-	log.Println("Answered handleGetVideoClicked successfully")
+	_, err = userDB.Exec("UPDATE users SET session_id = '0' WHERE username = ?", user.Username)
+	if err != nil {
+		reportError(w, 500, InternalServerErrorResponse, "SQL update failed: \n"+err.Error())
+		return
+	}
+	w.WriteHeader(200)
+	w.Write([]byte("Logged out"))
+	log.Println("Answered handlePostLogout successfully")
 }
 
 func handleGetVideoClicked(w http.ResponseWriter, r *http.Request) {

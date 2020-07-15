@@ -76,20 +76,19 @@ function sendPostRegisterRequest(){
 }
 
 function sendPostFavoriteRequest(){
-
     const request = createAjaxRequest();
     request.onreadystatechange = function () {
         if(4 === this.readyState){
             if(200 === this.status){
-                alert(this.responseText)
+                alert(this.responseText);
             }else{
                 alert(this.status + ":" + this.responseText);
             }
+            console.log(this);
         }
     }
     request.open("POST",/addToFavorites/,true);
     request.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
-    console.log("" + usernameInput + " " + passwordInput);
     request.send("video="+JSON.stringify(video));
 }
 

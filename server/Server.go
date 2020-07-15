@@ -29,6 +29,7 @@ const IncomingPostRegisterRequestUrl = "/register/"
 const IncomingGetVideosFromChannelRequestUrl = "/getVideoByChannel"
 const IncomingGetVideoClickedRequestUrl = "/clickVideo"
 const IncomingPostAddToFavoritesRequestUrl = "/addToFavorites/"
+const IncomingPostLogoutRequestUrl = "/logout/"
 
 //Parameter
 const ChannelNameParameter = "channel"
@@ -46,6 +47,8 @@ const VideoJsonPath = CrawlerDirName + "/good.json"
 
 //Characters allowed in SessionID
 const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+
+const authCookieName = "mediathekauth"
 
 //**********************</Constants>**********************************
 
@@ -115,6 +118,7 @@ func main() {
 	http.HandleFunc(IncomingPostAddToFavoritesRequestUrl, handlePostAddVideoToFavorites)
 	http.HandleFunc(IncomingGetVideoClickedRequestUrl, handleGetVideoClicked)
 	http.HandleFunc(IncomingPostRegisterRequestUrl, handlePostRegisterUser)
+	http.HandleFunc(IncomingPostLogoutRequestUrl, handlePostLogout)
 	err = http.ListenAndServe(":80", nil)
 	if err != nil {
 		log.Fatal("Starting Server failed: " + err.Error())
@@ -200,28 +204,16 @@ func parseVideosFromJson() {
 		}
 		allVideos = append(allVideos, video)
 	}
-
-	//Testing
-	//for _, a := range allVideos{
-	//	log.Print(a.channel)
-	//	log.Print(a.duration)
-	//	log.Print(a.fileName)
-	//	log.Print(a.link)
-	//	log.Print(a.pageLink)
-	//	log.Print(a.releaseDate)
-	//	log.Print(a.show)
-	//	log.Print(a.title)
-	//	log.Println()
-	//}
 }
-
-const AppName = "BLABLABLA"
 
 //Checks if a request has a valid cookie and writes to user if valid cookies exists
 func isUserLoggedInWithACookie(r *http.Request, userDB *sql.DB, user *User) (bool, error) {
 	//Check if there is a cookie in the request
-	cookie, err := r.Cookie(AppName)
+	cookie, err := r.Cookie(authCookieName)
 	if err == nil {
+		if cookie.Value == "0" {
+			return false, nil
+		}
 		rows, err := userDB.Query("Select * from Users where Session_Id = ?", cookie.Value)
 		if err != nil {
 			return false, errors.New("SQL query failed: \n" + err.Error())
@@ -237,6 +229,7 @@ func isUserLoggedInWithACookie(r *http.Request, userDB *sql.DB, user *User) (boo
 		}
 		return true, nil
 	} else {
+		log.Println("No cookie found with name " + authCookieName)
 		return false, nil
 	}
 }
@@ -272,18 +265,16 @@ func loginUser(w http.ResponseWriter, userDB *sql.DB, user *User, incomingUserna
 		}
 		expire := time.Now().AddDate(0, 0, 2)
 		cookie := http.Cookie{
-			Name:       AppName,
+			Name:       authCookieName,
 			Value:      sessionId,
 			Path:       "/",
-			Domain:     AppName + ".de",
+			Domain:     "localhost",
 			Expires:    expire,
 			RawExpires: expire.Format(time.UnixDate),
 			MaxAge:     172800,
 			Secure:     false,
 			HttpOnly:   true,
-			SameSite:   2,
-			Raw:        "",
-			Unparsed:   nil,
+			SameSite:   http.SameSiteLaxMode,
 		}
 		http.SetCookie(w, &cookie)
 	} else {
@@ -296,6 +287,26 @@ func loginUser(w http.ResponseWriter, userDB *sql.DB, user *User, incomingUserna
 //**************************************</Helpers>************************************************************************
 
 //**************************************<Handlers>***********************************************************************
+func handlePostLogout(w http.ResponseWriter, r *http.Request) {
+	log.Println("Answering handleGetVideoClicked request started...")
+	userDB := dbConnections[UserDBconnectionName]
+	err := userDB.Ping()
+	if err != nil {
+		reportError(w, 500, InternalServerErrorResponse, "Database connection failed: \n"+err.Error())
+		return
+	}
+	var user User
+	isCookieValid, err := isUserLoggedInWithACookie(r, userDB, &user)
+	if !isCookieValid {
+		if err != nil {
+			reportError(w, 401, "Authentication failed", "Database connection failed: \n"+err.Error())
+			return
+		}
+	}
+
+	log.Println("Answered handleGetVideoClicked successfully")
+}
+
 func handleGetVideoClicked(w http.ResponseWriter, r *http.Request) {
 	log.Println("Answering handleGetVideoClicked request started...")
 	viewcount := 0
@@ -308,7 +319,7 @@ func handleGetVideoClicked(w http.ResponseWriter, r *http.Request) {
 	}
 	queryResults, ok := r.URL.Query()[VideoTitleParameter]
 	if !ok || len(queryResults) < 1 {
-		reportError(w, 400, "url parameter unkown", "Cant find parameter "+VideoTitleParameter)
+		reportError(w, 400, "url parameter unknown", "Cant find parameter "+VideoTitleParameter)
 		return
 	}
 	title := queryResults[0]
@@ -369,7 +380,17 @@ func handlePostAddVideoToFavorites(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Access denied"))
 		return
 	}
-	log.Println("Video: " + incomingVideo)
+	//Check if video is already in favorites
+	rows, err := userDB.Query("Select * from user_has_favorite_videos where Users_Username = ? and Video = ?", user.Username, incomingVideo)
+	if err != nil {
+		reportError(w, 500, InternalServerErrorResponse, "SQL query checking for username and video failed: \n"+err.Error())
+		return
+	}
+	if rows.Next() {
+		reportError(w, 400, "Video is already favorite", "Video is already in favorites: \n")
+		return
+	}
+	//Insert new video for the user
 	_, err = userDB.Exec("INSERT INTO user_has_favorite_videos (Users_Username,Video) \n Values(?,?)", user.Username, incomingVideo)
 	if err != nil {
 		reportError(w, 500, InternalServerErrorResponse, "SQL insert failed: \n"+err.Error())
@@ -384,7 +405,7 @@ func handleGetVideosFromChannel(w http.ResponseWriter, r *http.Request) {
 	log.Println("Answering handleGetAllVideos request started...")
 	queryResults, ok := r.URL.Query()[ChannelNameParameter]
 	if !ok || len(queryResults) < 1 {
-		reportError(w, 400, "url parameter unkown", "Cant find parameter "+ChannelNameParameter)
+		reportError(w, 400, "url parameter unknown", "Cant find parameter "+ChannelNameParameter)
 		return
 	}
 	channel := queryResults[0]
@@ -432,13 +453,13 @@ func handlePostRegisterUser(w http.ResponseWriter, r *http.Request) {
 	//Check if username is in use
 	var user DB_User
 	for rows.Next() {
-		err = rows.Scan(&user.id, &user.name, &user.username, &user.passwordHash)
+		err = rows.Scan(&user.id, &user.name, &user.username, &user.passwordHash, &user.sessionId)
 		if err != nil {
 			reportError(w, 500, InternalServerErrorResponse, "Scanning rows failed: \n"+err.Error())
 			return
 		}
 		if user.username == incomingUsername {
-			reportError(w, 400, "Username taken", "Username taken: "+user.username)
+			reportError(w, 400, "User already exists", "Username taken: "+user.username)
 			return
 		}
 	}
@@ -490,7 +511,7 @@ func handlePostLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Println("No cookie found with name: " + AppName)
+	log.Println("No cookie found with name: " + authCookieName)
 	if !validCookieFound {
 		//Parse username and password from request
 		err = r.ParseForm()

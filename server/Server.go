@@ -109,7 +109,7 @@ func main() {
 	defer initDataBaseConnection("mysql", "root", "soe2020", "localhost:3306", UserDBconnectionName, UserDBconnectionName).Close()
 
 	log.Print("Server has started...")
-	http.Handle("/", http.FileServer(http.Dir("test_frontend/")))
+	http.Handle("/", http.FileServer(http.Dir("frontend/")))
 	http.HandleFunc(IncomingGetSearchRequestUrl, handleGetSearchVideos)
 	http.HandleFunc(IncomingGetVideosRequestUrl, handleGetAllVideos)
 	http.HandleFunc(IncomingGetVideosFromChannelRequestUrl, handleGetVideosFromChannel)

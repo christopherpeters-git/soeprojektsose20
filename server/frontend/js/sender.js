@@ -1,4 +1,5 @@
-function testLoad(value) {
-   window.open("/senderpage.html");
-   console.log(value);
+function loadSenderPage(wert) {
+   window.location.href="/senderpage.html";
+   console.log(wert);
+
 }

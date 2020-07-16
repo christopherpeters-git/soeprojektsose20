@@ -63,13 +63,8 @@ func handleCookieAuth(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var user lib.User
-	isCookieValid, err := lib.IsUserLoggedInWithACookie(r, userDB, &user)
-	if err != nil {
-		lib.ReportError(w, 500, lib.InternalServerErrorResponse, "Cookie validation failed: \n"+err.Error())
-		return
-	}
-	if !isCookieValid {
-		lib.ReportError(w, 401, lib.AuthenticationFailedResponse, "No valid Cookie found: \n")
+	if dErr := lib.IsUserLoggedInWithACookie(r, userDB, &user); dErr != nil {
+		lib.ReportError(w, dErr.Status(), dErr.PublicError(), dErr.Error())
 		return
 	}
 	err = lib.FillUserVideoArray(&user, userDB)
@@ -96,18 +91,16 @@ func handlePostLogout(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var user lib.User
-	isCookieValid, err := lib.IsUserLoggedInWithACookie(r, userDB, &user)
-	if !isCookieValid {
-		if err != nil {
-			lib.ReportError(w, 401, lib.AuthenticationFailedResponse, "Database connection failed: \n"+err.Error())
-			return
-		}
+	if dErr := lib.IsUserLoggedInWithACookie(r, userDB, &user); dErr != nil {
+		lib.ReportError(w, dErr.Status(), dErr.PublicError(), dErr.Error())
+		return
 	}
 	_, err = userDB.Exec("UPDATE users SET session_id = '0' WHERE username = ?", user.Username)
 	if err != nil {
 		lib.ReportError(w, 500, lib.InternalServerErrorResponse, "SQL update failed: \n"+err.Error())
 		return
 	}
+
 	w.WriteHeader(200)
 	w.Write([]byte("Logged out"))
 	log.Println("Answered handlePostLogout successfully")
@@ -240,14 +233,8 @@ func handlePostAddVideoToFavorites(w http.ResponseWriter, r *http.Request) {
 	}
 	incomingVideo := r.FormValue("video")
 	var user lib.User
-	isCookieValid, err := lib.IsUserLoggedInWithACookie(r, userDB, &user)
-	if err != nil {
-		lib.ReportError(w, 500, lib.InternalServerErrorResponse, "Cookie validation failed: \n"+err.Error())
-		return
-	}
-	if !isCookieValid {
-		w.WriteHeader(401)
-		w.Write([]byte("Access denied"))
+	if dErr := lib.IsUserLoggedInWithACookie(r, userDB, &user); dErr != nil {
+		lib.ReportError(w, dErr.Status(), dErr.PublicError(), dErr.Error())
 		return
 	}
 	//Check if video is already in favorites
@@ -384,7 +371,12 @@ func handlePostLogin(w http.ResponseWriter, r *http.Request) {
 	incomingUsername := r.FormValue("usernameInput")
 	incomingPassword := r.FormValue("passwordInput")
 
-	if !lib.LoginUser(w, userDB, &user, incomingUsername, incomingPassword) {
+	if dErr := lib.LoginUser(userDB, &user, incomingUsername, incomingPassword); dErr != nil {
+		lib.ReportError(w, dErr.Status(), dErr.PublicError(), dErr.Error())
+		return
+	}
+	if dErr := lib.PlaceCookie(w, userDB, incomingUsername); dErr != nil {
+		lib.ReportError(w, dErr.Status(), dErr.PublicError(), dErr.Error())
 		return
 	}
 

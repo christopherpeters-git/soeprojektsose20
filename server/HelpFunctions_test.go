@@ -1,0 +1,96 @@
+package main
+
+import (
+	lib "./library"
+	"github.com/DATA-DOG/go-sqlmock"
+	"log"
+	"reflect"
+	"testing"
+)
+
+var exampleVideos = []lib.Video{{
+	Channel:     "NDR",
+	Title:       "Segelschiff statt Jugendknast",
+	Show:        "Letzte Chance an Bord",
+	ReleaseDate: "02.11.2019",
+	Duration:    "00:29:36",
+	Link:        "http://mediandr-a.akamaihd.net/progressive/2018/0412/TV-20180412-1528-4400.hq.mp4",
+	PageLink:    "https://www.ndr.de/fernsehen/sendungen/die_reportage/Segelschiff-statt-Jugendknast,sendung610984.html",
+	FileName:    "76|d.mp4",
+}, {
+	Channel:     "NDR",
+	Title:       "Die Nordreportage: Leben in der Jahrhundertsiedlung",
+	Show:        "Die Nordreportage: Leben in der Jahrhundertsiedlung",
+	ReleaseDate: "16.09.2019",
+	Duration:    "00:28:31",
+	Link:        "http://mediandr-a.akamaihd.net/progressive/2019/0916/TV-20190916-1113-5400.hq.mp4",
+	PageLink:    "https://www.ndr.de/fernsehen/sendungen/die_nordreportage/Leben-in-der-Jahrhundertsiedlung,sendung943144.html",
+	FileName:    "76|d.mp4",
+}}
+
+func TestFillUserVideoArray(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	columns := []string{"Users_Username", "Video"}
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	givenUser := lib.User{
+		Id:             "1",
+		Name:           "Bob",
+		Username:       "bob123",
+		FavoriteVideos: nil,
+	}
+
+	expectedUser := lib.User{
+		Id:             "1",
+		Name:           "Bob",
+		Username:       "bob123",
+		FavoriteVideos: exampleVideos,
+	}
+	favVideo1 := "{\n  \"channel\": \"NDR\",\n  \"title\": \"Segelschiff statt Jugendknast\",\n  \"show\": \"Letzte Chance an Bord\",\n  \"releaseDate\": \"02.11.2019\",\n  \"duration\": \"00:29:36\",\n  \"link\": \"http://mediandr-a.akamaihd.net/progressive/2018/0412/TV-20180412-1528-4400.hq.mp4\",\n  \"pageLink\": \"https://www.ndr.de/fernsehen/sendungen/die_reportage/Segelschiff-statt-Jugendknast,sendung610984.html\",\n  \"fileName\": \"76|d.mp4\"\n }"
+	favVideo2 := "{\n  \"channel\": \"NDR\",\n  \"title\": \"Die Nordreportage: Leben in der Jahrhundertsiedlung\",\n  \"show\": \"Die Nordreportage: Leben in der Jahrhundertsiedlung\",\n  \"releaseDate\": \"16.09.2019\",\n  \"duration\": \"00:28:31\",\n  \"link\": \"http://mediandr-a.akamaihd.net/progressive/2019/0916/TV-20190916-1113-5400.hq.mp4\",\n  \"pageLink\": \"https://www.ndr.de/fernsehen/sendungen/die_nordreportage/Leben-in-der-Jahrhundertsiedlung,sendung943144.html\",\n  \"fileName\": \"76|d.mp4\"\n }"
+	resultRows := sqlmock.NewRows(columns).AddRow(givenUser.Username, favVideo1).AddRow(givenUser.Username, favVideo2)
+	mock.ExpectBegin()
+	mock.ExpectQuery("select * from user_has_favorite_videos where Users_Username = ?").WithArgs(givenUser.Username).WillReturnRows(resultRows)
+	mock.ExpectCommit()
+
+	if err := lib.FillUserVideoArray(&givenUser, db); err != nil {
+		log.Println("Test failed: \n" + err.Error())
+		return
+	}
+	if !givenUser.Equals(&expectedUser) {
+		t.Error("User are not the same!: givenUser: " + givenUser.ToString() + " expectedUser: " + expectedUser.ToString())
+	}
+}
+
+func TestConvertMapToArray(t *testing.T) {
+	exampleMap := make(map[string]map[string][]lib.Video)
+	exampleMap["abc"] = make(map[string][]lib.Video)
+	exampleMap["abc"]["def"] = make([]lib.Video, 0)
+	exampleMap["abc"]["def"] = append(exampleMap["abc"]["def"], exampleVideos[0])
+	exampleMap["abc"]["ghi"] = make([]lib.Video, 0)
+	exampleMap["abc"]["ghi"] = append(exampleMap["abc"]["ghi"], exampleVideos[1])
+
+	result := lib.ConvertMapToArray(exampleMap["abc"])
+	for i, v := range result {
+		if !v.Equals(&exampleVideos[i]) {
+			t.Errorf("Video didnt match: resultVideo: %s expectedVideo: %s\n", v.ToString(), exampleVideos[i].ToString())
+		}
+	}
+}
+
+func TestSortByChannelAndShow(t *testing.T) {
+	exampleMap := make(map[string]map[string][]lib.Video)
+	exampleMap[exampleVideos[0].Channel] = make(map[string][]lib.Video)
+	exampleMap[exampleVideos[0].Channel][exampleVideos[0].Show] = make([]lib.Video, 0)
+	exampleMap[exampleVideos[0].Channel][exampleVideos[0].Show] = append(exampleMap[exampleVideos[0].Channel][exampleVideos[0].Show], exampleVideos[0])
+	exampleMap[exampleVideos[0].Channel][exampleVideos[1].Show] = make([]lib.Video, 0)
+	exampleMap[exampleVideos[0].Channel][exampleVideos[1].Show] = append(exampleMap[exampleVideos[0].Channel][exampleVideos[1].Show], exampleVideos[1])
+	if !reflect.DeepEqual(lib.SortByChannelAndShow(exampleVideos), exampleMap) {
+		t.Error("Arrays are not the same")
+	}
+}
+
+func TestLoginUser(t *testing.T) {
+
+}

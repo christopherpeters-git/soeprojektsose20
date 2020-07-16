@@ -1,6 +1,6 @@
 package library
 
-//URL's
+//URL'publicErrorMessage
 const (
 	IncomingPostUserRequestUrl             = "/login/"
 	IncomingPostRegisterRequestUrl         = "/register/"
@@ -20,7 +20,7 @@ const (
 	VideoSearchParameter = "search"
 )
 
-//Error messages
+//PublicError messages
 const (
 	InternalServerErrorResponse  = "Internal server error - see logs"
 	AuthenticationFailedResponse = "Authentication failed"

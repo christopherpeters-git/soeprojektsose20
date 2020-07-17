@@ -1,4 +1,3 @@
-
 body{
 
 }
@@ -9,9 +8,6 @@ body{
 #videos{
     margin-top: 10%;
     margin-left: 5%;
-}
-#mainPage{
-
 }
 .Searchbar{
    
@@ -34,9 +30,7 @@ body{
 /* Change styles for span and cancel button on extra small screens */
 @media screen and (max-width: 400px) {
  
-    #fav_btn{
-        width: 100%;
-    }
+  
     #logout_btn{
         width: 100%;
     }
@@ -56,6 +50,3 @@ input[type=text]{
     border: 1px solid #ccc;
     box-sizing: border-box;
 }
-
-
-

@@ -1,4 +1,3 @@
-
 body{
 
 }
@@ -7,34 +6,14 @@ body{
     border-radius: 5%;
 }
 #videos{
-    padding-left: 10%;;
-}
-
-.thumbnail{
-    width: 50%;
-    margin-left:2% ;
-    margin-top: 2%;
-}
-
-.videoLink{
-    width:30%;
-    float: left;
-    border-style: groove;
-    border-radius: 5%;
-}
-
-#buttons{
-    clear: both;
-
-}
-#mainPage{
-
+    margin-top: 10%;
+    margin-left: 5%;
 }
 .Searchbar{
-
+   
 }
 #searchbarIcon{
-
+    
 }
 #logout_btn{
     cursor: pointer;
@@ -50,10 +29,8 @@ body{
 
 /* Change styles for span and cancel button on extra small screens */
 @media screen and (max-width: 400px) {
-
-    #fav_btn{
-        width: 100%;
-    }
+ 
+  
     #logout_btn{
         width: 100%;
     }
@@ -73,6 +50,3 @@ input[type=text]{
     border: 1px solid #ccc;
     box-sizing: border-box;
 }
-
-
-

@@ -4,8 +4,8 @@ let start =0;
 let end = 30;
 
 let currentPage =1;
-let lastPage =10;
 
+let lastPage =10;
 
 class Videoclass {
     constructor(channel, title, show, releaseDate, duration, link, pageLink, fileName) {
@@ -35,7 +35,6 @@ function sendGetVideos() {
                 channelJson = JSON.parse(this.responseText);
                 channelName = sessionStorage.getItem("channel");
                 console.log(channelJson);
-                addButtons();
                 setPage();
 
             } else {
@@ -59,24 +58,41 @@ function createAjaxRequest() {
 }
 
 function setPage() {
-    const videosdiv = document.getElementById("videos");
+    let videosDiv = document.getElementById("videos");
+    videosDiv.remove();
+    videosDiv = document.createElement("div");
+    videosDiv.id = "videos";
+    const vContainer = document.getElementById("videoContainer");
+    vContainer.appendChild(videosDiv);
+
     let currentVideo = new Videoclass("", "", "", "", "", "", "", "");
     let lastVideo;
+
     let show =  document.createElement("div");
-    lastVideo = channelJson[start];
+    lastVideo = channelJson[start+((currentPage-1)*30)];
     show.id = lastVideo.show;
+    show.className= "showClass";
+    let t = document.createTextNode(lastVideo.show);
+    show.appendChild(t);
+    show.appendChild(document.createElement('br'));
+    show.appendChild(document.createElement("hr"));
     appendShow(lastVideo,show);
     for(let i =(start+1)+((currentPage-1)*end);i<end*currentPage;i++){
         currentVideo = channelJson[i];
         if(lastVideo.show !== currentVideo.show){
-            videosdiv.appendChild(show);
+            videosDiv.appendChild(show);
             show =  document.createElement("div");
             show.id =  currentVideo.show;
+            show.className= "showClass";
+            t = document.createTextNode(currentVideo.show);
+            show.appendChild(t);
+            show.appendChild(document.createElement('br'));
+            show.appendChild(document.createElement("hr"));
         }
         appendShow(currentVideo,show);
         lastVideo = currentVideo;
     }
-    videosdiv.appendChild(show);
+    videosDiv.appendChild(show);
 
 }
 
@@ -88,7 +104,7 @@ function appendShow(video,showdiv){
     const a = document.createElement("a");
     a.href=JSON.stringify(video);
     videoDiv.setAttribute("class","videoLink");
-    img.setAttribute("src","/media/Sender-Logos/ard.png");
+    img.setAttribute("src","/media/Sender-Logos/"+video.channel+".png");
     img.setAttribute("class","thumbnail");
     videoDiv.appendChild(a);
     header5.innerHTML = video.title;
@@ -99,44 +115,17 @@ function appendShow(video,showdiv){
     showdiv.appendChild(videoDiv);
 }
 
-function addButtons() {
-    const buttonDiv = document.getElementById("buttons");
-    for(let i =currentPage; i<=lastPage;i++){
-        let button = document.createElement("button");
-        button.className= "senderPageButtons";
-        button.value = JSON.stringify(i);
-        button.textContent= JSON.stringify(i);
-        button.addEventListener('click',setPageWithNumbers,false);
-        buttonDiv.appendChild(button);
+function previousPage(){
+    if((currentPage-1)<1);
+    else {
+        currentPage = currentPage - 1;
+        setPage();
+        document.getElementById("inputButton").value=JSON.stringify(currentPage);
+
     }
 }
-
-function setPageWithNumbers() {
-    setPageNumbers(this.value);
+function nextPage() {
+    currentPage=currentPage+1;
     setPage();
-    let buttonSet;
-    buttonSet= document.getElementsByClassName("senderPageButtons");
-    console.log(buttonSet);
-    for(let i =0;i<=buttonSet.length;i++){
-        buttonSet[i].value = currentPage+i;
-        buttonSet[i].textContent = JSON.stringify(currentPage+i);
-    }
-}
-
- async function setPageNumbers(value) {
-    currentPage = parseInt(value);
-    lastPage = currentPage + 10;
-    console.log(lastPage);
-    let videosDiv = document.getElementById("videos");
-    videosDiv.remove();
-    videosDiv = document.createElement("div");
-    videosDiv.id = "videos";
-    const vContainer = document.getElementById("videoContainer");
-    vContainer.appendChild(videosDiv);
-    console.log(videosDiv);
-     await new Promise((res, rej) => {
-         setTimeout(() => res("Now it's done!"), 300)
-     });
-
-    return 1;
+    document.getElementById("inputButton").value=JSON.stringify(currentPage);
 }

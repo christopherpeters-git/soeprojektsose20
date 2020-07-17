@@ -46,7 +46,9 @@ body{
     cursor: pointer;
     margin-right: -13%;
 }
-
+#videoContainer{
+    clear:both;
+}
 
 /* Change styles for span and cancel button on extra small screens */
 @media screen and (max-width: 400px) {
@@ -72,6 +74,11 @@ input[type=text]{
     display: inline-block;
     border: 1px solid #ccc;
     box-sizing: border-box;
+}
+
+.showClass{
+    clear: both;
+    
 }
 
 

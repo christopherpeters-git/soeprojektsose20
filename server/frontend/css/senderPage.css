@@ -3,6 +3,23 @@
     border-radius: 5%;
 }
 #videos{
-    margin-top: 10%;
-    margin-left: 5%;
+    padding-left: 10%;;
+}
+
+.thumbnail{
+    width: 50%;
+    margin-left:2% ;
+    margin-top: 2%;
+}
+
+.videoLink{
+    width:30%;
+    float: left;
+    border-style: groove;
+    border-radius: 5%;
+}
+
+#buttons{
+    clear: both;
+
 }

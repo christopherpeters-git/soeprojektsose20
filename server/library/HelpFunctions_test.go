@@ -103,7 +103,7 @@ func TestLoginUser(t *testing.T) {
 	incomingPasswordHash, err := bcrypt.GenerateFromPassword([]byte(incomingPassword), bcrypt.MinCost)
 	givenSessionId := "0"
 	if err != nil {
-		t.Fatal("error '%s' was not expected creating a hash", err)
+		t.Fatalf("error '%s' was not expected creating a hash", err.Error())
 	}
 	columns := []string{"Id", "Name", "Username", "PasswordHash", "Session_Id"}
 	mock.ExpectBegin()

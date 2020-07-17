@@ -64,7 +64,7 @@ func handleCookieAuth(w http.ResponseWriter, r *http.Request) {
 	}
 	var user lib.User
 	if dErr := lib.IsUserLoggedInWithACookie(r, userDB, &user); dErr != nil {
-		lib.ReportError(w, dErr.Status(), dErr.PublicError(), dErr.Error())
+		lib.ReportDetailedError(w, dErr)
 		return
 	}
 	err = lib.FillUserVideoArray(&user, userDB)

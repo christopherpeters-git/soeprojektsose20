@@ -9,7 +9,6 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
-	"reflect"
 	"time"
 )
 
@@ -50,7 +49,7 @@ func ConvertMapToArray(mapToConvert map[string][]Video) []Video {
 }
 
 //Generate random session id
-func generateSessionId(n int) string {
+func GenerateSessionId(n int) string {
 	b := make([]byte, n)
 	for i := range b {
 		b[i] = LetterBytes[rand.Intn(len(LetterBytes))]
@@ -93,6 +92,11 @@ func InitDataBaseConnection(dbConnections map[string]*sql.DB, driverName string,
 func ReportError(w http.ResponseWriter, statusCode int, responseMessage string, logMessage string) {
 	http.Error(w, responseMessage, statusCode)
 	log.Println(logMessage)
+}
+
+func ReportDetailedError(w http.ResponseWriter, dErr DetailedHttpError) {
+	http.Error(w, dErr.PublicError(), dErr.Status())
+	log.Println(dErr.Error())
 }
 
 func ParseVideosFromJson(videos *[]Video) {
@@ -151,7 +155,7 @@ func IsUserLoggedInWithACookie(r *http.Request, userDB *sql.DB, user *User) Deta
 	}
 }
 
-//Returns true if user exists
+//Returns true if user exists and fills user with user information from the DB
 func LoginUser(userDB *sql.DB, user *User, incomingUsername string, incomingPassword string) DetailedHttpError {
 	//Get userdata from db for comparison
 	rows, err := userDB.Query("select * from users where username = ?", incomingUsername)
@@ -178,7 +182,7 @@ func LoginUser(userDB *sql.DB, user *User, incomingUsername string, incomingPass
 
 func PlaceCookie(w http.ResponseWriter, userDB *sql.DB, incomingUsername string) DetailedHttpError {
 	//Generating and inserting a new SessionId in the db
-	sessionId := generateSessionId(255)
+	sessionId := GenerateSessionId(255)
 	_, err := userDB.Exec("UPDATE users set Session_Id = ? where username = ?", sessionId, incomingUsername)
 	if err != nil {
 		return &ServerError{500, InternalServerErrorResponse, errors.New("Updating sql failed: \n" + err.Error())}

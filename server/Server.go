@@ -17,6 +17,7 @@ import (
 	"math/rand"
 	"net/http"
 	"os"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -293,8 +294,14 @@ func convertMapToArray(incomingChannel string) []Video {
 			channelArray = append(channelArray, e[ew])
 		}
 	}
-
+	sortArray(channelArray)
 	return channelArray
+}
+
+func sortArray(video []Video) {
+	sort.Slice(video, func(i, j int) bool {
+		return video[i].Show < video[j].Show
+	})
 }
 
 //**************************************</Helpers>************************************************************************

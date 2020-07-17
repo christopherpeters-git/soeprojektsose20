@@ -5,7 +5,7 @@ let end = 30;
 
 let currentPage =1;
 
-let lastPage =10;
+let lastPage;
 
 class Videoclass {
     constructor(channel, title, show, releaseDate, duration, link, pageLink, fileName) {
@@ -35,6 +35,8 @@ function sendGetVideos() {
                 channelJson = JSON.parse(this.responseText);
                 channelName = sessionStorage.getItem("channel");
                 console.log(channelJson);
+                lastPage = Math.round(channelJson.length/end)+1;
+                console.log(lastPage);
                 setPage();
 
             } else {
@@ -58,6 +60,10 @@ function createAjaxRequest() {
 }
 
 function setPage() {
+    /*Todo
+    - Schleife braucht noch eine IF-Bedingung für die letzte Seite
+     */
+
     let videosDiv = document.getElementById("videos");
     videosDiv.remove();
     videosDiv = document.createElement("div");

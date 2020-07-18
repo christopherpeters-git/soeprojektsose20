@@ -8,31 +8,38 @@
     <script src="js/videos.js"></script>
 </head>
 
-<body onload="requestVideos()">
+<body>
 <div id="v_blocker">
+
 </div>
 <div id="Login_Screen">
     <div class="tab">
         <button id="defaultOpener" class="tablinks" onclick="open_L_R(event, 'logins')">Login</button>
-        <button class="tablinks" onclick="open_L_R(event, 'registrieren')">Registieren</button>
+        <button class="tablinks" onclick="open_L_R(event, 'registrieren')">Registrieren</button>
     </div>
 
     <div id="logins" class="tabcontent">
         <form action="/login/" method="post">
             <div class="container">
-                <label for="uname" style="color: white"><b>Username</b></label>
-                <input type="text" placeholder="Enter Username" name="uname" required>
+                <label for="usernameLogin" style="color: white"><b>Username</b></label>
+                <input type="text" id="usernameLogin" placeholder="Enter Username" name="usernameLogin" required>
 
-                <label for="psw" style="color: white"><b>Password</b></label>
-                <input type="password" placeholder="Enter Password" name="psw" required>
+                <label for="passwordLogin" style="color: white"><b>Password</b></label>
+                <input type="password" id="passwordLogin" placeholder="Enter Password" name="passwordLogin" required>
 
-                <button type="submit">Login</button>
+                <button onclick="sendPostLoginRequest()">Login </button>
             </div>
         </form>
     </div>
     <div class="tabcontent" id="registrieren">
         <div class="container">
-            hier kommt noch etwas
+            <label for="fullname" style="color: white">Enter first and last name</label>
+            <input type="text" id="fullname" name="fullname" placeholder="First and Last Name">
+            <label for="usernameReg" style="color: white">New Username</label>
+            <input type="text" id="usernameReg" placeholder="Enter Username" name="usernameReg">
+            <label for="passwordReg" style="color: white">New Password</label>
+            <input type="text" id="passwordReg" name="passwordReg" placeholder="Enter password">
+            <button onclick="sendPostRegisterRequest()">Create new Account</button>
         </div>
     </div>
 </div>

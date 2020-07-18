@@ -38,7 +38,7 @@ func main() {
 	defer lib.InitDataBaseConnection(dbConnections, "mysql", "root", "soe2020", "localhost:3306", lib.UserDBconnectionName, lib.UserDBconnectionName).Close()
 
 	log.Print("Server has started...")
-	http.Handle("/", http.FileServer(http.Dir("test_frontend/")))
+	http.Handle("/", http.FileServer(http.Dir("frontend/")))
 	http.HandleFunc(lib.IncomingGetSearchRequestUrl, handleGetSearchVideos)
 	http.HandleFunc(lib.IncomingGetVideosRequestUrl, handleGetAllVideos)
 	http.HandleFunc(lib.IncomingGetVideosFromChannelRequestUrl, handleGetVideosByChannel)
@@ -52,6 +52,7 @@ func main() {
 	if err != nil {
 		log.Fatal("Starting Server failed: " + err.Error())
 	}
+	log.Print("Server is running")
 }
 
 func handleCookieAuth(w http.ResponseWriter, r *http.Request) {

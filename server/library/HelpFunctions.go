@@ -12,6 +12,31 @@ import (
 	"time"
 )
 
+func FillUserVideoArray(user *User, userDB *sql.DB) error {
+	//Getting the informations about the user
+	rows, err := userDB.Query("select * from user_has_favorite_videos where Users_Username = ?", user.Username)
+	if err != nil {
+		return errors.New("SQL query failed: \n" + err.Error())
+	}
+	user.FavoriteVideos = make([]Video, 0)
+	var username string
+	var videoStr string
+	for rows.Next() {
+		err := rows.Scan(&username, &videoStr)
+		if err != nil {
+			return errors.New("Scanning rows failed: \n" + err.Error())
+		}
+		var video Video
+		err = json.Unmarshal([]byte(videoStr), &video)
+		if err != nil {
+			return errors.New("unmarshalling failed: \n" + err.Error())
+		}
+		user.FavoriteVideos = append(user.FavoriteVideos, video)
+	}
+	return nil
+}
+
+//Converts a Videoarray map to an video array
 func ConvertMapToArray(mapToConvert map[string][]Video) []Video {
 	var channelArray []Video
 	var channelMap = mapToConvert
@@ -24,7 +49,7 @@ func ConvertMapToArray(mapToConvert map[string][]Video) []Video {
 }
 
 //Generate random session id
-func generateSessionId(n int) string {
+func GenerateSessionId(n int) string {
 	b := make([]byte, n)
 	for i := range b {
 		b[i] = LetterBytes[rand.Intn(len(LetterBytes))]
@@ -49,6 +74,7 @@ func SortByChannelAndShow(allVideos []Video) map[string]map[string][]Video { //c
 	return videosSortedAfterChannels
 }
 
+//Starts a connection to a database and adds it to the connection map
 func InitDataBaseConnection(dbConnections map[string]*sql.DB, driverName string, user string, password string, url string, dbName string, idName string) *sql.DB {
 	//Open and check the sql-databse connection
 	db, err := sql.Open(driverName,
@@ -62,9 +88,15 @@ func InitDataBaseConnection(dbConnections map[string]*sql.DB, driverName string,
 	return db
 }
 
+//Reports an error and prints to the log
 func ReportError(w http.ResponseWriter, statusCode int, responseMessage string, logMessage string) {
 	http.Error(w, responseMessage, statusCode)
 	log.Println(logMessage)
+}
+
+func ReportDetailedError(w http.ResponseWriter, dErr DetailedHttpError) {
+	http.Error(w, dErr.PublicError(), dErr.Status())
+	log.Println(dErr.Error())
 }
 
 func ParseVideosFromJson(videos *[]Video) {
@@ -97,79 +129,77 @@ func ParseVideosFromJson(videos *[]Video) {
 }
 
 //Checks if a request has a valid cookie and writes to user if valid cookies exists
-func IsUserLoggedInWithACookie(r *http.Request, userDB *sql.DB, user *User) (bool, error) {
+func IsUserLoggedInWithACookie(r *http.Request, userDB *sql.DB, user *User) DetailedHttpError {
 	//Check if there is a cookie in the request
 	cookie, err := r.Cookie(AuthCookieName)
 	if err == nil {
 		if cookie.Value == "0" {
-			return false, nil
+			return &ClientError{401, AuthenticationFailedResponse, errors.New("session ID in cookie is 0")}
 		}
 		rows, err := userDB.Query("Select * from Users where Session_Id = ?", cookie.Value)
 		if err != nil {
-			return false, errors.New("SQL query failed: \n" + err.Error())
+			return &ServerError{500, InternalServerErrorResponse, errors.New("SQL query failed: \n" + err.Error())}
 		}
 		if rows.Next() {
 			err := rows.Scan(&user.Id, &user.Name, &user.Username, &user.passwordHash, &user.sessionId)
 			if err != nil {
-				return false, errors.New("Scanning rows failed: \n" + err.Error())
+				return &ServerError{500, InternalServerErrorResponse, errors.New("Scanning rows failed: \n" + err.Error())}
 			}
 		} else {
 			log.Println("No such SessionId found")
-			return false, nil
+			return &ClientError{401, AuthenticationFailedResponse, errors.New("session ID in DB is 0")}
 		}
-		return true, nil
+		return nil
 	} else {
-		log.Println("No cookie found with name " + AuthCookieName)
-		return false, nil
+		return &ClientError{401, AuthenticationFailedResponse, errors.New("no cookie found with name: " + AuthCookieName)}
 	}
 }
 
-func LoginUser(w http.ResponseWriter, userDB *sql.DB, user *User, incomingUsername string, incomingPassword string) bool {
+//Returns true if user exists and fills user with user information from the DB
+func LoginUser(userDB *sql.DB, user *User, incomingUsername string, incomingPassword string) DetailedHttpError {
 	//Get userdata from db for comparison
 	rows, err := userDB.Query("select * from users where username = ?", incomingUsername)
 	if err != nil {
-		ReportError(w, 500, InternalServerErrorResponse, "Sql query failed: \n"+err.Error())
-		return false
+		return &ServerError{500, InternalServerErrorResponse, errors.New("sql query failed: \n" + err.Error())}
 	}
 	if rows.Next() {
 		err := rows.Scan(&user.Id, &user.Name, &user.Username, &user.passwordHash, &user.sessionId)
 		if err != nil {
-			ReportError(w, 500, InternalServerErrorResponse, "Scanning rows failed: \n"+err.Error())
-			return false
+			return &ServerError{500, InternalServerErrorResponse, errors.New("scanning rows failed: \n" + err.Error())}
 		}
-		log.Println("User from Query: username: " + user.Username + " passwordhash: " + user.passwordHash)
 		//Compare found password hash with incoming password hash
 		err = bcrypt.CompareHashAndPassword([]byte(user.passwordHash), []byte(incomingPassword))
 		if err != nil {
-			ReportError(w, 400, "Wrong password", "Wrong password: \n"+err.Error())
-			return false
+			return &ClientError{400, "wrong password", errors.New("wrong password: \n" + err.Error())}
 		} else {
 			log.Println("Entered Password is correct")
 		}
-		//Generating and inserting a new SessionId in the db
-		sessionId := generateSessionId(255)
-		_, err = userDB.Exec("UPDATE users set Session_Id = ? where username = ?", sessionId, incomingUsername)
-		if err != nil {
-			ReportError(w, 500, InternalServerErrorResponse, "Updating sql failed: \n"+err.Error())
-			return false
-		}
-		expire := time.Now().AddDate(0, 0, 2)
-		cookie := http.Cookie{
-			Name:       AuthCookieName,
-			Value:      sessionId,
-			Path:       "/",
-			Domain:     "localhost",
-			Expires:    expire,
-			RawExpires: expire.Format(time.UnixDate),
-			MaxAge:     172800,
-			Secure:     false,
-			HttpOnly:   true,
-			SameSite:   http.SameSiteLaxMode,
-		}
-		http.SetCookie(w, &cookie)
 	} else {
-		ReportError(w, 404, "User not found", "Empty sql result set \n")
-		return false
+		return &ClientError{404, "user not found", errors.New("empty sql result set")}
 	}
-	return true
+	return nil
+}
+
+func PlaceCookie(w http.ResponseWriter, userDB *sql.DB, incomingUsername string) DetailedHttpError {
+	//Generating and inserting a new SessionId in the db
+	sessionId := GenerateSessionId(255)
+	_, err := userDB.Exec("UPDATE users set Session_Id = ? where username = ?", sessionId, incomingUsername)
+	if err != nil {
+		return &ServerError{500, InternalServerErrorResponse, errors.New("Updating sql failed: \n" + err.Error())}
+	}
+	expire := time.Now().AddDate(0, 0, 2)
+	cookie := http.Cookie{
+		Name:       AuthCookieName,
+		Value:      sessionId,
+		Path:       "/",
+		Domain:     "localhost",
+		Expires:    expire,
+		RawExpires: expire.Format(time.UnixDate),
+		MaxAge:     172800,
+		Secure:     false,
+		HttpOnly:   true,
+		SameSite:   http.SameSiteLaxMode,
+	}
+	http.SetCookie(w, &cookie)
+	return nil
 }

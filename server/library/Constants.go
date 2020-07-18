@@ -1,11 +1,12 @@
 package library
 
-//URL's
+//URL'publicErrorMessage
 const (
 	IncomingPostUserRequestUrl             = "/login/"
 	IncomingPostRegisterRequestUrl         = "/register/"
 	IncomingPostAddToFavoritesRequestUrl   = "/addToFavorites/"
 	IncomingPostLogoutRequestUrl           = "/logout/"
+	IncomingPostCookieAUthRequestUrl       = "/cookieAuth/"
 	IncomingGetSearchRequestUrl            = "/search"
 	IncomingGetVideosFromChannelRequestUrl = "/getVideoByChannel"
 	IncomingGetVideoClickedRequestUrl      = "/clickVideo"
@@ -19,9 +20,10 @@ const (
 	VideoSearchParameter = "search"
 )
 
-//Error messages
+//PublicError messages
 const (
-	InternalServerErrorResponse = "Internal server error - see logs"
+	InternalServerErrorResponse  = "Internal server error - see logs"
+	AuthenticationFailedResponse = "Authentication failed"
 )
 
 //db connection names

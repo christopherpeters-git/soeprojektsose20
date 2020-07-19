@@ -37,9 +37,11 @@ function sendPostCookieAuthRequest(){
     request.onreadystatechange = function () {
         if(4 === this.readyState){
             if(200 === this.status){
-                alert(this.responseText)
+                hideVBlockerAndLogin();
             }else{
-                alert(this.status + ":" + this.responseText);
+                console.log(this.status + ":" + this.responseText);
+                document.getElementById("Login_Screen").style.visibility="visible";
+
             }
         }
     }

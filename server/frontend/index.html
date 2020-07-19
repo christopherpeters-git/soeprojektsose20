@@ -8,14 +8,14 @@
     <script src="js/sender.js"></script>
 </head>
 
-<body>
+<body onload="sendPostCookieAuthRequest()">
 <div id="v_blocker">
 
 </div>
-<div id="Login_Screen">
+<div id="Login_Screen" style="visibility: hidden;">
     <div class="tab">
         <button id="defaultOpener" class="tablinks" onclick="openTab(event, 'logins')">Login</button>
-        <button class="tablinks" onclick="openTab(event, 'registrieren')">Registieren</button>
+        <button class="tablinks" onclick="openTab(event, 'registrieren')">Registrieren</button>
     </div>
 
     <div id="logins" class="tabcontent">
@@ -36,7 +36,7 @@
             <label for="usernameReg" style="color: white">New Username</label>
             <input type="text" id="usernameReg" placeholder="Enter Username" name="usernameReg">
             <label for="passwordReg" style="color: white">New Password</label>
-            <input type="text" id="passwordReg" name="passwordReg" placeholder="Enter password">
+            <input type="password" id="passwordReg" name="passwordReg" placeholder="Enter password">
             <button onclick="sendPostRegisterRequest()">Create new Account</button>
         </div>
     </div>

@@ -1,11 +1,17 @@
 let channelJson;
 let channelName;
-let start =0;
-let end = 30;
+const start =0;
+const end = 30;
 
 let currentPage =1;
 
 let lastPage;
+
+/*todo
+* searchfunktion
+*
+* */
+
 
 class Videoclass {
     constructor(channel, title, show, releaseDate, duration, link, pageLink, fileName) {
@@ -42,8 +48,8 @@ function sendGetVideos() {
             if (200 === this.status) {
                 channelJson = JSON.parse(this.responseText);
                 channelName = sessionStorage.getItem("channel");
-                console.log(channelJson);
-                lastPage = Math.round(channelJson.length/end)+1;
+                console.log(channelJson.length);
+                lastPage = (Math.ceil(channelJson.length/end));
                 console.log(lastPage);
                 setPage();
                 setSenderPagePicture(channelJson[1]);
@@ -69,10 +75,8 @@ function createAjaxRequest() {
 }
 
 function setPage() {
-    /*Todo
-    - Schleife braucht noch eine IF-Bedingung für die letzte Seite
-     */
-
+    let tempStart=start;
+    let tempEnd =end;
     let videosDiv = document.getElementById("videos");
     videosDiv.remove();
     videosDiv = document.createElement("div");
@@ -91,8 +95,11 @@ function setPage() {
     show.appendChild(t);
     show.appendChild(document.createElement('br'));
     show.appendChild(document.createElement("hr"));
-    appendShow(lastVideo,show);
-    for(let i =(start+1)+((currentPage-1)*end);i<end*currentPage;i++){
+    appendShow(lastVideo,show)
+    if(currentPage === lastPage){
+        tempEnd= (lastPage*30)-channelJson.length;
+    }
+    for(let i =(tempStart+1)+((currentPage-1)*tempEnd);i<tempEnd*currentPage;i++){
         currentVideo = channelJson[i];
         if(lastVideo.show !== currentVideo.show){
             videosDiv.appendChild(show);
@@ -144,9 +151,12 @@ function previousPage(){
     }
 }
 function nextPage() {
-    currentPage=currentPage+1;
-    setPage();
-    document.getElementById("inputButton").value=JSON.stringify(currentPage);
+    if((currentPage+1)>lastPage);
+    else {
+        currentPage = currentPage + 1;
+        setPage();
+        document.getElementById("inputButton").value = JSON.stringify(currentPage);
+    }
 }
 
 function openVideoPlayer() {

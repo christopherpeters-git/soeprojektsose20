@@ -180,9 +180,7 @@ function loginAfterRegister() {
    let userLogin = document.getElementById("usernameLogin");
    let userPass = document.getElementById("passwordLogin");
    userLogin.value = document.getElementById("usernameReg").value;
-   console.log(userLogin.value);
    userPass.value = document.getElementById("passwordReg").value;
-   console.log(userPass.value);
    sendPostLoginRequest();
 }
 

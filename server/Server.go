@@ -52,7 +52,6 @@ func main() {
 	if err != nil {
 		log.Fatal("Starting Server failed: " + err.Error())
 	}
-	log.Print("Server is running")
 }
 
 func handleCookieAuth(w http.ResponseWriter, r *http.Request) {

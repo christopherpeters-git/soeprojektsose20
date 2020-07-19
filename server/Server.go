@@ -42,9 +42,9 @@ func main() {
 	http.HandleFunc(lib.IncomingGetSearchRequestUrl, handleGetSearchVideos)
 	http.HandleFunc(lib.IncomingGetVideosRequestUrl, handleGetAllVideos)
 	http.HandleFunc(lib.IncomingGetVideosFromChannelRequestUrl, handleGetVideosByChannel)
+	http.HandleFunc(lib.IncomingGetVideoClickedRequestUrl, handleGetVideoClicked)
 	http.HandleFunc(lib.IncomingPostUserRequestUrl, handlePostLogin)
 	http.HandleFunc(lib.IncomingPostAddToFavoritesRequestUrl, handlePostAddVideoToFavorites)
-	http.HandleFunc(lib.IncomingGetVideoClickedRequestUrl, handleGetVideoClicked)
 	http.HandleFunc(lib.IncomingPostRegisterRequestUrl, handlePostRegisterUser)
 	http.HandleFunc(lib.IncomingPostLogoutRequestUrl, handlePostLogout)
 	http.HandleFunc(lib.IncomingPostCookieAUthRequestUrl, handleCookieAuth)
@@ -108,47 +108,83 @@ func handlePostLogout(w http.ResponseWriter, r *http.Request) {
 
 func handleGetSearchVideos(w http.ResponseWriter, r *http.Request) {
 	log.Println("Answering handleGetSearchVideos request started...")
-	queryResults, ok := r.URL.Query()[lib.VideoSearchParameter]
-	if !ok || len(queryResults) < 1 {
+	query := r.URL.Query()
+	searchQueryResults, ok := query[lib.VideoSearchParameter]
+	if !ok || len(searchQueryResults) < 1 {
 		lib.ReportError(w, 400, "url parameter unkown", "Cant find parameter "+lib.VideoTitleParameter)
 		return
 	}
-	searchString := queryResults[0]
+	channelQueryResults, ok := query[lib.ChannelNameParameter]
+	if !ok || len(channelQueryResults) < 1 {
+		lib.ReportError(w, 400, "url parameter unkown", "Cant find parameter "+lib.ChannelNameParameter)
+		return
+	}
+	searchString := searchQueryResults[0]
+	channelString := channelQueryResults[0]
 	searchResult := make([]lib.Video, 0)
 	videosFound := false
 	if searchString == "" || searchString == " " {
 		videosFound = true
 	}
-	//Check if searchstring is a channel
-	for k, v := range videosSortedAfterChannels {
-		if strings.EqualFold(k, searchString) {
-			for _, v2 := range v {
-				for _, video := range v2 {
-					searchResult = append(searchResult, video)
+
+	if channelString == "none" { //Search in every channel
+		//Check if searchstring is a channel
+		for k, v := range videosSortedAfterChannels {
+			if strings.EqualFold(k, searchString) {
+				for _, v2 := range v {
+					for _, video := range v2 {
+						searchResult = append(searchResult, video)
+					}
 				}
-			}
-			videosFound = true
-			break
-		}
-	}
-	//Check if searchstring is a show
-	if !videosFound {
-		for _, v := range videosSortedAfterChannels {
-			for k2, v2 := range v {
-				if strings.EqualFold(k2, searchString) {
-					searchResult = v2
-					videosFound = true
-					break
-				}
+				videosFound = true
+				break
 			}
 		}
-	}
-	//Search for a substring
-	if !videosFound {
-		lowerSearchString := strings.ToLower(searchString)
-		for _, v := range videosSortedAfterChannels {
-			for _, v2 := range v {
-				for _, video := range v2 {
+		//Check if searchstring is a show
+		if !videosFound {
+			for _, v := range videosSortedAfterChannels {
+				for k2, v2 := range v {
+					if strings.EqualFold(k2, searchString) {
+						searchResult = v2
+						videosFound = true
+						break
+					}
+				}
+			}
+		}
+		//Search for a substring in the title
+		if !videosFound {
+			lowerSearchString := strings.ToLower(searchString)
+			for _, v := range videosSortedAfterChannels {
+				for _, v2 := range v {
+					for _, video := range v2 {
+						if strings.Contains(strings.ToLower(video.Title), lowerSearchString) {
+							searchResult = append(searchResult, video)
+							videosFound = true
+						}
+					}
+				}
+			}
+		}
+	} else {
+		videosFromChannel := videosSortedAfterChannels[channelString]
+		if videosFromChannel == nil {
+			lib.ReportError(w, 404, "channel '"+channelString+"' not found", channelString+" doesnt exist")
+			return
+		}
+		//Search for the show
+		for k, v := range videosFromChannel {
+			if strings.EqualFold(k, searchString) {
+				searchResult = v
+				videosFound = true
+				break
+			}
+		}
+		//Search for a substring in the title
+		if !videosFound {
+			lowerSearchString := strings.ToLower(searchString)
+			for _, v := range videosFromChannel {
+				for _, video := range v {
 					if strings.Contains(strings.ToLower(video.Title), lowerSearchString) {
 						searchResult = append(searchResult, video)
 						videosFound = true
@@ -157,6 +193,7 @@ func handleGetSearchVideos(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 	}
+
 	if !videosFound {
 		log.Println("No Video found with: '" + searchString + "'!")
 	}

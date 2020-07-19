@@ -47,6 +47,9 @@ function sendGetVideos() {
         if (4 === this.readyState) {
             if (200 === this.status) {
                 channelJson = JSON.parse(this.responseText);
+                if(channelJson===null){
+                    window.location.href="/index.html";
+                }
                 channelName = sessionStorage.getItem("channel");
                 console.log(channelJson.length);
                 lastPage = (Math.ceil(channelJson.length/end));

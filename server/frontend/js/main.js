@@ -94,7 +94,7 @@ function sendPostLogoutRequest(){
         if(4 === this.readyState){
             if(200 === this.status){
                 alert(this.responseText)
-
+                unhideVBlockerAndLogin();
             }else{
                 alert(this.status + ":" + this.responseText);
             }
@@ -115,7 +115,7 @@ function sendPostRegisterRequest(){
             if(200 === this.status){
                 alert(this.responseText)
                 hideVBlockerAndLogin();
-
+                loginAfterRegister();
             }else{
                 alert(this.status + ":" + this.responseText);
             }
@@ -165,10 +165,25 @@ function sendGetClickedVideos(){
 function hideVBlockerAndLogin() {
     var vblocker = document.getElementById("v_blocker");
     var loginscreen = document.getElementById("Login_Screen");
-    vblocker.style.visibility = "hidden";
     loginscreen.style.visibility = "hidden";
+    vblocker.style.visibility = "hidden";
+}
 
+function unhideVBlockerAndLogin() {
+    var vblocker = document.getElementById("v_blocker");
+    var loginscreen = document.getElementById("Login_Screen");
+    vblocker.style.visibility = "visible";
+    loginscreen.style.visibility = "visible";
+}
 
+function loginAfterRegister() {
+   let userLogin = document.getElementById("usernameLogin");
+   let userPass = document.getElementById("passwordLogin");
+   userLogin.value = document.getElementById("usernameReg").value;
+   console.log(userLogin.value);
+   userPass.value = document.getElementById("passwordReg").value;
+   console.log(userPass.value);
+   sendPostLoginRequest();
 }
 
 

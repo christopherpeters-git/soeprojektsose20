@@ -53,11 +53,11 @@
 
     <div class="Searchbar" style="width: 50%;float: left">
         <input id="searchInput" type="text" placeholder="Suchbegriff eingeben" size="70" style="position: center">
-        <img src="media/images/icon_Search.png" id="iconSearchbar" onclick="searchThroughDatabase()" title="Suche starten">
+        <img src="media/images/icon_Search.png" id="iconSearchbar" onclick="sendGetSearchRequest()" title="Suche starten">
     </div>
 
     <div id="logout" style="width: 10%;float: right">
-        <img id="logout_btn" src="media/Sender-Logos/logout.png" width="30%;" style="float: right;">
+        <img onclick="sendPostLogoutRequest()" id="logout_btn" src="media/Sender-Logos/logout.png" width="30%;" style="float: right;">
     </div>
 
     <div class="Senderliste">

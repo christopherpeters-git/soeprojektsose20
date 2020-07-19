@@ -6,12 +6,11 @@
     <script src="js/main.js"></script>
     <script src="js/videos.js"></script>
     <script src="js/sender.js"></script>
-    
-
 </head>
 
-<body onload="requestVideos()">
+<body>
 <div id="v_blocker">
+
 </div>
 <div id="Login_Screen">
     <div class="tab">
@@ -21,17 +20,24 @@
 
     <div id="logins" class="tabcontent">
             <div class="container">
-                <label for="uname" style="color: white"><b>Username</b></label>
-                <input id="usernameInput" type="text" placeholder="Enter Username" name="uname" required>
-                <label for="psw" style="color: white"><b>Password</b></label>
-                <input id="passwordInput" type="password" placeholder="Enter Password" name="psw" required>
-                <button onclick="sendPostLoginRequest()">Login</button>
+                <label for="usernameLogin" style="color: white"><b>Username</b></label>
+                <input type="text" id="usernameLogin" placeholder="Enter Username" name="usernameLogin" required>
+
+                <label for="passwordLogin" style="color: white"><b>Password</b></label>
+                <input type="password" id="passwordLogin" placeholder="Enter Password" name="passwordLogin" required>
+
+                <button onclick="sendPostLoginRequest()">Login </button>
             </div>
-        </form>
     </div>
     <div class="tabcontent" id="registrieren">
         <div class="container">
-            hier kommt noch etwas
+            <label for="fullname" style="color: white">Enter first and last name</label>
+            <input type="text" id="fullname" name="fullname" placeholder="First and Last Name">
+            <label for="usernameReg" style="color: white">New Username</label>
+            <input type="text" id="usernameReg" placeholder="Enter Username" name="usernameReg">
+            <label for="passwordReg" style="color: white">New Password</label>
+            <input type="text" id="passwordReg" name="passwordReg" placeholder="Enter password">
+            <button onclick="sendPostRegisterRequest()">Create new Account</button>
         </div>
     </div>
 </div>
@@ -49,11 +55,11 @@
         <input id="searchInput" type="text" placeholder="Suchbegriff eingeben" size="70" style="position: center; " >
     </div>
     <div id="searchbarIcon" style="width: 10%;float: left">
-        <img src="media/images/icon_Search.png" onclick="searchThroughDatabase()" title="Suche starten" width="35">
+        <img src="media/images/icon_Search.png" onclick="sendGetSearchRequest()" title="Suche starten" width="35">
     </div>
 
     <div id="logout" style="width: 10%;float: right">
-        <img id="logout_btn" src="media/Sender-Logos/logout.png" width="30%;" style="float: right;">
+        <img onclick="sendPostLogoutRequest()" id="logout_btn" src="media/Sender-Logos/logout.png" width="30%;" style="float: right;">
     </div>
 
     <div class="Senderliste">
@@ -78,16 +84,16 @@
             <input id="DW" type="image" src="media/Sender-Logos/DW.png" class="sender" value="DW"  onclick="loadSenderPage(value)">
         </from>
     </div>
-    
+
     <center><div class ="dropup" style="width: 30%;">
         <button class= "dropbtn" >Impressum</button>
         <center> <div class="dropup-content" style="width: 100%;">
               <br> <br>
-              E-Mail: m.kannathasan@ostfalia.de, 
+              E-Mail: m.kannathasan@ostfalia.de,
               c.peters@ostfalia.de, d.dietrich@ostfalia.de, ti.fricke@ostfalia.de<br> <br>
               Matrikelnummern: Mathusan Kannathasan: 70463094, Christopher Peters: 70463991, Daniel Dietrich: 70462732, Till Fricke: 70463997<br> <br>
           </div></center>
-      </div></center> 
+      </div></center>
 </div>
 </body>
 

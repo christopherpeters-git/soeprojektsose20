@@ -32,9 +32,26 @@ function createAjaxRequest(){
     return request;
 }
 
+function sendPostCookieAuthRequest(){
+    const request = createAjaxRequest();
+    request.onreadystatechange = function () {
+        if(4 === this.readyState){
+            if(200 === this.status){
+                alert(this.responseText)
+            }else{
+                alert(this.status + ":" + this.responseText);
+            }
+        }
+    }
+    request.open("POST","/cookieAuth/",true);
+    request.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+    request.send("dummy=dummy");
+}
+
 function sendGetSearchRequest(){
     const request = createAjaxRequest();
     const searchString = document.getElementById("searchInput").value;
+    const channelString = document.getElementById("channelInput").value;
     request.onreadystatechange = function () {
         if(4 === this.readyState){
             if(200 === this.status){
@@ -45,7 +62,7 @@ function sendGetSearchRequest(){
         }
     }
 
-    request.open("GET","/search" +"?search="+searchString,true);
+    request.open("GET","/search" +"?search="+searchString + "&channel="+channelString,true);
     request.send();
 }
 

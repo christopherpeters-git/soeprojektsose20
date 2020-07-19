@@ -5,7 +5,7 @@
     <title>Test</title>
     <script src = "test.js"></script>
 </head>
-<body>
+<body onload="sendPostCookieAuthRequest()">
     <h2>Login</h2>
 
     <form action="/login/" method="post">
@@ -18,7 +18,7 @@
 
     <h2>Register</h2>
 
-    <form action="/register/" method="post">
+    <form >
         <label for="nameInput">First and last name:</label><br>
         <input type="text" id="nameInput2" name="nameInput" value="First and last name"><br>
         <label for="passwordInput">Password:</label><br>
@@ -31,8 +31,11 @@
 
     <h2>Search</h2>
     <input type="text" id="searchInput" name="searchInput"><br><br>
+    <input type="text" id="channelInput" name="channelInput" value="none"><br><br>
+
     <button onclick="sendGetSearchRequest()">Search</button>
 
+    <h2>Misc</h2>
     <button onclick="sendPostFavoriteRequest()"> favorite</button>
     <button onclick="sendGetClickedVideos()"> click</button>
     <button onclick="sendPostLogoutRequest()"> logout</button>

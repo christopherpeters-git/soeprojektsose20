@@ -91,7 +91,6 @@ func InitDataBaseConnection(dbConnections map[string]*sql.DB, driverName string,
 		log.Fatal("Database connection failed: " + err.Error())
 		return nil
 	}
-	//defer db.Close() //???????
 	dbConnections[idName] = db
 	return db
 }

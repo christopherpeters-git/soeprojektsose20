@@ -27,6 +27,14 @@ function loadSenderPage(wert) {
 
 }
 
+function setSenderPagePicture(channel) {
+    let img = document.createElement("img");
+    img.setAttribute("src","/media/Sender-Logos/"+channel.channel+".png");
+    img.setAttribute("id","senderPicture");
+    const senderPagePic =document.getElementById("senderPic");
+    senderPagePic.appendChild(img);
+}
+
 function sendGetVideos() {
     const request = createAjaxRequest();
     request.onreadystatechange = function () {
@@ -38,6 +46,7 @@ function sendGetVideos() {
                 lastPage = Math.round(channelJson.length/end)+1;
                 console.log(lastPage);
                 setPage();
+                setSenderPagePicture(channelJson[1]);
 
             } else {
                 alert(this.status + ":" + this.responseText);
@@ -105,7 +114,9 @@ function setPage() {
 function appendShow(video,showdiv){
     const videoDiv = document.createElement("div");
     const header5 = document.createElement("h5");
+    header5.className="videoTitle";
     const header7 = document.createElement("h6");
+    header7.className="videoDuration"
     const img = document.createElement("img");
     const a = document.createElement("a");
     a.href=JSON.stringify(video);
@@ -118,6 +129,8 @@ function appendShow(video,showdiv){
     videoDiv.appendChild(img);
     videoDiv.appendChild(header5);
     videoDiv.appendChild(header7);
+    videoDiv.addEventListener("click",openVideoPlayer,false);
+    videoDiv.value = video;
     showdiv.appendChild(videoDiv);
 }
 
@@ -134,4 +147,9 @@ function nextPage() {
     currentPage=currentPage+1;
     setPage();
     document.getElementById("inputButton").value=JSON.stringify(currentPage);
+}
+
+function openVideoPlayer() {
+    console.log(this.value);
+
 }

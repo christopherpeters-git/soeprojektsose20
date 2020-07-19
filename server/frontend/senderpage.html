@@ -25,7 +25,14 @@
     <div id="homeIcon" style="width: 10%;float: right">
         <a href="index.html"> <img id="home_btn" src="media/images/Home-icon.svg.png" width="30%"></a>
     </div>
+</div>
 
+<div id ="senderPic" >
+
+    <select id="View-dropdown" name="Items"style="visibility: hidden">
+        <option value="listView">Listview </option>
+        <option value="kachelView"> Kachelview </option>
+    </select>
 
 </div>
 
@@ -36,9 +43,9 @@
 
 
 <div id="buttons">
-<button id="backButton" onclick="previousPage()"> zurück</button>
- <input type="text" id="inputButton" placeholder="1">
-    <button id="forButton" onclick="nextPage()"> Vorwärts</button>
+<button id="backButton" onclick="previousPage()">«</button>
+<input type="text" id="inputButton" placeholder="1" readonly>
+<button id="forButton" onclick="nextPage()"> »</button>
 </div>
 
 </body>

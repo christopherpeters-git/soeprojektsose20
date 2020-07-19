@@ -11,31 +11,54 @@ body{
 }
 
 .thumbnail{
-    width: 50%;
-    margin-left:2% ;
-    margin-top: 2%;
+    float: left;
+    /*width: 30%;*/
+    width: 5%;
 }
 
 .videoLink{
-    width:30%;
+    width: 94.5%;
+   /* width:32%;*/
     float: left;
+}
+.videoLink:hover{
+    cursor: pointer;
     border-style: groove;
-    border-radius: 5%;
 }
 
-#buttons{
+.videoDuration{
+    float: left;
+    width: 10%;
+
+}
+
+hr{
+    width: 94.5%;
+    background-color: #2d2d2d;
+    height: 3px;
+    margin-right:20%;
+    border-color: white;
+}
+
+.videoTitle{
+    width:60%;
+    float: left;
+}
+
+
+
+
+#senderPic{
     clear: both;
 
-}
-#mainPage{
 
+    background-color: #cccccc;
 }
-.Searchbar{
 
+#senderPicture{
+    margin-left: 40%;
 }
-#searchbarIcon{
 
-}
 #logout_btn{
     cursor: pointer;
 }
@@ -44,7 +67,7 @@ body{
 }
 #homeIcon{
     cursor: pointer;
-    margin-right: -13%;
+
 }
 #videoContainer{
     clear:both;
@@ -65,6 +88,9 @@ body{
     #searchbarIcon{
         width: 100%;
     }
+    #inputButton{
+        width: 20%;
+    }
 }
 
 input[type=text]{
@@ -78,8 +104,33 @@ input[type=text]{
 
 .showClass{
     clear: both;
-    
+
 }
 
+
+
+#buttons{
+    clear: both;
+    display: block;
+    width: 40%;
+    margin-left: 45%;
+
+}
+
+#inputButton{
+    width: 10%;
+    border-style: none;
+    text-align: center
+}
+#backButton{
+    font-size: 0.5cm;
+    width: 10%;
+
+}
+#forButton{
+    font-size: 0.5cm;
+    width: 10%;
+
+}
 
 

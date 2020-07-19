@@ -1,0 +1,52 @@
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <link type="text/css" rel="stylesheet" href="css/senderPage.css">
+    <script src="js/sender.js"></script>
+
+</head>
+<body onload="sendGetVideos()">
+<div id="mainPage">
+    <div id="favorite" style="width: 10%;float: left">
+        <a href="favoritelist.html"> <img id="fav_btn" src="media/Sender-Logos/favoritenlite.JPG" width="30%"></a>
+    </div>
+
+    <div class="Searchbar" style="width: 60%;float: left">
+        <input id="searchInput" type="text" placeholder="Suchbegriff eingeben" size="70" style="position: center;" >
+    </div>
+    <div id="searchbarIcon" style="width: 10%;float: left">
+        <img src="media/images/icon_Search.png" onclick="searchThroughDatabase()" title="Suche starten" width="35">
+    </div>
+    <div id="logout" style="width: 10%;float: right">
+        <img id="logout_btn" src="media/Sender-Logos/logout.png" width="30%;" style="float: right;">
+    </div>
+
+    <div id="homeIcon" style="width: 10%;float: right">
+        <a href="index.html"> <img id="home_btn" src="media/images/Home-icon.svg.png" width="30%"></a>
+    </div>
+</div>
+
+<div id ="senderPic" >
+
+    <select id="View-dropdown" name="Items"style="visibility: hidden">
+        <option value="listView">Listview </option>
+        <option value="kachelView"> Kachelview </option>
+    </select>
+
+</div>
+
+<div id = videoContainer>
+  <div id= "videos">
+  </div>
+</div>
+
+
+<div id="buttons">
+<button id="backButton" onclick="previousPage()">«</button>
+<input type="text" id="inputButton" placeholder="1" readonly>
+<button id="forButton" onclick="nextPage()"> »</button>
+</div>
+
+</body>
+</html>

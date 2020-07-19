@@ -3,19 +3,19 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <link type="text/css" rel="stylesheet" href="css/main.css">
-    <link type="text/css" rel="stylesheet" href="css/index.css">
     <script src="js/main.js"></script>
     <script src="js/videos.js"></script>
+    <script src="js/sender.js"></script>
 </head>
 
-<body>
+<body onload="sendPostCookieAuthRequest()">
 <div id="v_blocker">
 
 </div>
-<div id="Login_Screen">
+<div id="Login_Screen" style="visibility: hidden;">
     <div class="tab">
-        <button id="defaultOpener" class="tablinks" onclick="open_L_R(event, 'logins')">Login</button>
-        <button class="tablinks" onclick="open_L_R(event, 'registrieren')">Registrieren</button>
+        <button id="defaultOpener" class="tablinks" onclick="openTab(event, 'logins')">Login</button>
+        <button class="tablinks" onclick="openTab(event, 'registrieren')">Registrieren</button>
     </div>
 
     <div id="logins" class="tabcontent">
@@ -36,7 +36,7 @@
             <label for="usernameReg" style="color: white">New Username</label>
             <input type="text" id="usernameReg" placeholder="Enter Username" name="usernameReg">
             <label for="passwordReg" style="color: white">New Password</label>
-            <input type="text" id="passwordReg" name="passwordReg" placeholder="Enter password">
+            <input type="password" id="passwordReg" name="passwordReg" placeholder="Enter password">
             <button onclick="sendPostRegisterRequest()">Create new Account</button>
         </div>
     </div>
@@ -48,12 +48,14 @@
 
 <div id="main_site">
     <div id="favorite" style="width: 10%;float: left">
-        <img id="fav_btn" src="media/Sender-Logos/favoritenlite.JPG" width="30%">
+        <a href="favoritelist.html"> <img id="fav_btn" src="media/Sender-Logos/favoritenlite.JPG" width="30%"></a>
     </div>
 
-    <div class="Searchbar" style="width: 50%;float: left">
-        <input id="searchInput" type="text" placeholder="Suchbegriff eingeben" size="70" style="position: center">
-        <img src="media/images/icon_Search.png" id="iconSearchbar" onclick="sendGetSearchRequest()" title="Suche starten">
+    <div class="Searchbar" style="width: 60%;float: left">
+        <input id="searchInput" type="text" placeholder="Suchbegriff eingeben" size="70" style="position: center; " >
+    </div>
+    <div id="searchbarIcon" style="width: 10%;float: left">
+        <img src="media/images/icon_Search.png" onclick="sendGetSearchRequest()" title="Suche starten" width="35">
     </div>
 
     <div id="logout" style="width: 10%;float: right">
@@ -62,26 +64,36 @@
 
     <div class="Senderliste">
         <from>
-            <input id="ard" type="image" src="media/Sender-Logos/ard.png" class="sender">
-            <input id="zdf" type="image" src="media/Sender-Logos/zdf.png" class="sender">
-            <input id="phoenix" type="image" src="media/Sender-Logos/phoenix.png" class="sender">
-            <input id="dreisat" type="image" src="media/Sender-Logos/3sat.png" class="sender">
-            <input id="ndr" type="image" src="media/Sender-Logos/ndr.png" class="sender">
-            <input id="wdr" type="image" src="media/Sender-Logos/wdr.png" class="sender">
-            <input id="mdr" type="image" src="media/Sender-Logos/mdr.png" class="sender">
-            <input id="rbb" type="image" src="media/Sender-Logos/rbb.png" class="sender">
-            <input id="hr" type="image" src="media/Sender-Logos/hr.png" class="sender">
-            <input id="orf" type="image" src="media/Sender-Logos/orf.png" class="sender">
-            <input id="sr" type="image" src="media/Sender-Logos/sr.png" class="sender">
-            <input id="srf" type="image" src="media/Sender-Logos/SRF.PNG" class="sender">
-            <input id="swr" type="image" src="media/Sender-Logos/swr.png" class="sender">
-            <input id="arte" type="image" src="media/Sender-Logos/arte.png" class="sender">
-            <input id="kika" type="image" src="media/Sender-Logos/Kika.PNG" class="sender">
-            <input id="br" type="image" src="media/Sender-Logos/br.png" class="sender">
-            <input id="rb" type="image" src="media/Sender-Logos/radio bremen.png" class="sender">
-            <input id="DW" type="image" src="media/Sender-Logos/DW.png" class="sender">
+            <input id="ard" type="image" src="media/Sender-Logos/ard.png" class="sender" value="ARD" onclick="loadSenderPage(value)">
+            <input id="zdf" type="image" src="media/Sender-Logos/zdf.png" class="sender" value="ZDF" onclick="loadSenderPage(value)">
+            <input id="phoenix" type="image" src="media/Sender-Logos/phoenix.png" class="sender"  value="PHOENIX" onclick="loadSenderPage(value)">
+            <input id="dreisat" type="image" src="media/Sender-Logos/3sat.png" class="sender" value="3Sat"  onclick="loadSenderPage(value)">
+            <input id="ndr" type="image" src="media/Sender-Logos/ndr.png" class="sender" value="NDR"  onclick="loadSenderPage(value)">
+            <input id="wdr" type="image" src="media/Sender-Logos/wdr.png" class="sender" value="WDR"  onclick="loadSenderPage(value)">
+            <input id="mdr" type="image" src="media/Sender-Logos/mdr.png" class="sender" value="MDR"  onclick="loadSenderPage(value)">
+            <input id="rbb" type="image" src="media/Sender-Logos/rbb.png" class="sender" value="RBB"  onclick="loadSenderPage(value)">
+            <input id="hr" type="image" src="media/Sender-Logos/hr.png" class="sender" value="HR"  onclick="loadSenderPage(value)">
+            <input id="orf" type="image" src="media/Sender-Logos/orf.png" class="sender" value="ORF"  onclick="loadSenderPage(value)">
+            <input id="sr" type="image" src="media/Sender-Logos/sr.png" class="sender" value="SR"  onclick="loadSenderPage(value)">
+            <input id="srf" type="image" src="media/Sender-Logos/SRF.PNG" class="sender" value="SRF"  onclick="loadSenderPage(value)">
+            <input id="swr" type="image" src="media/Sender-Logos/swr.png" class="sender" value="SWR"  onclick="loadSenderPage(value)">
+            <input id="arte" type="image" src="media/Sender-Logos/arte.de.png" class="sender" value="ARTE.DE" onclick="loadSenderPage(value)">
+            <input id="kika" type="image" src="media/Sender-Logos/Kika.PNG" class="sender" value="KiKA"  onclick="loadSenderPage(value)">
+            <input id="br" type="image" src="media/Sender-Logos/br.png" class="sender" value="BR"  onclick="loadSenderPage(value)">
+            <input id="rb" type="image" src="media/Sender-Logos/radio bremen.png" class="sender" value="RB" onclick="loadSenderPage(value)">
+            <input id="DW" type="image" src="media/Sender-Logos/DW.png" class="sender" value="DW"  onclick="loadSenderPage(value)">
         </from>
     </div>
+
+    <center><div class ="dropup" style="width: 30%;">
+        <button class= "dropbtn" >Impressum</button>
+        <center> <div class="dropup-content" style="width: 100%;">
+              <br> <br>
+              E-Mail: m.kannathasan@ostfalia.de,
+              c.peters@ostfalia.de, d.dietrich@ostfalia.de, ti.fricke@ostfalia.de<br> <br>
+              Matrikelnummern: Mathusan Kannathasan: 70463094, Christopher Peters: 70463991, Daniel Dietrich: 70462732, Till Fricke: 70463997<br> <br>
+          </div></center>
+      </div></center>
 </div>
 </body>
 

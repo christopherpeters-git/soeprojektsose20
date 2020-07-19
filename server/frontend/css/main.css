@@ -11,6 +11,7 @@ body {
     width:4000px;
     height:4000px;
 
+
 }
 .sender{
     width: 20%;
@@ -38,6 +39,7 @@ body {
     margin-left: 45%;
     margin-top: 10%;
     border-style: groove;
+
 }
 
 #main_site{
@@ -45,7 +47,7 @@ body {
 }
 
 .Searchbar{
-    margin-left: 20%;
+
 }
 
 #logout_btn{
@@ -144,6 +146,47 @@ span.psw {
     padding: 6px 12px;
     border: 1px solid black;
     border-top: none;
+}
+
+/*Style for the Dropup-Impressum*/
+
+.dropbtn {
+    background-color: #5E5E5E;
+    color: white;
+    padding: 16px;
+    font-size: 16px;
+    border: none;
+   
+}
+  .dropup {
+    position: relative;
+    display: inline-block;
+ }
+  
+  .dropup-content {
+    display: none;
+    position: absolute;
+    background-color: #a09d9d;
+    min-width: 160px;
+    bottom: 50px;
+    z-index: 1;
+    
+  }
+  
+  .dropup-content a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+  }
+  .dropup-content a:hover {
+    background-color: #ccc
+   }
+.dropup:hover .dropup-content {
+    display: block;
+}
+.dropup:hover .dropbtn {
+  background-color: #15181a;
 }
 
 

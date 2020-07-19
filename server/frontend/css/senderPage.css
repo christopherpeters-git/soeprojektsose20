@@ -1,0 +1,136 @@
+
+body{
+
+}
+.sender{
+    border-style: groove;
+    border-radius: 5%;
+}
+#videos{
+    padding-left: 10%;;
+}
+
+.thumbnail{
+    float: left;
+    /*width: 30%;*/
+    width: 5%;
+}
+
+.videoLink{
+    width: 94.5%;
+   /* width:32%;*/
+    float: left;
+}
+.videoLink:hover{
+    cursor: pointer;
+    border-style: groove;
+}
+
+.videoDuration{
+    float: left;
+    width: 10%;
+
+}
+
+hr{
+    width: 94.5%;
+    background-color: #2d2d2d;
+    height: 3px;
+    margin-right:20%;
+    border-color: white;
+}
+
+.videoTitle{
+    width:60%;
+    float: left;
+}
+
+
+
+
+#senderPic{
+    clear: both;
+
+
+    background-color: #cccccc;
+}
+
+#senderPicture{
+    margin-left: 40%;
+}
+
+#logout_btn{
+    cursor: pointer;
+}
+#fav_btn{
+    cursor: pointer;
+}
+#homeIcon{
+    cursor: pointer;
+
+}
+#videoContainer{
+    clear:both;
+}
+
+/* Change styles for span and cancel button on extra small screens */
+@media screen and (max-width: 400px) {
+
+    #fav_btn{
+        width: 100%;
+    }
+    #logout_btn{
+        width: 100%;
+    }
+    #homeIcon{
+        width: 100%;
+    }
+    #searchbarIcon{
+        width: 100%;
+    }
+    #inputButton{
+        width: 20%;
+    }
+}
+
+input[type=text]{
+    width: 100%;
+    padding: 12px 20px;
+
+    display: inline-block;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+}
+
+.showClass{
+    clear: both;
+
+}
+
+
+
+#buttons{
+    clear: both;
+    display: block;
+    width: 40%;
+    margin-left: 45%;
+
+}
+
+#inputButton{
+    width: 15%;
+    border-style: none;
+    text-align: center
+}
+#backButton{
+    font-size: 0.5cm;
+    width: 10%;
+
+}
+#forButton{
+    font-size: 0.5cm;
+    width: 10%;
+
+}
+
+

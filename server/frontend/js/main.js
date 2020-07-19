@@ -37,9 +37,11 @@ function sendPostCookieAuthRequest(){
     request.onreadystatechange = function () {
         if(4 === this.readyState){
             if(200 === this.status){
-                alert(this.responseText)
+                hideVBlockerAndLogin();
             }else{
-                alert(this.status + ":" + this.responseText);
+                console.log(this.status + ":" + this.responseText);
+                document.getElementById("Login_Screen").style.visibility="visible";
+
             }
         }
     }
@@ -187,7 +189,7 @@ function loginAfterRegister() {
 
 
 
-function open_L_R(evt, cityName) {
+function openTab(evt, tabName)  {
     // Declare all variables
     var i, tabcontent, tablinks;
 
@@ -204,6 +206,6 @@ function open_L_R(evt, cityName) {
     }
 
     // Show the current tab, and add an "active" class to the button that opened the tab
-    document.getElementById(cityName).style.display = "block";
+    document.getElementById(tabName).style.display = "block";
     evt.currentTarget.className += " active";
 }

@@ -9,8 +9,15 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
+	"sort"
 	"time"
 )
+
+func sortArray(video []Video) {
+	sort.Slice(video, func(i, j int) bool {
+		return video[i].Show < video[j].Show
+	})
+}
 
 func FillUserVideoArray(user *User, userDB *sql.DB) error {
 	//Getting the informations about the user
@@ -45,6 +52,7 @@ func ConvertMapToArray(mapToConvert map[string][]Video) []Video {
 			channelArray = append(channelArray, v[video])
 		}
 	}
+	sortArray(channelArray)
 	return channelArray
 }
 
@@ -83,7 +91,6 @@ func InitDataBaseConnection(dbConnections map[string]*sql.DB, driverName string,
 		log.Fatal("Database connection failed: " + err.Error())
 		return nil
 	}
-	//defer db.Close() //???????
 	dbConnections[idName] = db
 	return db
 }
@@ -170,7 +177,7 @@ func LoginUser(userDB *sql.DB, user *User, incomingUsername string, incomingPass
 		//Compare found password hash with incoming password hash
 		err = bcrypt.CompareHashAndPassword([]byte(user.passwordHash), []byte(incomingPassword))
 		if err != nil {
-			return &ClientError{400, "wrong password", errors.New("wrong password: \n" + err.Error())}
+			return &ClientError{401, "wrong password", errors.New("wrong password: \n" + err.Error())}
 		} else {
 			log.Println("Entered Password is correct")
 		}

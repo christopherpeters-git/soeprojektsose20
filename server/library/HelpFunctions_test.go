@@ -3,30 +3,32 @@ package library
 import (
 	"github.com/DATA-DOG/go-sqlmock"
 	"golang.org/x/crypto/bcrypt"
-	"log"
 	"reflect"
+	"strconv"
 	"testing"
 )
 
-var exampleVideos = []Video{{
-	Channel:     "NDR",
-	Title:       "Segelschiff statt Jugendknast",
-	Show:        "Letzte Chance an Bord",
-	ReleaseDate: "02.11.2019",
-	Duration:    "00:29:36",
-	Link:        "http://mediandr-a.akamaihd.net/progressive/2018/0412/TV-20180412-1528-4400.hq.mp4",
-	PageLink:    "https://www.ndr.de/fernsehen/sendungen/die_reportage/Segelschiff-statt-Jugendknast,sendung610984.html",
-	FileName:    "76|d.mp4",
-}, {
-	Channel:     "NDR",
-	Title:       "Die Nordreportage: Leben in der Jahrhundertsiedlung",
-	Show:        "Die Nordreportage: Leben in der Jahrhundertsiedlung",
-	ReleaseDate: "16.09.2019",
-	Duration:    "00:28:31",
-	Link:        "http://mediandr-a.akamaihd.net/progressive/2019/0916/TV-20190916-1113-5400.hq.mp4",
-	PageLink:    "https://www.ndr.de/fernsehen/sendungen/die_nordreportage/Leben-in-der-Jahrhundertsiedlung,sendung943144.html",
-	FileName:    "76|d.mp4",
-}}
+var exampleVideos = []Video{
+	{
+		Channel:     "NDR",
+		Title:       "Die Nordreportage: Leben in der Jahrhundertsiedlung",
+		Show:        "Die Nordreportage: Leben in der Jahrhundertsiedlung",
+		ReleaseDate: "16.09.2019",
+		Duration:    "00:28:31",
+		Link:        "http://mediandr-a.akamaihd.net/progressive/2019/0916/TV-20190916-1113-5400.hq.mp4",
+		PageLink:    "https://www.ndr.de/fernsehen/sendungen/die_nordreportage/Leben-in-der-Jahrhundertsiedlung,sendung943144.html",
+		FileName:    "76|d.mp4",
+	},
+	{
+		Channel:     "NDR",
+		Title:       "Segelschiff statt Jugendknast",
+		Show:        "Letzte Chance an Bord",
+		ReleaseDate: "02.11.2019",
+		Duration:    "00:29:36",
+		Link:        "http://mediandr-a.akamaihd.net/progressive/2018/0412/TV-20180412-1528-4400.hq.mp4",
+		PageLink:    "https://www.ndr.de/fernsehen/sendungen/die_reportage/Segelschiff-statt-Jugendknast,sendung610984.html",
+		FileName:    "76|d.mp4",
+	}}
 
 func TestFillUserVideoArray(t *testing.T) {
 	db, mock, err := sqlmock.New()
@@ -47,16 +49,15 @@ func TestFillUserVideoArray(t *testing.T) {
 		Username:       "bob123",
 		FavoriteVideos: exampleVideos,
 	}
-	favVideo1 := "{\n  \"channel\": \"NDR\",\n  \"title\": \"Segelschiff statt Jugendknast\",\n  \"show\": \"Letzte Chance an Bord\",\n  \"releaseDate\": \"02.11.2019\",\n  \"duration\": \"00:29:36\",\n  \"link\": \"http://mediandr-a.akamaihd.net/progressive/2018/0412/TV-20180412-1528-4400.hq.mp4\",\n  \"pageLink\": \"https://www.ndr.de/fernsehen/sendungen/die_reportage/Segelschiff-statt-Jugendknast,sendung610984.html\",\n  \"fileName\": \"76|d.mp4\"\n }"
-	favVideo2 := "{\n  \"channel\": \"NDR\",\n  \"title\": \"Die Nordreportage: Leben in der Jahrhundertsiedlung\",\n  \"show\": \"Die Nordreportage: Leben in der Jahrhundertsiedlung\",\n  \"releaseDate\": \"16.09.2019\",\n  \"duration\": \"00:28:31\",\n  \"link\": \"http://mediandr-a.akamaihd.net/progressive/2019/0916/TV-20190916-1113-5400.hq.mp4\",\n  \"pageLink\": \"https://www.ndr.de/fernsehen/sendungen/die_nordreportage/Leben-in-der-Jahrhundertsiedlung,sendung943144.html\",\n  \"fileName\": \"76|d.mp4\"\n }"
+	favVideo1 := "{\n  \"channel\": \"NDR\",\n  \"title\": \"Die Nordreportage: Leben in der Jahrhundertsiedlung\",\n  \"show\": \"Die Nordreportage: Leben in der Jahrhundertsiedlung\",\n  \"releaseDate\": \"16.09.2019\",\n  \"duration\": \"00:28:31\",\n  \"link\": \"http://mediandr-a.akamaihd.net/progressive/2019/0916/TV-20190916-1113-5400.hq.mp4\",\n  \"pageLink\": \"https://www.ndr.de/fernsehen/sendungen/die_nordreportage/Leben-in-der-Jahrhundertsiedlung,sendung943144.html\",\n  \"fileName\": \"76|d.mp4\"\n }"
+	favVideo2 := "{\n  \"channel\": \"NDR\",\n  \"title\": \"Segelschiff statt Jugendknast\",\n  \"show\": \"Letzte Chance an Bord\",\n  \"releaseDate\": \"02.11.2019\",\n  \"duration\": \"00:29:36\",\n  \"link\": \"http://mediandr-a.akamaihd.net/progressive/2018/0412/TV-20180412-1528-4400.hq.mp4\",\n  \"pageLink\": \"https://www.ndr.de/fernsehen/sendungen/die_reportage/Segelschiff-statt-Jugendknast,sendung610984.html\",\n  \"fileName\": \"76|d.mp4\"\n }"
 	resultRows := sqlmock.NewRows(columns).AddRow(givenUser.Username, favVideo1).AddRow(givenUser.Username, favVideo2)
-	mock.ExpectQuery("select * from user_has_favorite_videos where Users_Username = '" + givenUser.Username + "'").WillReturnRows(resultRows)
+	mock.ExpectQuery("select (.+) from user_has_favorite_videos where Users_Username = (.+)").WillReturnRows(resultRows)
 	if err := FillUserVideoArray(&givenUser, db); err != nil {
-		log.Println("Test failed: \n" + err.Error())
+		t.Error("Unexpected error \n" + err.Error())
 		return
-	}
-	if !givenUser.Equals(&expectedUser) {
-		t.Error("User are not the same!: givenUser: " + givenUser.ToString() + " expectedUser: " + expectedUser.ToString())
+	} else if !givenUser.Equals(&expectedUser) {
+		t.Error("Users are not equal!: givenUser: " + givenUser.ToString() + " expectedUser: " + expectedUser.ToString())
 	}
 }
 
@@ -94,6 +95,7 @@ func TestLoginUser(t *testing.T) {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
 	defer db.Close()
+	//Test if user is able to be logged in
 	var givenUser User
 	incomingUsername := "maxMustermann"
 	incomingPassword := "muster123"
@@ -103,31 +105,28 @@ func TestLoginUser(t *testing.T) {
 		t.Fatalf("error '%s' was not expected creating a hash", err.Error())
 	}
 	columns := []string{"Id", "Name", "Username", "PasswordHash", "Session_Id"}
-	mock.ExpectQuery("Select * from Users where username = '" + incomingUsername + "'").WillReturnRows(sqlmock.NewRows(columns).AddRow("0", "Max Mustermann", incomingUsername, string(incomingPasswordHash), givenSessionId))
+	mock.ExpectQuery("select [*] from users where username = ?").WillReturnRows(sqlmock.NewRows(columns).AddRow("0", "Max Mustermann", incomingUsername, string(incomingPasswordHash), givenSessionId))
 	expectedUser := User{
 		Id:             "0",
 		Name:           "Max Mustermann",
 		Username:       incomingUsername,
 		passwordHash:   string(incomingPasswordHash),
+		sessionId:      "0",
 		FavoriteVideos: nil,
 	}
-	//Test if user is able to be logged in
 	if dErr := LoginUser(db, &givenUser, incomingUsername, incomingPassword); dErr != nil {
 		t.Error("login failed unexpected: " + dErr.Error())
-	}
-	if !givenUser.Equals(&expectedUser) {
+	} else if !givenUser.Equals(&expectedUser) {
 		t.Errorf("given user didnt match expected user: givenUser: %s expectedUser: %s\n", givenUser.ToString(), expectedUser.ToString())
 	}
+	//Test if user cant log with wrong password in as expected
+	mock.ExpectQuery("select [*] from users where username = ?").WillReturnRows(sqlmock.NewRows(columns).AddRow("0", "Max Mustermann", incomingUsername, string(incomingPasswordHash), givenSessionId))
 	var givenUser2 User
 	wrongPassword := "wrongPassword"
-	//mock.ExpectBegin()
-	//mock.ExpectQuery("Select * from Users where username = '" + incomingUsername + "'").WillReturnRows(sqlmock.NewRows(columns).AddRow("0","Max Mustermann",incomingUsername,string(incomingPasswordHash),givenSessionId))
-	//mock.ExpectCommit()
 	dErr := LoginUser(db, &givenUser2, incomingUsername, wrongPassword)
-	//Test if user cant log with wrong password in as expected
 	if dErr == nil {
 		t.Errorf("Error expected!")
 	} else if dErr.Status() != 401 {
-		t.Errorf("Expected error status 401")
+		t.Errorf("Expected error status 401, got: " + strconv.FormatInt(int64(dErr.Status()), 10) + " " + dErr.Error())
 	}
 }

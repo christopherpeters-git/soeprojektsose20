@@ -10,6 +10,7 @@ import (
 	"math/rand"
 	"net/http"
 	"sort"
+	"strings"
 	"time"
 )
 
@@ -22,11 +23,9 @@ func sortArray(video []Video) {
 
 //Check if string is legal
 func IsStringLegal(str string) bool {
-	for _, a := range str {
-		for _, b := range ForbiddenChars {
-			if byte(a) == b {
-				return false
-			}
+	for _, c := range str {
+		if !strings.Contains(LetterBytes, strings.ToLower(string(c))) {
+			return false
 		}
 	}
 	return true
@@ -159,7 +158,7 @@ func IsUserLoggedInWithACookie(r *http.Request, userDB *sql.DB, user *User) Deta
 		if cookie.Value == "0" {
 			return &ClientError{http.StatusForbidden, AuthenticationFailedResponse, errors.New("session ID in cookie is 0")}
 		}
-		rows, err := userDB.Query("Select * from Users where Session_Id = ?", cookie.Value)
+		rows, err := userDB.Query("select * from users where session_id = ?", cookie.Value)
 		if err != nil {
 			return &ServerError{http.StatusInternalServerError, InternalServerErrorResponse, errors.New("SQL query failed: \n" + err.Error())}
 		}
@@ -170,7 +169,7 @@ func IsUserLoggedInWithACookie(r *http.Request, userDB *sql.DB, user *User) Deta
 			}
 		} else {
 			log.Println("No such SessionId found")
-			return &ClientError{http.StatusForbidden, AuthenticationFailedResponse, errors.New("session ID in DB is 0")}
+			return &ClientError{http.StatusForbidden, AuthenticationFailedResponse, errors.New("No user found with session id: " + cookie.Value)}
 		}
 		return nil
 	} else {

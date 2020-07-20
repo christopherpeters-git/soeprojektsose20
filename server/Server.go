@@ -171,6 +171,12 @@ func handleGetSearchVideos(w http.ResponseWriter, r *http.Request) {
 	videosFound := false
 	if searchString == "" || searchString == " " {
 		lib.ReportError(w, http.StatusBadRequest, lib.EmptyParameterResponse+lib.SearchParameter, lib.EmptyParameterResponse+lib.SearchParameter)
+		return
+	}
+
+	if !lib.IsStringLegal(searchString) {
+		lib.ReportError(w, http.StatusBadRequest, lib.IllegalParameterResponse+lib.SearchParameter, lib.IllegalParameterResponse+lib.SearchParameter)
+		return
 	}
 
 	if channelString == "none" { //Search in every channel

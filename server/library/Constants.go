@@ -44,11 +44,8 @@ const (
 	VideoJsonPath  = CrawlerDirName + "/good.json"
 )
 
-//Characters allowed in SessionID
+//miscellaneous
 const (
 	LetterBytes    = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 	AuthCookieName = "mediathekauth"
 )
-
-//Forbidden characters
-var ForbiddenChars = [4]byte{'<', '>', '/', '.'}

@@ -1,0 +1,64 @@
+#my-video {
+    margin-left: 10%;
+    width: 100%;
+    clear: both;
+
+}
+
+#videoPlayer {
+    margin-top: 2%;
+    width: 100%;
+    float: left;
+    text-align: center;
+}
+
+@media only screen and (min-width: 1024px) {
+    #videoPlayer {
+        width: 70%;
+    }
+}
+
+#videoInformation {
+    margin-left: 10%;
+    width: 100%;
+    display: inline-block;
+    text-align: left;
+
+}
+
+#videoTitle {
+    float: left;
+    font-size: 0.65cm;
+    width: 100%;
+}
+
+#videoClick {
+    color: #a09d9d;
+}
+
+#nextVideos {
+    clear: both;
+    width: 19%;
+    float: right;
+    text-align: left;
+}
+
+#searchBar {
+    clear: both;
+}
+
+.thumbnail{
+    width: 30%;
+}
+.videoTitle{
+    width: 50%;
+    float: left;
+}
+.videoLink{
+    border-bottom-width:2px ;
+    border-bottom-style: solid;
+}
+.videoLink:hover{
+    opacity: 0.2;
+    cursor: pointer;
+}

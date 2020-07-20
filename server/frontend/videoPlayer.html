@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <head>
+        <link  href="css/video-js.css" rel="stylesheet" />
+        <link type="text/css" href="css/videoPlayer.css" rel="stylesheet" media="screen"/>
+        <script src="js/videoplayer.js"></script>
+        <script src="js/videojs-ie8.min.js"></script>
+        <script src="js/VideoFormat.js"></script>
+    </head>
+
+<body onunload="clearVideoPlayer()">
+<div id="searchBar">
+    <div id ="fav_btn" style="width: 10%;float: left">
+        <a href="favoritelist.html"> <img id="fav_btn" src="media/Sender-Logos/favoritenlite.JPG" width="30%"></a>
+    </div>
+    <div id="logout"style="width: 10%;float: right">
+        <img onclick="sendPostLogoutRequest()" id="logout_btn" src="media/Sender-Logos/logout.png" width="30%;" style="float: right;">
+    </div>
+    <div id="homeIcon" style="width: 10%;float: right">
+        <a href="index.html"> <img id="home_btn" src="media/images/Home-icon.svg.png" width="30%"></a>
+    </div>
+
+</div>
+<div id="nextVideos"> Naechste Titel</div>
+<div id="videoPlayer">
+<video id="my-video" class="video-js" controls preload="auto" poster="media/Sender-Logos/ard.png" data-setup="{}">
+    <source src="dummy.mp4" type="video/mp4" />
+    <p class="vjs-no-js">
+        To view this video please enable JavaScript, and consider upgrading to a
+        web browser that
+        <a href="https://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>
+    </p>
+
+</video>
+    <div id="videoInformation">
+        <div id="videoTitle"></div>
+        <div id="videoClick"></div>
+    </div>
+</div>
+
+
+
+
+<script src="js/video.js"></script>
+<script> initVideoPlayer()</script>
+</body>
+
+
+
+</html>

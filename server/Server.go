@@ -376,13 +376,20 @@ func handlePostRegisterUser(w http.ResponseWriter, r *http.Request) {
 		lib.ReportError(w, http.StatusBadRequest, "Invalid request parameters", "Parameter parsing error: "+err.Error())
 		return
 	}
-	incomingUsername := r.FormValue("usernameInput")
-	incomingName := r.FormValue("nameInput")
-	incomingPassword := r.FormValue("passwordInput")
+	incomingUsername := r.FormValue(lib.UsernameParameter)
+	incomingName := r.FormValue(lib.NameParameter)
+	incomingPassword := r.FormValue(lib.PasswordParameter)
 	//Check if any of the recieved information is empty
 	if len(incomingUsername) < 1 || len(incomingName) < 1 || len(incomingPassword) < 1 {
-		lib.ReportError(w, http.StatusBadRequest, "Send Information must not be empty", "one or more received strings is empty\n")
+		lib.ReportError(w, http.StatusBadRequest, lib.EmptyParameterResponse, "one or more received strings is empty\n")
 		return
+	}
+	//Check if Username or Name is illegal
+	if !lib.IsStringLegal(incomingUsername) {
+		lib.ReportError(w, http.StatusBadRequest, lib.IllegalParameterResponse+lib.UsernameParameter, "forbidden chars in Username")
+	}
+	if !lib.IsStringLegal(incomingName) {
+		lib.ReportError(w, http.StatusBadRequest, lib.IllegalParameterResponse+lib.NameParameter, "forbidden chars in Name")
 	}
 	//Get userdata from db for comparison
 	rows, err := userDB.Query("select Username from users where username = ?", incomingUsername)
@@ -457,6 +464,9 @@ func handlePostLogin(w http.ResponseWriter, r *http.Request) {
 	if incomingUsername == "" || incomingPassword == "" {
 		lib.ReportError(w, http.StatusBadRequest, lib.EmptyParameterResponse+lib.UsernameParameter+","+lib.PasswordParameter, "empty username or password")
 		return
+	}
+	if !lib.IsStringLegal(incomingUsername) {
+		lib.ReportError(w, http.StatusBadRequest, lib.IllegalParameterResponse+lib.UsernameParameter, "forbidden chars in Username")
 	}
 
 	if dErr := lib.LoginUser(userDB, &user, incomingUsername, incomingPassword); dErr != nil {

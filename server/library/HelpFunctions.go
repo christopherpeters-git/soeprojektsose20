@@ -20,6 +20,18 @@ func sortArray(video []Video) {
 	})
 }
 
+//Check if string is legal
+func IsStringLegal(str string) bool {
+	for _, a := range str {
+		for _, b := range ForbiddenChars {
+			if byte(a) == b {
+				return false
+			}
+		}
+	}
+	return true
+}
+
 //Creates the array of favorite videos for a given user
 func FillUserVideoArray(user *User, userDB *sql.DB) error {
 	//Getting the informations about the user

@@ -22,13 +22,15 @@ const (
 	VideoParameter       = "video"
 	UsernameParameter    = "usernameInput"
 	PasswordParameter    = "passwordInput"
+	NameParameter        = "nameInput"
 )
 
 //PublicError messages
 const (
 	InternalServerErrorResponse  = "Interner Serverfehler"
 	AuthenticationFailedResponse = "Authentifizierung fehlgeschlagen"
-	EmptyParameterResponse       = "Leere(r) Parameter:"
+	EmptyParameterResponse       = "Leere(r) Parameter: "
+	IllegalParameterResponse     = "Illegale(r) Parameter: "
 )
 
 //db connection names
@@ -47,3 +49,6 @@ const (
 	LetterBytes    = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 	AuthCookieName = "mediathekauth"
 )
+
+//Forbidden characters
+var ForbiddenChars = [4]byte{'<', '>', '/', '.'}

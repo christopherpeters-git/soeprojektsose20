@@ -31,6 +31,19 @@ var exampleVideos = []Video{
 		FileName:    "76|d.mp4",
 	}}
 
+func TestIsStringLegal(t *testing.T) {
+	legalString := "Hallo"
+	illegalStrings := [4]string{"Hal<lo", "Hallo>", "hal/lo", "hall.o"}
+	if !IsStringLegal(legalString) {
+		t.Errorf("string '%s' should be legal!", legalString)
+	}
+	for _, str := range illegalStrings {
+		if IsStringLegal(str) {
+			t.Errorf("string '%s' should be illegal!", legalString)
+		}
+	}
+}
+
 func TestFillUserVideoArray(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	columns := []string{"Users_Username", "Video"}

@@ -3,6 +3,7 @@ package library
 import (
 	"github.com/DATA-DOG/go-sqlmock"
 	"golang.org/x/crypto/bcrypt"
+	"net/http"
 	"reflect"
 	"strconv"
 	"testing"
@@ -15,7 +16,7 @@ var exampleVideos = []Video{
 		Show:        "Die Nordreportage: Leben in der Jahrhundertsiedlung",
 		ReleaseDate: "16.09.2019",
 		Duration:    "00:28:31",
-		Link:        "http://mediandr-a.akamaihd.net/progressive/2019/0916/TV-20190916-1113-5400.hq.mp4",
+		Link:        "http://mediandr-a.akamaihd.net/progressive/2019/0916/TV-20190916-1113-5http.StatusBadRequest.hq.mp4",
 		PageLink:    "https://www.ndr.de/fernsehen/sendungen/die_nordreportage/Leben-in-der-Jahrhundertsiedlung,sendung943144.html",
 		FileName:    "76|d.mp4",
 	},
@@ -25,7 +26,7 @@ var exampleVideos = []Video{
 		Show:        "Letzte Chance an Bord",
 		ReleaseDate: "02.11.2019",
 		Duration:    "00:29:36",
-		Link:        "http://mediandr-a.akamaihd.net/progressive/2018/0412/TV-20180412-1528-4400.hq.mp4",
+		Link:        "http://mediandr-a.akamaihd.net/progressive/2018/0412/TV-20180412-1528-4http.StatusBadRequest.hq.mp4",
 		PageLink:    "https://www.ndr.de/fernsehen/sendungen/die_reportage/Segelschiff-statt-Jugendknast,sendung610984.html",
 		FileName:    "76|d.mp4",
 	}}
@@ -49,8 +50,8 @@ func TestFillUserVideoArray(t *testing.T) {
 		Username:       "bob123",
 		FavoriteVideos: exampleVideos,
 	}
-	favVideo1 := "{\n  \"channel\": \"NDR\",\n  \"title\": \"Die Nordreportage: Leben in der Jahrhundertsiedlung\",\n  \"show\": \"Die Nordreportage: Leben in der Jahrhundertsiedlung\",\n  \"releaseDate\": \"16.09.2019\",\n  \"duration\": \"00:28:31\",\n  \"link\": \"http://mediandr-a.akamaihd.net/progressive/2019/0916/TV-20190916-1113-5400.hq.mp4\",\n  \"pageLink\": \"https://www.ndr.de/fernsehen/sendungen/die_nordreportage/Leben-in-der-Jahrhundertsiedlung,sendung943144.html\",\n  \"fileName\": \"76|d.mp4\"\n }"
-	favVideo2 := "{\n  \"channel\": \"NDR\",\n  \"title\": \"Segelschiff statt Jugendknast\",\n  \"show\": \"Letzte Chance an Bord\",\n  \"releaseDate\": \"02.11.2019\",\n  \"duration\": \"00:29:36\",\n  \"link\": \"http://mediandr-a.akamaihd.net/progressive/2018/0412/TV-20180412-1528-4400.hq.mp4\",\n  \"pageLink\": \"https://www.ndr.de/fernsehen/sendungen/die_reportage/Segelschiff-statt-Jugendknast,sendung610984.html\",\n  \"fileName\": \"76|d.mp4\"\n }"
+	favVideo1 := "{\n  \"channel\": \"NDR\",\n  \"title\": \"Die Nordreportage: Leben in der Jahrhundertsiedlung\",\n  \"show\": \"Die Nordreportage: Leben in der Jahrhundertsiedlung\",\n  \"releaseDate\": \"16.09.2019\",\n  \"duration\": \"00:28:31\",\n  \"link\": \"http://mediandr-a.akamaihd.net/progressive/2019/0916/TV-20190916-1113-5http.StatusBadRequest.hq.mp4\",\n  \"pageLink\": \"https://www.ndr.de/fernsehen/sendungen/die_nordreportage/Leben-in-der-Jahrhundertsiedlung,sendung943144.html\",\n  \"fileName\": \"76|d.mp4\"\n }"
+	favVideo2 := "{\n  \"channel\": \"NDR\",\n  \"title\": \"Segelschiff statt Jugendknast\",\n  \"show\": \"Letzte Chance an Bord\",\n  \"releaseDate\": \"02.11.2019\",\n  \"duration\": \"00:29:36\",\n  \"link\": \"http://mediandr-a.akamaihd.net/progressive/2018/0412/TV-20180412-1528-4http.StatusBadRequest.hq.mp4\",\n  \"pageLink\": \"https://www.ndr.de/fernsehen/sendungen/die_reportage/Segelschiff-statt-Jugendknast,sendung610984.html\",\n  \"fileName\": \"76|d.mp4\"\n }"
 	resultRows := sqlmock.NewRows(columns).AddRow(givenUser.Username, favVideo1).AddRow(givenUser.Username, favVideo2)
 	mock.ExpectQuery("select (.+) from user_has_favorite_videos where Users_Username = (.+)").WillReturnRows(resultRows)
 	if err := FillUserVideoArray(&givenUser, db); err != nil {
@@ -126,7 +127,7 @@ func TestLoginUser(t *testing.T) {
 	dErr := LoginUser(db, &givenUser2, incomingUsername, wrongPassword)
 	if dErr == nil {
 		t.Errorf("Error expected!")
-	} else if dErr.Status() != 401 {
-		t.Errorf("Expected error status 401, got: " + strconv.FormatInt(int64(dErr.Status()), 10) + " " + dErr.Error())
+	} else if dErr.Status() != http.StatusForbidden {
+		t.Errorf("Expected error status http.StatusForbidden, got: " + strconv.FormatInt(int64(dErr.Status()), 10) + " " + dErr.Error())
 	}
 }

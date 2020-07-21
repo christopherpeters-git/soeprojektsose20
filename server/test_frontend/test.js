@@ -126,6 +126,23 @@ function sendPostRegisterRequest(){
     request.send("usernameInput="+usernameInput+"&"+"passwordInput="+passwordInput+"&"+"nameInput="+name);
 }
 
+function sendPostRemoveFavoriteRequest(){
+    const request = createAjaxRequest();
+    request.onreadystatechange = function () {
+        if(4 === this.readyState){
+            if(200 === this.status){
+                alert(this.responseText);
+            }else{
+                alert(this.status + ":" + this.responseText);
+            }
+            console.log(this);
+        }
+    }
+    request.open("POST",/removeFromFavorites/,true);
+    request.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+    request.send("video="+JSON.stringify(video));
+}
+
 function sendPostFavoriteRequest(){
     const request = createAjaxRequest();
     request.onreadystatechange = function () {

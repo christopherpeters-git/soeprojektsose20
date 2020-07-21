@@ -88,3 +88,22 @@ func (r *User) ToString() string {
 	}
 	return str
 }
+
+//Reader for tests
+type DemoReader struct {
+	content []byte
+}
+
+func (r *DemoReader) Read(p []byte) (n int, err error) {
+	count := 0
+	r.content = make([]byte, len(p))
+	for _, b := range p {
+		r.content[count] = b
+		count++
+	}
+	return count, nil
+}
+
+func (r *DemoReader) GetContent() []byte {
+	return r.content
+}

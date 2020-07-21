@@ -7,12 +7,6 @@ let currentPage =1;
 
 let lastPage;
 
-/*todo
-* searchfunktion
-*
-* */
-
-
 
 function loadSenderPage(wert) {
     window.location.href = "/channel.html";
@@ -78,7 +72,6 @@ function setPage() {
     videosDiv.id = "videos";
     const vContainer = document.getElementById("videoContainer");
     vContainer.appendChild(videosDiv);
-
     let currentVideo = new Videoclass("", "", "", "", "", "", "", "");
     let lastVideo;
     if(currentPage === lastPage){
@@ -116,7 +109,6 @@ function setPage() {
         lastVideo = currentVideo;
     }
     videosDiv.appendChild(show);
-
 }
 
 function appendShow(video,showdiv,i){

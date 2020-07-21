@@ -49,8 +49,6 @@ function addVideoinformation(video) {
     addToFavoritBtn.addEventListener("click",addVideoToFav,false);
     videoClick.appendChild(addToFavoritBtn);
     videoClick.appendChild(document.createElement("br")); videoClick.appendChild(document.createElement("br"));
-
-
 }
 
 function sendGetClickedVideos(video){
@@ -69,8 +67,14 @@ function sendGetClickedVideos(video){
     request.send();
     return clickNumber;
 }
-function shareThisVideo(){
-    console.log(this.value);
+function shareThisVideo(event){
+    console.log(event);
+    let copInput = document.createElement("textarea");
+    copInput.textContent=this.value;
+    copInput.select();
+    document.execCommand("copy");
+    console.log(copInput);
+    alertSetterFunction("#cccccc",this.value);
 }
 
 function sendGetVideos() {
@@ -176,7 +180,7 @@ function sendPostFavoriteRequest(video){
     }
     request.open("POST",/addToFavorites/,true);
     request.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
-    request.send("video="+JSON.stringify(video));
+    request.send("video="+video);
 }
 
 function alertSetterFunction(color,message) {
@@ -186,3 +190,15 @@ function alertSetterFunction(color,message) {
     alert.style.display="block"
     setTimeout(function(){alert.style.display="none"},1500);
 }
+
+/*
+function toggleAutoplayVideoplayer() {
+    const slider = document.getElementsByClassName("switch");
+    setAutoplay(slider[0].children[0].checked);
+
+
+}
+
+function setAutoplay(bool) {
+    console.log()
+}*/

@@ -5,6 +5,7 @@ sendGetVideos();
 function initVideoPlayer() {
     const videoPlayer =document.getElementById("my-video");
     let video = JSON.parse(sessionStorage.getItem("video"));
+    videoPlayer.setAttribute("poster","media/Sender-Logos/"+video[0].channel+".png");
     videoPlayer.children[0].setAttribute("src",video[0].link);
     document.title =video[0].title;
     const videoTitle = document.getElementById("videoTitle");
@@ -12,6 +13,8 @@ function initVideoPlayer() {
     addVideoinformation(video);
     document.getElementById("nextVideos").innerHTML="";
     fillNextVideos(video);
+    document.getElementById("moreInformation").innerHTML="";
+    setMoreInformation(video);
 }
 
 
@@ -37,8 +40,16 @@ function addVideoinformation(video) {
     shareButton.value= video.pageLink;
     shareButton.addEventListener("click",shareThisVideo,false);
     shareButton.textContent = "➦ Teilen";
+    shareButton.value=JSON.stringify(video[0].pageLink);
     videoClick.appendChild(shareButton);
     let addToFavoritBtn = document.createElement("button");
+    addToFavoritBtn.id = "Favbtn";
+    addToFavoritBtn.textContent = "❤";
+    addToFavoritBtn.value=JSON.stringify(video[0]);
+    addToFavoritBtn.addEventListener("click",addVideoToFav,false);
+    videoClick.appendChild(addToFavoritBtn);
+    videoClick.appendChild(document.createElement("br")); videoClick.appendChild(document.createElement("br"));
+
 
 }
 
@@ -58,7 +69,6 @@ function sendGetClickedVideos(video){
     request.send();
     return clickNumber;
 }
-
 function shareThisVideo(){
     console.log(this.value);
 }
@@ -116,8 +126,63 @@ function fillNextVideos(video) {
     }
 }
 
+function setMoreInformation(video) {
+    const infoDiv = document.getElementById("moreInformation");
+    let informationSet = document.createElement("div");
+    const img = document.createElement("img");
+    img.setAttribute("id","infoPic");
+    img.setAttribute("src", "/media/Sender-Logos/" + video[0].channel + ".png");
+    const header5 = document.createElement("h5");
+    header5.id = "InfoTitle";
+    header5.innerHTML = "Channel: "+video[0].channel+" Show: "+video[0].show;
+    let tempdiv = document.createElement("div");
+    tempdiv.id = "Info";
+    let header1 = document.createElement("h1");
+    let header2 = document.createElement("h2");
+    let header3 = document.createElement("h3");
+    const a = document.createElement("a");
+    header1.innerHTML = "Titel: "+video[0].title;
+    header2.innerHTML = "Dauer: "+video[0].duration;
+    header3.innerHTML = "Seitenlink: "+video[0].pageLink;
+    tempdiv.appendChild(header1);
+    tempdiv.appendChild(header2);
+    tempdiv.appendChild(header3);
+    informationSet.appendChild(img);
+    informationSet.appendChild(header5);
+    informationSet.appendChild(tempdiv);
+    infoDiv.appendChild(informationSet);
+}
 
 function openVideoPlayer() {
     sessionStorage.setItem('video', JSON.stringify(this.value));
     initVideoPlayer();
+}
+function addVideoToFav() {
+    sendPostFavoriteRequest(this.value)
+
+}
+
+function sendPostFavoriteRequest(video){
+    const request = createAjaxRequest();
+    request.onreadystatechange = function () {
+        if(4 === this.readyState){
+            if(200 === this.status){
+                alertSetterFunction("rgba(39,255,0,0.75)",this.responseText);
+            }else{
+                alertSetterFunction("rgba(255,0,30,0.75)",this.responseText);
+            }
+            console.log(this);
+        }
+    }
+    request.open("POST",/addToFavorites/,true);
+    request.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+    request.send("video="+JSON.stringify(video));
+}
+
+function alertSetterFunction(color,message) {
+    const alert = document.getElementById("alert");
+    alert.textContent= message;
+    alert.style.background=color;
+    alert.style.display="block"
+    setTimeout(function(){alert.style.display="none"},1500);
 }

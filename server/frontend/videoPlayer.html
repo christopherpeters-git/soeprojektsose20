@@ -11,6 +11,7 @@
     </head>
 
 <body onunload="clearVideoPlayer()">
+
 <div id="searchBar">
     <div id ="fav_btn" style="width: 10%;float: left">
         <a href="favoritelist.html"> <img id="fav_btn" src="media/Sender-Logos/favoritenlite.JPG" width="30%"></a>
@@ -23,7 +24,12 @@
     </div>
 
 </div>
-<div id="nextVideos"> Naechste Titel</div>
+
+<div id="alert"style="display:none">
+
+</div>
+
+
 <div id="videoPlayer">
 <video id="my-video" class="video-js" controls preload="auto" poster="media/Sender-Logos/ard.png" data-setup="{}">
     <source src="dummy.mp4" type="video/mp4" />
@@ -37,10 +43,11 @@
     <div id="videoInformation">
         <div id="videoTitle"></div>
         <div id="videoClick"></div>
+        <div id="moreInformation"> </div>
     </div>
 </div>
 
-
+<div id="nextVideos"> Naechste Titel</div>
 
 
 <script src="js/video.js"></script>

@@ -1,8 +1,6 @@
 #my-video {
-    margin-left: 10%;
     width: 100%;
     clear: both;
-
 }
 
 #videoPlayer {
@@ -10,20 +8,36 @@
     width: 100%;
     float: left;
     text-align: center;
+    clear: both;
+}
+
+#nextVideos {
+    width: 100%;
+    text-align: left;
 }
 
 @media only screen and (min-width: 1024px) {
     #videoPlayer {
         width: 70%;
     }
+    #nextVideos {
+
+        width: 19%;
+        float: right;
+        text-align: left;
+    }
+    #my-video{
+        margin-left: 10%;
+    }
+    #videoInformation{
+        margin-left: 10%;
+    }
 }
 
 #videoInformation {
-    margin-left: 10%;
     width: 100%;
     display: inline-block;
     text-align: left;
-
 }
 
 #videoTitle {
@@ -36,15 +50,12 @@
     color: #a09d9d;
 }
 
-#nextVideos {
-    clear: both;
-    width: 19%;
-    float: right;
-    text-align: left;
-}
+
 
 #searchBar {
     clear: both;
+    width: 100%;
+    height: auto;
 }
 
 .thumbnail{
@@ -62,3 +73,64 @@
     opacity: 0.2;
     cursor: pointer;
 }
+#moreInformation{
+    border-top-width:2px;
+    border-bottom-style: solid;
+    border-color: #cccccc;
+}
+#videoClick{
+    clear: both ;
+    border-top-width:2px;
+    border-bottom-style: solid;
+    border-color: #cccccc;
+}
+#infoPic{
+    float: left;
+    border-radius: 100%;
+    width: 5%;
+}
+
+.InfoTitle{
+    width:20%;
+    float: left;
+}
+#Info{
+   clear:both;
+    font-size: 0.3cm;
+}
+#shareButton{
+    float: right;
+    border-style: none;
+    background-color: white;
+    font-size: 0.5cm;
+}
+#shareButton:hover{
+    cursor: pointer;
+    opacity: 0.8;
+}
+
+#Favbtn{
+    float: right;
+    border-style: none;
+    background-color: white;
+    font-size: 0.5cm;
+}
+#Favbtn:hover{
+     cursor: pointer;
+     opacity: 0.8;
+ }
+
+
+/*########################ALert-BOX########################################################*/
+/* The alert message box */
+#alert {
+    position: absolute;
+    z-index: 5;
+    margin-left: 10%;
+    clear: both;
+    width: 50%;
+    padding: 20px;
+    background-color: #f44336; /* Red */
+    color: white;
+}
+

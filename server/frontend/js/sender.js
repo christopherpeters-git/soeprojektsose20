@@ -96,11 +96,12 @@ function setPage() {
     let tempStart=start;
     let tempEnd =end;
     let videosDiv = document.getElementById("videos");
-    videosDiv.remove();
+   /* videosDiv.remove();
     videosDiv = document.createElement("div");
     videosDiv.id = "videos";
     const vContainer = document.getElementById("videoContainer");
-    vContainer.appendChild(videosDiv);
+    vContainer.appendChild(videosDiv);*/
+    videosDiv.innerHTML = "";
 
     let currentVideo = new Videoclass("", "", "", "", "", "", "", "");
     let lastVideo;

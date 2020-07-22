@@ -1,7 +1,3 @@
-const getJsonVideoTargetUrl = "localhost:80/getVideos/";
-let videosJson;
-
-
 class Video {
     constructor(channel,title,show,releaseDate,duration,link,pageLink,fileName) {
         this.channel = channel;

@@ -7,9 +7,9 @@
     <link type="text/css" rel="stylesheet" href="css/searchresults.css">
     <script src="js/sender.js"></script>
     <script src="js/main.js"></script>
-    <script src="js/videos.js"></script>
+
 </head>
-<body>
+<body onload="sendGetSearchRequest(), searchOnEnter()">
 <div id="mainPage">
     <div id="homeIcon" style="width: 10%;float: left">
         <a href="index.html"> <img id="home_btn" src="media/images/Home-icon.svg.png" width="30%";></a>
@@ -18,7 +18,7 @@
         <input id="searchInput" type="text" placeholder="Suchbegriff eingeben" size="70" style="position: center;" >
     </div>
     <div id="searchbarIcon" style="width: 10%;float: left">
-        <img id="searchIcon" src="media/images/icon_Search.png" onclick="sendGetSearchRequestChannel()" title="Suche starten" width="35">
+        <img id="searchIcon" src="media/images/icon_Search.png" onclick="sendGetSearchRequestSearchResults()" title="Suche starten" width="35">
     </div>
     <div class="Dropdown" id="Dropdown" style="width: 10%; float:right">
         <button class="avatar" style="width:100%; float: left">
@@ -33,8 +33,8 @@
 
 </div>
 
-<div id = videoContainer>
-    <div id= "videos">
+<div id="videoResultContainer">
+    <div id="videoResults">
     </div>
 </div>
 

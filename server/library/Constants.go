@@ -2,28 +2,35 @@ package library
 
 //URL'publicErrorMessage
 const (
-	IncomingPostUserRequestUrl             = "/login/"
-	IncomingPostRegisterRequestUrl         = "/register/"
-	IncomingPostAddToFavoritesRequestUrl   = "/addToFavorites/"
-	IncomingPostLogoutRequestUrl           = "/logout/"
-	IncomingPostCookieAUthRequestUrl       = "/cookieAuth/"
-	IncomingGetSearchRequestUrl            = "/search"
-	IncomingGetVideosFromChannelRequestUrl = "/getVideoByChannel"
-	IncomingGetVideoClickedRequestUrl      = "/clickVideo"
-	IncomingGetVideosRequestUrl            = "/getVideos/"
+	IncomingPostUserRequestUrl                = "/login/"
+	IncomingPostRegisterRequestUrl            = "/register/"
+	IncomingPostAddToFavoritesRequestUrl      = "/addToFavorites/"
+	IncomingPostRemoveFromFavoritesRequestUrl = "/removeFromFavorites/"
+	IncomingPostLogoutRequestUrl              = "/logout/"
+	IncomingPostCookieAUthRequestUrl          = "/cookieAuth/"
+	IncomingGetSearchRequestUrl               = "/search"
+	IncomingGetVideosFromChannelRequestUrl    = "/getVideoByChannel"
+	IncomingGetVideoClickedRequestUrl         = "/clickVideo"
+	IncomingGetVideosRequestUrl               = "/getVideos/"
 )
 
 //Parameter
 const (
 	ChannelNameParameter = "channel"
 	VideoTitleParameter  = "videoTitle"
-	VideoSearchParameter = "search"
+	SearchParameter      = "search"
+	VideoParameter       = "video"
+	UsernameParameter    = "usernameInput"
+	PasswordParameter    = "passwordInput"
+	NameParameter        = "nameInput"
 )
 
 //PublicError messages
 const (
-	InternalServerErrorResponse  = "Internal server error - see logs"
-	AuthenticationFailedResponse = "Authentication failed"
+	InternalServerErrorResponse  = "Interner Serverfehler"
+	AuthenticationFailedResponse = "Authentifizierung fehlgeschlagen"
+	EmptyParameterResponse       = "Leere(r) Parameter: "
+	IllegalParameterResponse     = "Illegale(r) Parameter: "
 )
 
 //db connection names
@@ -37,7 +44,7 @@ const (
 	VideoJsonPath  = CrawlerDirName + "/good.json"
 )
 
-//Characters allowed in SessionID
+//miscellaneous
 const (
 	LetterBytes    = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 	AuthCookieName = "mediathekauth"

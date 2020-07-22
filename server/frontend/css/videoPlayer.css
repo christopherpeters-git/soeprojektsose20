@@ -18,6 +18,45 @@
     text-align: left;
 }
 
+.avatar{
+    background-color: #ffffff;
+    color: white;
+    padding: 16px;
+    margin-top: -10%;
+
+    font-size: 16px;
+    border: none;
+}
+.Dropdown{
+    position: relative;
+    display: inline-block;
+    margin-right: 5%;
+}
+.Dropdown-content{
+    display: none;
+    position: absolute;
+    background-color: #ffffff;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+}
+.Dropdown-content a{
+    cursor: pointer;
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+}
+.Dropdown-content a:hover{
+    background-color: #ccc;
+}
+.Dropdown:hover .Dropdown-content{
+    display: block;
+}
+.Dropdown:hover .avatar {
+    background-color: #a09d9d;
+}
+
 @media only screen and (min-width: 1024px) {
     #videoPlayer {
         width: 70%;

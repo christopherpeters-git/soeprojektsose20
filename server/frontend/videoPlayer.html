@@ -13,14 +13,19 @@
 <body onunload="clearVideoPlayer()" onload="setDefaultAutplay()">
 
 <div id="searchBar">
-    <div id ="fav_btn" style="width: 10%;float: left">
-        <a href="favoritelist.html"> <img id="fav_btn" src="media/Sender-Logos/favoritenlite.JPG" width="30%"></a>
-    </div>
-    <div id="logout"style="width: 10%;float: right">
-        <img onclick="sendPostLogoutRequest()" id="logout_btn" src="media/Sender-Logos/logout.png" width="30%;" style="float: right;">
-    </div>
-    <div id="homeIcon" style="width: 10%;float: right">
+    <div id="homeIcon" style="width: 10%;float: left">
         <a href="index.html"> <img id="home_btn" src="media/images/Home-icon.svg.png" width="30%"></a>
+    </div>
+
+    <div class="Dropdown" id="Dropdown" style="width: 10%; float:right">
+        <button class="avatar" style="width:100%; float: left">
+            <img src="media/images/avatar.png" style="width: 40%">
+        </button>
+        <div class="Dropdown-content" >
+            <a onclick="openProfil()">Profil</a>
+            <a onclick="openHome()">Home</a>
+            <a onclick="Logout()">Ausloggen</a>
+        </div>
     </div>
 
 </div>

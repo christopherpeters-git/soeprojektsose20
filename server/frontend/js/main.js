@@ -33,11 +33,13 @@ function createAjaxRequest(){
 }
 
 function sendPostCookieAuthRequest(){
+    alert("Wir nutzen Cookies du Wichser!");
     const request = createAjaxRequest();
     request.onreadystatechange = function () {
         if(4 === this.readyState){
             if(200 === this.status){
                 hideVBlockerAndLogin();
+                unhideAvatar();
             }else{
                 console.log(this.status + ":" + this.responseText);
                 document.getElementById("Login_Screen").style.visibility="visible";
@@ -79,6 +81,7 @@ function sendPostLoginRequest(){
                 user = JSON.parse(this.responseText);
                 console.log(user);
                 hideVBlockerAndLogin();
+                unhideAvatar();
             }else{
                 alert(this.status + ":" + this.responseText);
             }
@@ -97,6 +100,7 @@ function sendPostLogoutRequest(){
             if(200 === this.status){
                 alert(this.responseText)
                 unhideVBlockerAndLogin();
+                hideAvatar();
             }else{
                 alert(this.status + ":" + this.responseText);
             }
@@ -117,6 +121,7 @@ function sendPostRegisterRequest(){
             if(200 === this.status){
                 alert(this.responseText)
                 hideVBlockerAndLogin();
+                unhideAvatar();
                 loginAfterRegister();
             }else{
                 alert(this.status + ":" + this.responseText);
@@ -176,6 +181,19 @@ function unhideVBlockerAndLogin() {
     var loginscreen = document.getElementById("Login_Screen");
     vblocker.style.visibility = "visible";
     loginscreen.style.visibility = "visible";
+}
+function hideAvatar() {
+    var avatar = document.getElementById("Dropdown");
+    avatar.style.visibility = "hidden";
+
+}
+function unhideAvatar() {
+    var avatar = document.getElementById("Dropdown");
+    avatar.style.visibility = "visible";
+}
+
+function openProfil(){
+    window.location.href = "/Profil.html";
 }
 
 function loginAfterRegister() {

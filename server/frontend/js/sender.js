@@ -109,6 +109,7 @@ function setPage() {
         lastVideo = currentVideo;
     }
     videosDiv.appendChild(show);
+
 }
 
 function appendShow(video,showdiv,i){
@@ -156,4 +157,16 @@ function openVideoPlayer() {
     sessionStorage.setItem('video', JSON.stringify(this.value));
     console.log(this.value);
     window.location.href = "/videoPlayer.html";
+}
+function Logout() {
+    window.location.href = "/index.html";
+   sendPostLogoutRequest();
+}
+
+function openProfil() {
+    window.location.href="/Profil.html";
+}
+function openHome() {
+    window.location.href="/index.html";
+
 }

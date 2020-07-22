@@ -46,9 +46,6 @@
 
 
 <div id="main_site">
-    <div id="favorite" style="width: 10%;float: left">
-        <a href="favoritelist.html"> <img id="fav_btn" src="media/Sender-Logos/favoritenlite.JPG" width="30%"></a>
-    </div>
 
     <div class="Searchbar" style="width: 60%;float: left">
         <input id="searchInput" type="text" placeholder="Suchbegriff eingeben" size="70" style="position: center; " >
@@ -57,30 +54,39 @@
         <img src="media/images/icon_Search.png" onclick="sendGetSearchRequest()" title="Suche starten" width="35">
     </div>
 
-    <div id="logout" style="width: 10%;float: right">
-        <img onclick="sendPostLogoutRequest()" id="logout_btn" src="media/Sender-Logos/logout.png" width="30%;" style="float: right;">
+    <div class="Dropdown" id="Dropdown" style="width: 10%; float:right; visibility: hidden">
+        <button class="avatar" style="width:100%; float: left">
+            <img src="media/images/avatar.png" style="width: 40%">
+        </button>
+        <div class="Dropdown-content" >
+            <a onclick="openProfil()">Profil</a>
+            <a onclick="sendPostLogoutRequest()">Ausloggen</a>
+        </div>
     </div>
+
 
     <div class="Senderliste">
         <from>
             <input id="ard" type="image" src="media/Sender-Logos/ard.png" class="sender" value="ARD" onclick="loadSenderPage(value)">
             <input id="zdf" type="image" src="media/Sender-Logos/zdf.png" class="sender" value="ZDF" onclick="loadSenderPage(value)">
+            <input id="zdf-tivi" type="image" src="media/Sender-Logos/ZDF-tivi.png" class="sender" value="ZDF-tivi"  onclick="loadSenderPage(value)">
             <input id="phoenix" type="image" src="media/Sender-Logos/phoenix.png" class="sender"  value="PHOENIX" onclick="loadSenderPage(value)">
             <input id="dreisat" type="image" src="media/Sender-Logos/3sat.png" class="sender" value="3Sat"  onclick="loadSenderPage(value)">
             <input id="ndr" type="image" src="media/Sender-Logos/ndr.png" class="sender" value="NDR"  onclick="loadSenderPage(value)">
-            <input id="wdr" type="image" src="media/Sender-Logos/wdr.png" class="sender" value="WDR"  onclick="loadSenderPage(value)">
             <input id="mdr" type="image" src="media/Sender-Logos/mdr.png" class="sender" value="MDR"  onclick="loadSenderPage(value)">
             <input id="rbb" type="image" src="media/Sender-Logos/rbb.png" class="sender" value="RBB"  onclick="loadSenderPage(value)">
             <input id="hr" type="image" src="media/Sender-Logos/hr.png" class="sender" value="HR"  onclick="loadSenderPage(value)">
             <input id="orf" type="image" src="media/Sender-Logos/orf.png" class="sender" value="ORF"  onclick="loadSenderPage(value)">
             <input id="sr" type="image" src="media/Sender-Logos/sr.png" class="sender" value="SR"  onclick="loadSenderPage(value)">
             <input id="srf" type="image" src="media/Sender-Logos/SRF.PNG" class="sender" value="SRF"  onclick="loadSenderPage(value)">
+            <input id="srfPd" type="image" src="media/Sender-Logos/SRF.Podcast.PNG" class="sender" value="SRF.Podcast" onclick="loadSenderPage(value)">
             <input id="swr" type="image" src="media/Sender-Logos/swr.png" class="sender" value="SWR"  onclick="loadSenderPage(value)">
             <input id="arte" type="image" src="media/Sender-Logos/arte.de.png" class="sender" value="ARTE.DE" onclick="loadSenderPage(value)">
+            <input id="artefr" type="image" src="media/Sender-Logos/arte.fr.png" class="sender" value="ARTE.FR" onclick="loadSenderPage(value)">
             <input id="kika" type="image" src="media/Sender-Logos/Kika.PNG" class="sender" value="KiKA"  onclick="loadSenderPage(value)">
             <input id="br" type="image" src="media/Sender-Logos/br.png" class="sender" value="BR"  onclick="loadSenderPage(value)">
-            <input id="rb" type="image" src="media/Sender-Logos/radio bremen.png" class="sender" value="RB" onclick="loadSenderPage(value)">
             <input id="DW" type="image" src="media/Sender-Logos/DW.png" class="sender" value="DW"  onclick="loadSenderPage(value)">
+            <input id="rb-tv" type="image" src="media/Sender-Logos/rbtv.png" class="sender" value="rbtv" onclick="loadSenderPage(value)">
         </from>
     </div>
 
@@ -95,6 +101,5 @@
       </div></center>
 </div>
 </body>
-
 
 </html>

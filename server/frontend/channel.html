@@ -4,27 +4,30 @@
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <link type="text/css" rel="stylesheet" href="css/senderPage.css">
     <script src="js/sender.js"></script>
+    <script src="js/main.js"></script>
     <script src="js/VideoFormat.js"></script>
 
 </head>
 <body onload="sendGetVideos()">
 <div id="mainPage">
-    <div id="favorite" style="width: 10%;float: left">
-        <a href="favoritelist.html"> <img id="fav_btn" src="media/Sender-Logos/favoritenlite.JPG" width="30%"></a>
+    <div id="homeIcon" style="width: 10%;float: left">
+        <a href="index.html"> <img id="home_btn" src="media/images/Home-icon.svg.png" width="30%";></a>
     </div>
-
-    <div class="Searchbar" style="width: 60%;float: left">
+    <div class="Searchbar" style="width: 50%;float: left">
         <input id="searchInput" type="text" placeholder="Suchbegriff eingeben" size="70" style="position: center;" >
     </div>
     <div id="searchbarIcon" style="width: 10%;float: left">
         <img src="media/images/icon_Search.png" onclick="searchThroughDatabase()" title="Suche starten" width="35">
     </div>
-    <div id="logout" style="width: 10%;float: right">
-        <img id="logout_btn" src="media/Sender-Logos/logout.png" width="30%;" style="float: right;">
-    </div>
-
-    <div id="homeIcon" style="width: 10%;float: right">
-       <img id="home_btn" src="media/images/Home-icon.svg.png" width="30%" onclick=openHomePage()>
+    <div class="Dropdown" id="Dropdown" style="width: 10%; float:right">
+        <button class="avatar" style="width:100%; float: left">
+            <img src="media/images/avatar.png" style="width: 40%">
+        </button>
+        <div class="Dropdown-content" >
+            <a onclick="openProfil()">Profil</a>
+            <a onclick="openHome()">Home</a>
+            <a onclick="Logout()">Ausloggen</a>
+        </div>
     </div>
 </div>
 

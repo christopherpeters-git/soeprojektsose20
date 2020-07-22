@@ -3,9 +3,11 @@ package library
 import (
 	"github.com/DATA-DOG/go-sqlmock"
 	"golang.org/x/crypto/bcrypt"
+	"net/http"
 	"reflect"
 	"strconv"
 	"testing"
+	"time"
 )
 
 var exampleVideos = []Video{
@@ -15,7 +17,7 @@ var exampleVideos = []Video{
 		Show:        "Die Nordreportage: Leben in der Jahrhundertsiedlung",
 		ReleaseDate: "16.09.2019",
 		Duration:    "00:28:31",
-		Link:        "http://mediandr-a.akamaihd.net/progressive/2019/0916/TV-20190916-1113-5400.hq.mp4",
+		Link:        "http://mediandr-a.akamaihd.net/progressive/2019/0916/TV-20190916-1113-5http.StatusBadRequest.hq.mp4",
 		PageLink:    "https://www.ndr.de/fernsehen/sendungen/die_nordreportage/Leben-in-der-Jahrhundertsiedlung,sendung943144.html",
 		FileName:    "76|d.mp4",
 	},
@@ -25,10 +27,25 @@ var exampleVideos = []Video{
 		Show:        "Letzte Chance an Bord",
 		ReleaseDate: "02.11.2019",
 		Duration:    "00:29:36",
-		Link:        "http://mediandr-a.akamaihd.net/progressive/2018/0412/TV-20180412-1528-4400.hq.mp4",
+		Link:        "http://mediandr-a.akamaihd.net/progressive/2018/0412/TV-20180412-1528-4http.StatusBadRequest.hq.mp4",
 		PageLink:    "https://www.ndr.de/fernsehen/sendungen/die_reportage/Segelschiff-statt-Jugendknast,sendung610984.html",
 		FileName:    "76|d.mp4",
 	}}
+
+var userColumns = []string{"Id", "Name", "Username", "PasswordHash", "Session_Id"}
+
+func TestIsStringLegal(t *testing.T) {
+	legalString := "Hallo123"
+	illegalStrings := [4]string{"Hal<lo", "Hallo>", "hal/lo", "hall.o"}
+	if !IsStringLegal(legalString) {
+		t.Errorf("string '%s' should be legal!", legalString)
+	}
+	for _, str := range illegalStrings {
+		if IsStringLegal(str) {
+			t.Errorf("string '%s' should be illegal!", legalString)
+		}
+	}
+}
 
 func TestFillUserVideoArray(t *testing.T) {
 	db, mock, err := sqlmock.New()
@@ -49,8 +66,8 @@ func TestFillUserVideoArray(t *testing.T) {
 		Username:       "bob123",
 		FavoriteVideos: exampleVideos,
 	}
-	favVideo1 := "{\n  \"channel\": \"NDR\",\n  \"title\": \"Die Nordreportage: Leben in der Jahrhundertsiedlung\",\n  \"show\": \"Die Nordreportage: Leben in der Jahrhundertsiedlung\",\n  \"releaseDate\": \"16.09.2019\",\n  \"duration\": \"00:28:31\",\n  \"link\": \"http://mediandr-a.akamaihd.net/progressive/2019/0916/TV-20190916-1113-5400.hq.mp4\",\n  \"pageLink\": \"https://www.ndr.de/fernsehen/sendungen/die_nordreportage/Leben-in-der-Jahrhundertsiedlung,sendung943144.html\",\n  \"fileName\": \"76|d.mp4\"\n }"
-	favVideo2 := "{\n  \"channel\": \"NDR\",\n  \"title\": \"Segelschiff statt Jugendknast\",\n  \"show\": \"Letzte Chance an Bord\",\n  \"releaseDate\": \"02.11.2019\",\n  \"duration\": \"00:29:36\",\n  \"link\": \"http://mediandr-a.akamaihd.net/progressive/2018/0412/TV-20180412-1528-4400.hq.mp4\",\n  \"pageLink\": \"https://www.ndr.de/fernsehen/sendungen/die_reportage/Segelschiff-statt-Jugendknast,sendung610984.html\",\n  \"fileName\": \"76|d.mp4\"\n }"
+	favVideo1 := "{\n  \"channel\": \"NDR\",\n  \"title\": \"Die Nordreportage: Leben in der Jahrhundertsiedlung\",\n  \"show\": \"Die Nordreportage: Leben in der Jahrhundertsiedlung\",\n  \"releaseDate\": \"16.09.2019\",\n  \"duration\": \"00:28:31\",\n  \"link\": \"http://mediandr-a.akamaihd.net/progressive/2019/0916/TV-20190916-1113-5http.StatusBadRequest.hq.mp4\",\n  \"pageLink\": \"https://www.ndr.de/fernsehen/sendungen/die_nordreportage/Leben-in-der-Jahrhundertsiedlung,sendung943144.html\",\n  \"fileName\": \"76|d.mp4\"\n }"
+	favVideo2 := "{\n  \"channel\": \"NDR\",\n  \"title\": \"Segelschiff statt Jugendknast\",\n  \"show\": \"Letzte Chance an Bord\",\n  \"releaseDate\": \"02.11.2019\",\n  \"duration\": \"00:29:36\",\n  \"link\": \"http://mediandr-a.akamaihd.net/progressive/2018/0412/TV-20180412-1528-4http.StatusBadRequest.hq.mp4\",\n  \"pageLink\": \"https://www.ndr.de/fernsehen/sendungen/die_reportage/Segelschiff-statt-Jugendknast,sendung610984.html\",\n  \"fileName\": \"76|d.mp4\"\n }"
 	resultRows := sqlmock.NewRows(columns).AddRow(givenUser.Username, favVideo1).AddRow(givenUser.Username, favVideo2)
 	mock.ExpectQuery("select (.+) from user_has_favorite_videos where Users_Username = (.+)").WillReturnRows(resultRows)
 	if err := FillUserVideoArray(&givenUser, db); err != nil {
@@ -104,8 +121,7 @@ func TestLoginUser(t *testing.T) {
 	if err != nil {
 		t.Fatalf("error '%s' was not expected creating a hash", err.Error())
 	}
-	columns := []string{"Id", "Name", "Username", "PasswordHash", "Session_Id"}
-	mock.ExpectQuery("select [*] from users where username = ?").WillReturnRows(sqlmock.NewRows(columns).AddRow("0", "Max Mustermann", incomingUsername, string(incomingPasswordHash), givenSessionId))
+	mock.ExpectQuery("select [*] from users where username = ?").WillReturnRows(sqlmock.NewRows(userColumns).AddRow("0", "Max Mustermann", incomingUsername, string(incomingPasswordHash), givenSessionId))
 	expectedUser := User{
 		Id:             "0",
 		Name:           "Max Mustermann",
@@ -120,13 +136,80 @@ func TestLoginUser(t *testing.T) {
 		t.Errorf("given user didnt match expected user: givenUser: %s expectedUser: %s\n", givenUser.ToString(), expectedUser.ToString())
 	}
 	//Test if user cant log with wrong password in as expected
-	mock.ExpectQuery("select [*] from users where username = ?").WillReturnRows(sqlmock.NewRows(columns).AddRow("0", "Max Mustermann", incomingUsername, string(incomingPasswordHash), givenSessionId))
+	mock.ExpectQuery("select [*] from users where username = ?").WillReturnRows(sqlmock.NewRows(userColumns).AddRow("0", "Max Mustermann", incomingUsername, string(incomingPasswordHash), givenSessionId))
 	var givenUser2 User
 	wrongPassword := "wrongPassword"
 	dErr := LoginUser(db, &givenUser2, incomingUsername, wrongPassword)
 	if dErr == nil {
 		t.Errorf("Error expected!")
-	} else if dErr.Status() != 401 {
-		t.Errorf("Expected error status 401, got: " + strconv.FormatInt(int64(dErr.Status()), 10) + " " + dErr.Error())
+	} else if dErr.Status() != http.StatusForbidden {
+		t.Errorf("Expected error status http.StatusForbidden, got: " + strconv.FormatInt(int64(dErr.Status()), 10) + " " + dErr.Error())
 	}
+}
+
+func TestIsUserLoggedInWithACookie(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer db.Close()
+
+	var givenUser User
+	//Creating a demo request and cookie
+	exampleSessionId := GenerateSessionId(255)
+	expire := time.Now().AddDate(0, 0, 2)
+	sessionCookie := http.Cookie{
+		Name:       AuthCookieName,
+		Value:      exampleSessionId,
+		Path:       "/",
+		Domain:     "localhost",
+		Expires:    expire,
+		RawExpires: expire.Format(time.UnixDate),
+		MaxAge:     172800,
+		Secure:     false,
+		HttpOnly:   true,
+		SameSite:   http.SameSiteLaxMode,
+	}
+	reader := DemoReader{}
+	request, err := http.NewRequest("POST", "localhost", &reader)
+	if err != nil {
+		t.Errorf("unexpected error while creating a request: \n %s", err.Error())
+	}
+
+	expectedUser := User{
+		Id:             "1",
+		Name:           "Bob",
+		Username:       "bob123",
+		sessionId:      exampleSessionId,
+		passwordHash:   "abcdef",
+		FavoriteVideos: nil,
+	}
+	//Test if login throws error if no cookie is there
+	if dErr := IsUserLoggedInWithACookie(request, db, &givenUser); dErr == nil {
+		t.Errorf("login was successful unexpectedly!")
+	}
+	//Test if login is successful with right session id
+	request, err = http.NewRequest("POST", "localhost", &reader)
+	if err != nil {
+		t.Errorf("unexpected error while creating a request: \n %s", err.Error())
+		return
+	}
+	//Test if login is successful with right session id
+	request.AddCookie(&sessionCookie)
+	mock.ExpectQuery("select [*] from users where session_id = ?").WillReturnRows(sqlmock.NewRows(userColumns).AddRow(expectedUser.Id, expectedUser.Name, expectedUser.Username, expectedUser.passwordHash, expectedUser.sessionId))
+	if dErr := IsUserLoggedInWithACookie(request, db, &givenUser); dErr != nil {
+		t.Errorf("login threw unexepcted error: \n %s", dErr.Error())
+	} else if !givenUser.Equals(&expectedUser) {
+		t.Errorf("given user does not match expected user: gU:\n %s\n eU:\n %s\n", givenUser, expectedUser)
+	}
+	//Test if login throws error with a wrong session id
+	mock.ExpectQuery("select [*] from users where session_id = ?").WillReturnRows(sqlmock.NewRows(userColumns))
+	sessionCookie.Value = "wrongSessionId"
+	if dErr := IsUserLoggedInWithACookie(request, db, &givenUser); dErr == nil {
+		t.Errorf("login was successful unexpectedly!")
+	}
+}
+
+func TestPlaceCookie(t *testing.T) {
+
 }

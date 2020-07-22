@@ -172,3 +172,15 @@ function openVideoPlayer() {
     console.log(this.value);
 
 }
+function Logout() {
+    window.location.href = "/index.html";
+   sendPostLogoutRequest();
+}
+
+function openProfil() {
+    window.location.href="/Profil.html";
+}
+function openHome() {
+    window.location.href="/index.html";
+
+}

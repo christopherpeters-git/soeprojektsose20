@@ -8,7 +8,7 @@
     <script src="js/sender.js"></script>
 </head>
 
-<body onload="sendPostCookieAuthRequest()">
+<body onload="sendPostCookieAuthRequest(), searchOnEnter()">
 <div id="v_blocker">
 
 </div>
@@ -52,7 +52,7 @@
         <input id="searchInput" type="text" placeholder="Suchbegriff eingeben" size="70" style="position: center; " >
     </div>
     <div id="searchbarIcon" style="width: 10%;float: left">
-        <img src="media/images/icon_Search.png" onclick="sendGetSearchRequest()" title="Suche starten" width="35">
+        <img id="searchIcon" src="media/images/icon_Search.png" onclick="sendGetSearchRequest()" title="Suche starten" width="35">
     </div>
 
     <div class="Dropdown" id="Dropdown" style="width: 10%; float:right; visibility: hidden">

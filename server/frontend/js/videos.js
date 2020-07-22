@@ -43,7 +43,7 @@ function searchOnEnter() {
     inputSearch.addEventListener("keyup", function (event) {
         if (event.key === "Enter") {
             event.preventDefault();
-            document.getElementById("iconSearchbar").click();
+            document.getElementById("searchIcon").click();
         }
     })
 }

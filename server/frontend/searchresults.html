@@ -1,14 +1,15 @@
-<html lang="de">
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
+    <title>Suchresultate</title>
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-    <link type="text/css" rel="stylesheet" href="css/senderPage.css">
+    <link type="text/css" rel="stylesheet" href="css/searchresults.css">
     <script src="js/sender.js"></script>
     <script src="js/main.js"></script>
     <script src="js/videos.js"></script>
-
 </head>
-<body onload="sendGetVideos(),searchOnEnter()">
+<body>
 <div id="mainPage">
     <div id="homeIcon" style="width: 10%;float: left">
         <a href="index.html"> <img id="home_btn" src="media/images/Home-icon.svg.png" width="30%";></a>
@@ -32,26 +33,16 @@
 
 </div>
 
-<div id ="senderPic" >
-
-    <select id="View-dropdown" name="Items"style="visibility: hidden">
-        <option value="listView">Listview </option>
-        <option value="kachelView"> Kachelview </option>
-    </select>
-
-</div>
-
 <div id = videoContainer>
-  <div id= "videos">
-  </div>
+    <div id= "videos">
+    </div>
 </div>
 
 
 <div id="buttons">
-<button id="backButton" onclick="previousPage()">«</button>
-<input type="text" id="inputButton" placeholder="1" readonly>
-<button id="forButton" onclick="nextPage()"> »</button>
+    <button id="backButton" onclick="previousPage()">«</button>
+    <input type="text" id="inputButton" placeholder="1" readonly>
+    <button id="forButton" onclick="nextPage()"> »</button>
 </div>
-
 </body>
 </html>

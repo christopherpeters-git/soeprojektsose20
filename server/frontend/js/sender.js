@@ -7,10 +7,25 @@ let currentPage =1;
 
 let lastPage;
 
-/*todo
-* searchfunktion
-*
-* */
+function sendGetSearchRequestChannel(){
+    const request = createAjaxRequest();
+    const searchString = document.getElementById("searchInput").value;
+    let channel = channelName;
+    console.log(channel + "  "+ searchString);
+    request.onreadystatechange = function () {
+        if(4 === this.readyState){
+            if(200 === this.status){
+                alert(this.responseText);
+                console.log("Suchfunktion Channelpage");
+            }else{
+                alert(this.status + ":" + this.responseText);
+            }
+        }
+    }
+
+    request.open("GET","/search" +"?search="+searchString+"&"+"channel="+channel,true);
+    request.send();
+}
 
 
 class Videoclass {

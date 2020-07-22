@@ -55,17 +55,20 @@ function sendPostCookieAuthRequest(){
 function sendGetSearchRequest(){
     const request = createAjaxRequest();
     const searchString = document.getElementById("searchInput").value;
+    let channel = "none";
+    console.log(channel + "  "+ searchString);
     request.onreadystatechange = function () {
         if(4 === this.readyState){
             if(200 === this.status){
                 alert(this.responseText);
+                console.log("Suchfunktion Mainpage");
             }else{
                 alert(this.status + ":" + this.responseText);
             }
         }
     }
 
-    request.open("GET","/search" +"?search="+searchString,true);
+    request.open("GET","/search" +"?search="+searchString+"&"+"channel="+channel,true);
     request.send();
 }
 

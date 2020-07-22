@@ -75,7 +75,6 @@ function sendGetClickedVideos(video){
     return clickNumber;
 }
 function shareThisVideo(event){
-    console.log(event);
     let copInput = document.createElement("textarea");
     copInput.textContent=this.value;
     copInput.select();
@@ -182,7 +181,6 @@ function sendPostFavoriteRequest(video){
             }else{
                 alertSetterFunction("rgba(255,0,30,0.75)",this.responseText);
             }
-            console.log(this);
         }
     }
     request.open("POST",/addToFavorites/,true);

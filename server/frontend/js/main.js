@@ -191,6 +191,11 @@ function unhideAvatar() {
     avatar.style.visibility = "visible";
 }
 
+function openProfil() {
+    window.location.href="/Profil.html";
+}
+
+
 
 function loginAfterRegister() {
    let userLogin = document.getElementById("usernameLogin");

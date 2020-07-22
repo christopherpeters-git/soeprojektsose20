@@ -31,9 +31,9 @@ body {
 }
 
 #Login_Screen{
+    position: fixed;
     background-image: url("../media/Sender-Logos/4236532-background-images.jpg");
     background-color: white;
-    position: absolute;
     z-index: 10;
     width: 20%;
     margin-left: 45%;

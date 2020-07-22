@@ -1,9 +1,13 @@
 let channel;
 sendGetVideos();
 
+function setDefaultAutplay() {
+    const slider = document.getElementsByClassName("switch");
+    slider[0].children[0].checked=false;
+}
 
 function initVideoPlayer() {
-    const videoPlayer =document.getElementById("my-video");
+    const videoPlayer =document.getElementById("my-video")
     let video = JSON.parse(sessionStorage.getItem("video"));
     videoPlayer.setAttribute("poster","media/Sender-Logos/"+video[0].channel+".png");
     videoPlayer.children[0].setAttribute("src",video[0].link);
@@ -29,6 +33,9 @@ function createAjaxRequest(){
 }
 
 function clearVideoPlayer() {
+    let myPlayer = document.getElementById("my-video");
+    myPlayer = myPlayer.children[0];
+    myPlayer.removeEventListener("ended",autoPlayFunction,false);
 }
 
 function addVideoinformation(video) {
@@ -191,14 +198,30 @@ function alertSetterFunction(color,message) {
     setTimeout(function(){alert.style.display="none"},1500);
 }
 
-/*
+
 function toggleAutoplayVideoplayer() {
     const slider = document.getElementsByClassName("switch");
-    setAutoplay(slider[0].children[0].checked);
-
-
+    let myPlayer = document.getElementById("my-video");
+    myPlayer = myPlayer.children[0];
+    if(slider[0].children[0].checked){
+        myPlayer.addEventListener("ended",autoPlayFunction,false);
+    }
+    else {
+        myPlayer.removeEventListener("ended",autoPlayFunction,false);
+    }
 }
 
-function setAutoplay(bool) {
-    console.log()
-}*/
+
+
+function autoPlayFunction() {
+    console.log("started new Video");
+    let listVideos = document.getElementById("nextVideos");
+    if(listVideos!==null) {
+        listVideos=listVideos.children[0];
+        sessionStorage.setItem('video', JSON.stringify(listVideos.value));
+        initVideoPlayer();
+        let myPlayer = document.getElementById("my-video");
+        myPlayer = myPlayer.children[0];
+        myPlayer.play();
+    }
+}

@@ -10,7 +10,7 @@
         <script src="js/VideoFormat.js"></script>
     </head>
 
-<body onunload="clearVideoPlayer()">
+<body onunload="clearVideoPlayer()" onload="setDefaultAutplay()">
 
 <div id="searchBar">
     <div id ="fav_btn" style="width: 10%;float: left">
@@ -50,26 +50,20 @@
 <div id="nextVideosList" >Naechste Titel
     <!--Quelle: https://www.w3schools.com/howto/howto_css_switch.asp -->
     <!-- Rounded switch -->
-    <!-- Rounded switch -->
-    <div id ="switchContainer"style="float: right;display: none">
+    <div id ="switchContainer"style="float: right">
         Autoplay
     <label class="switch" >
-        <input id ="checkboxAutoplay" type="checkbox" >
+        <input id ="checkboxAutoplay" type="checkbox" onclick="toggleAutoplayVideoplayer()">
         <span class="slider round"></span>
     </label>
     </div>
 
 <div id="nextVideos">
-
-
 </div>
-
-
 </div>
-
-
 <script src="js/video.js"></script>
 <script> initVideoPlayer()</script>
+
 </body>
 
 

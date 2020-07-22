@@ -168,8 +168,8 @@ function openVideoPlayer() {
     initVideoPlayer();
 }
 function addVideoToFav() {
-    sendPostFavoriteRequest(this.value)
-
+    console.log(this.value);
+    sendPostFavoriteRequest(encodeURIComponent(this.value));
 }
 
 function sendPostFavoriteRequest(video){

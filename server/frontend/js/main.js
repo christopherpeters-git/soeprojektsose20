@@ -72,6 +72,7 @@ function sendPostLoginRequest(){
     const usernameInput = document.getElementById("usernameLogin").value;
     const passwordInput = document.getElementById("passwordLogin").value;
     const request = createAjaxRequest();
+    cookieInfo();
     request.onreadystatechange = function () {
         if(4 === this.readyState){
             if(200 === this.status){
@@ -194,7 +195,9 @@ function unhideAvatar() {
 function openProfil() {
     window.location.href="/Profil.html";
 }
-
+function cookieInfo(){
+alert("Wir benutzen Cookies, um Inhalte und Anzeigen zu personalisieren.")
+}
 
 
 function loginAfterRegister() {

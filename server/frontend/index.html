@@ -4,11 +4,12 @@
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <link type="text/css" rel="stylesheet" href="css/main.css">
     <script src="js/main.js"></script>
+
     <script src="js/sender.js"></script>
 
 </head>
 
-<body onload="sendPostCookieAuthRequest()">
+<body onload="initMainPage()">
 <div id="v_blocker">
 
 </div>
@@ -52,7 +53,7 @@
         <input id="searchInput" type="text" placeholder="Suchbegriff eingeben" size="70" style="position: center; " >
     </div>
     <div id="searchbarIcon" style="width: 10%;float: left">
-        <img src="media/images/icon_Search.png" onclick="sendGetSearchRequest()" title="Suche starten" width="35">
+        <img id="searchIcon" src="media/images/icon_Search.png" onclick="openSearchPage()" title="Suche starten" width="35">
     </div>
 
     <div class="Dropdown" id="Dropdown" style="width: 10%; float:right; visibility: hidden">

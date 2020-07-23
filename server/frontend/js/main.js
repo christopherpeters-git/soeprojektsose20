@@ -1,4 +1,6 @@
 "use strict"
+let searchResultsJSON;
+let pageFlag;
 
 class User{
     constructor(id,name,username,favoriteVideos) {
@@ -8,6 +10,18 @@ class User{
         this.favoriteVideos= favoriteVideos;
     }
 
+}
+class Video {
+    constructor(channel, title, show, releaseDate, duration, link, pageLink, fileName) {
+        this.channel = channel;
+        this.title = title;
+        this.show = show;
+        this.releaseDate = releaseDate;
+        this.duration = duration;
+        this.link = link;
+        this.pageLink = pageLink;
+        this.fileName = fileName;
+    }
 }
 
 const video =  {
@@ -53,18 +67,41 @@ function sendPostCookieAuthRequest(){
 
 function sendGetSearchRequest(){
     const request = createAjaxRequest();
-    const searchString = document.getElementById("searchInput").value;
+    console.log("SearchRequest: " + sessionStorage.getItem("search"));
+    const searchString = sessionStorage.getItem("search");
+    let channel = "none";
+    console.log(channel + "  "+ searchString);
     request.onreadystatechange = function () {
         if(4 === this.readyState){
             if(200 === this.status){
-                alert(this.responseText);
+                searchResultsJSON = JSON.parse(this.responseText);
+                setPage(searchResultsJSON);
             }else{
                 alert(this.status + ":" + this.responseText);
             }
         }
     }
 
-    request.open("GET","/search" +"?search="+searchString,true);
+    request.open("GET","/search" +"?search="+searchString+"&"+"channel="+channel,true);
+    request.send();
+}
+
+function sendGetSearchRequestSearchResults(){
+    const request = createAjaxRequest();
+    const searchString = document.getElementById("searchInput").value;
+    let channel = "none";
+    request.onreadystatechange = function () {
+        if(4 === this.readyState){
+            if(200 === this.status){
+                searchResultsJSON = JSON.parse(this.responseText);
+                setPage(searchResultsJSON);
+            }else{
+                alert(this.status + ":" + this.responseText);
+            }
+        }
+    }
+
+    request.open("GET","/search" +"?search="+searchString+"&"+"channel="+channel,true);
     request.send();
 }
 
@@ -191,11 +228,9 @@ function unhideAvatar() {
     avatar.style.visibility = "visible";
 }
 
-function openProfil() {
-    window.location.href="/Profil.html";
+function openProfil(){
+    window.location.href = "/Profil.html";
 }
-
-
 
 function loginAfterRegister() {
    let userLogin = document.getElementById("usernameLogin");
@@ -205,6 +240,54 @@ function loginAfterRegister() {
    sendPostLoginRequest();
 }
 
+function openSearchPage() {
+    let searchInp = document.getElementById("searchInput").value;
+    sessionStorage.setItem('search',searchInp);
+    console.log("OpenSearchPage: " + sessionStorage.getItem("search"));
+    window.location.href = "/searchresults.html";
+}
+
+function fillSearchPage() {
+    let videoEx = new Video("","","","","","","","");
+    let videoResultsC = document.getElementById("videoResultContainer");
+    let vidDiv = document.getElementById("videoResults");
+    vidDiv.innerHTML = "";
+    for(videoEx of searchResultsJSON) {
+        let h2 = document.createElement("div");
+        let h5 = document.createElement("h5");
+        h5.innerText = videoEx.title;
+        h2.appendChild(h5);
+        vidDiv.appendChild(h2)
+    }
+}
+
+function initChannelPage() {
+    pageFlag = "channel";
+    sessionStorage.setItem("pageflag",pageFlag);
+    sendGetVideos();
+    searchOnEnter();
+    console.log(pageFlag);
+}
+
+function initMainPage() {
+    pageFlag = "main";
+    sessionStorage.setItem("pageflag",pageFlag);
+    sendPostCookieAuthRequest();
+    searchOnEnter();
+    console.log(pageFlag);
+}
+
+function initSearchPage() {
+    searchOnEnter();
+    let whichPage = sessionStorage.getItem("pageflag");
+    console.log("Suche wird aufgerufen: " + whichPage);
+    if(!(whichPage.localeCompare("main"))) {
+        sendGetSearchRequest();
+    }else {
+        console.log("Suche Channel");
+        sendGetSearchRequestChannel();
+    }
+}
 
 
 
@@ -227,4 +310,18 @@ function openTab(evt, tabName)  {
     // Show the current tab, and add an "active" class to the button that opened the tab
     document.getElementById(tabName).style.display = "block";
     evt.currentTarget.className += " active";
+}
+
+function searchOnEnter() {
+    const inputSearch = document.getElementById("searchInput");
+    inputSearch.addEventListener("keyup", function (event) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            document.getElementById("searchIcon").click();
+        }
+    })
+}
+
+function decideSearch() {
+
 }

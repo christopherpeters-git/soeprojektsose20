@@ -89,6 +89,7 @@ function sendGetSearchRequest(){
 function sendGetSearchRequestSearchResults(){
     const request = createAjaxRequest();
     const searchString = document.getElementById("searchInput").value;
+    let channel = "none";
     request.onreadystatechange = function () {
         if(4 === this.readyState){
             if(200 === this.status){

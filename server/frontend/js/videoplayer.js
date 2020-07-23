@@ -1,4 +1,4 @@
-let channel;
+let channel = "none";
 sendGetVideos();
 
 function setDefaultAutplay() {

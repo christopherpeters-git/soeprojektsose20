@@ -1,6 +1,14 @@
-body{
-
+*{
+    margin: 0;
+    padding: 0;
 }
+
+#profilePicture{
+    float:left;
+    width: 5%;
+    height: 10%;
+}
+
 .sender{
     border-style: groove;
     border-radius: 5%;

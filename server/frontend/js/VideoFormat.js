@@ -27,11 +27,10 @@ function Logout() {
 }
 
 function openProfil() {
-    window.location.href="/Profil.html";
+    window.location.href="/profil.html";
 }
 function openHome() {
     window.location.href="/index.html";
-
 }
 
 function sendPostLogoutRequest(){

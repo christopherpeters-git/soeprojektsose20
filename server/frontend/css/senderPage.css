@@ -47,11 +47,8 @@ hr{
 
 
 
-
 #senderPic{
     clear: both;
-
-
     background-color: #cccccc;
 }
 
@@ -145,17 +142,13 @@ input[type=text]{
 
 .showClass{
     clear: both;
-
 }
-
-
 
 #buttons{
     clear: both;
     display: block;
     width: 40%;
     margin-left: 45%;
-
 }
 
 #inputButton{
@@ -171,7 +164,6 @@ input[type=text]{
 #forButton{
     font-size: 0.5cm;
     width: 10%;
-
 }
 
 

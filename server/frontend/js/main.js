@@ -192,7 +192,7 @@ function unhideAvatar() {
 }
 
 function openProfil() {
-    window.location.href="/Profil.html";
+    window.location.href="/profil.html";
 }
 
 

@@ -91,7 +91,6 @@ function setPage() {
     show.appendChild(document.createElement('br'));
     show.appendChild(document.createElement("hr"));
     appendShow(lastVideo,show,(start+((currentPage-1)*30)));
-
     for(let i =(tempStart+1)+((currentPage-1)*tempEnd);i<tempEnd*currentPage;i++){
         console.log(tempEnd);
         currentVideo = channelJson[i];

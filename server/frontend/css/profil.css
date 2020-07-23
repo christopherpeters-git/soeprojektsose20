@@ -1,14 +1,13 @@
-*{
-    margin: 0;
-    padding: 0;
-}
 
 #profilePicture{
-    float:left;
+    margin-top: 20%;
     width: 5%;
     height: 10%;
 }
-
+#favorites{
+    position: fixed;
+    margin-top: 50%;
+}
 .sender{
     border-style: groove;
     border-radius: 5%;
@@ -75,6 +74,9 @@
         width: 100%;
     }
     #avatar{
+        width: 100%;
+    }
+    #profilePicture{
         width: 100%;
     }
 }

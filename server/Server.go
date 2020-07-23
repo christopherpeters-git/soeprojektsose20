@@ -70,14 +70,8 @@ func handlePostFetchFavorites(w http.ResponseWriter, r *http.Request) {
 		lib.ReportDetailedError(w, dErr)
 		return
 	}
-	rows, err := userDB.Query("select * from user_has_favorite_videos where Users_Username = ?", user.Username)
-	if err != nil {
-		lib.ReportError(w, http.StatusInternalServerError, lib.InternalServerErrorResponse, "SQL query failed")
-		return
-	}
-	favoriteVideos := make([]lib.Video, 0)
-	for rows.Next() {
-		rows.Scan()
+	if err = lib.FillUserVideoArray(&user, userDB); err != nil {
+		lib.ReportError(w, http.StatusInternalServerError, lib.InternalServerErrorResponse, "FillUserVideoArray failed:\n"+err.Error())
 	}
 	log.Println("Answered handlePostFetchFavorites request successfully")
 }

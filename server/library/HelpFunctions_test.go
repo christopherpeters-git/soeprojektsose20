@@ -121,7 +121,7 @@ func TestLoginUser(t *testing.T) {
 	if err != nil {
 		t.Fatalf("error '%s' was not expected creating a hash", err.Error())
 	}
-	mock.ExpectQuery("select [*] from users where username = ?").WillReturnRows(sqlmock.NewRows(userColumns).AddRow("0", "Max Mustermann", incomingUsername, string(incomingPasswordHash), givenSessionId))
+	mock.ExpectQuery("select (.+) from users where username = ?").WillReturnRows(sqlmock.NewRows(userColumns).AddRow("0", "Max Mustermann", incomingUsername, string(incomingPasswordHash), givenSessionId))
 	expectedUser := User{
 		Id:             "0",
 		Name:           "Max Mustermann",
@@ -136,7 +136,7 @@ func TestLoginUser(t *testing.T) {
 		t.Errorf("given user didnt match expected user: givenUser: %s expectedUser: %s\n", givenUser.ToString(), expectedUser.ToString())
 	}
 	//Test if user cant log with wrong password in as expected
-	mock.ExpectQuery("select [*] from users where username = ?").WillReturnRows(sqlmock.NewRows(userColumns).AddRow("0", "Max Mustermann", incomingUsername, string(incomingPasswordHash), givenSessionId))
+	mock.ExpectQuery("select (.+) from users where username = ?").WillReturnRows(sqlmock.NewRows(userColumns).AddRow("0", "Max Mustermann", incomingUsername, string(incomingPasswordHash), givenSessionId))
 	var givenUser2 User
 	wrongPassword := "wrongPassword"
 	dErr := LoginUser(db, &givenUser2, incomingUsername, wrongPassword)
@@ -196,14 +196,14 @@ func TestIsUserLoggedInWithACookie(t *testing.T) {
 	}
 	//Test if login is successful with right session id
 	request.AddCookie(&sessionCookie)
-	mock.ExpectQuery("select [*] from users where session_id = ?").WillReturnRows(sqlmock.NewRows(userColumns).AddRow(expectedUser.Id, expectedUser.Name, expectedUser.Username, expectedUser.passwordHash, expectedUser.sessionId))
+	mock.ExpectQuery("select (.+) from users where session_id = ?").WillReturnRows(sqlmock.NewRows(userColumns).AddRow(expectedUser.Id, expectedUser.Name, expectedUser.Username, expectedUser.passwordHash, expectedUser.sessionId))
 	if dErr := IsUserLoggedInWithACookie(request, db, &givenUser); dErr != nil {
 		t.Errorf("login threw unexepcted error: \n %s", dErr.Error())
 	} else if !givenUser.Equals(&expectedUser) {
 		t.Errorf("given user does not match expected user: gU:\n %s\n eU:\n %s\n", givenUser, expectedUser)
 	}
 	//Test if login throws error with a wrong session id
-	mock.ExpectQuery("select [*] from users where session_id = ?").WillReturnRows(sqlmock.NewRows(userColumns))
+	mock.ExpectQuery("select (.+) from users where session_id = ?").WillReturnRows(sqlmock.NewRows(userColumns))
 	sessionCookie.Value = "wrongSessionId"
 	if dErr := IsUserLoggedInWithACookie(request, db, &givenUser); dErr == nil {
 		t.Errorf("login was successful unexpectedly!")

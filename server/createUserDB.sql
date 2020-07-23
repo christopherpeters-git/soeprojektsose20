@@ -6,6 +6,7 @@ CREATE TABLE users (
     Username varchar(255) NOT NULL UNIQUE,
     PasswordHash varchar(255) NOT NULL,
     Session_Id varchar(255) NOT NULL DEFAULT 0,
+    Profile_Picture LONGBLOB,
     PRIMARY KEY(Id)
 );
 

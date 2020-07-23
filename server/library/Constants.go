@@ -13,6 +13,8 @@ const (
 	IncomingGetVideoClickedRequestUrl         = "/clickVideo"
 	IncomingGetVideosRequestUrl               = "/getVideos/"
 	IncomingPostFetchFavoritesRequestUrl      = "/getFavorites/"
+	IncomingGetFetchProfilePictureRequestUrl  = "/getProfilePicture/"
+	IncomingPostSaveProfilePictureRequestUrl  = "/setProfilePicture/"
 )
 
 //Parameter

@@ -32,6 +32,40 @@ function createAjaxRequest(){
     return request;
 }
 
+function sendPostSaveProfilePicture(){
+    const request = createAjaxRequest();
+    const profilePicture = document.getElementById("ppUpload").value;
+    const formData = new FormData();
+    formData.append("profilepicture",profilePicture)
+    request.onreadystatechange = function () {
+        if(4 === this.readyState){
+            if(200 === this.status){
+                alert(this.responseText)
+            }else{
+                alert(this.status + ":" + this.responseText);
+            }
+        }
+    }
+    request.open("POST","/setProfilePicture/",true);
+    request.send(formData);
+}
+
+function sendGetLoadProfilePicture(){
+    const request = createAjaxRequest();
+    request.onreadystatechange = function () {
+        if(4 === this.readyState){
+            if(200 === this.status){
+                document.getElementById("pp").value = this.responseText
+                console.log(this.responseText)
+            }else{
+                alert(this.status + ":" + this.responseText);
+            }
+        }
+    }
+    request.open("GET","/getProfilePicture/",true);
+    request.send();
+}
+
 function sendPostCookieAuthRequest(){
     const request = createAjaxRequest();
     request.onreadystatechange = function () {
@@ -44,6 +78,22 @@ function sendPostCookieAuthRequest(){
         }
     }
     request.open("POST","/cookieAuth/",true);
+    request.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+    request.send("dummy=dummy");
+}
+
+function sendPostFetchFavoritesRequest(){
+    const request = createAjaxRequest();
+    request.onreadystatechange = function () {
+        if(4 === this.readyState){
+            if(200 === this.status){
+                alert(this.responseText)
+            }else{
+                alert(this.status + ":" + this.responseText);
+            }
+        }
+    }
+    request.open("POST","/getFavorites/",true);
     request.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
     request.send("dummy=dummy");
 }

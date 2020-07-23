@@ -35,10 +35,19 @@
 
     <button onclick="sendGetSearchRequest()">Search</button>
 
+    <h2>Profile picture</h2>
+    <label for="ppUpload">Upload Image</label>
+    <input id="ppUpload" type="file">
+    <button onclick="sendPostSaveProfilePicture()">Save PP</button>
+    <button onclick="sendGetLoadProfilePicture()">Get PP</button>
+    <img id="pp">
+
     <h2>Misc</h2>
     <button onclick="sendPostFavoriteRequest()"> add video to favorites</button>
     <button onclick="sendPostRemoveFavoriteRequest()"> remove video to favorites</button>
     <button onclick="sendGetClickedVideos()"> click</button>
     <button onclick="sendPostLogoutRequest()"> logout</button>
+    <button onclick="sendPostFetchFavoritesRequest()"> fetch favorites</button>
+
 </body>
 </html>

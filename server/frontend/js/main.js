@@ -33,7 +33,6 @@ function createAjaxRequest(){
 }
 
 function sendPostCookieAuthRequest(){
-    alert("Wir nutzen Cookies du Wichser!");
     const request = createAjaxRequest();
     request.onreadystatechange = function () {
         if(4 === this.readyState){
@@ -192,9 +191,11 @@ function unhideAvatar() {
     avatar.style.visibility = "visible";
 }
 
-function openProfil(){
-    window.location.href = "/Profil.html";
+function openProfil() {
+    window.location.href="/Profil.html";
 }
+
+
 
 function loginAfterRegister() {
    let userLogin = document.getElementById("usernameLogin");

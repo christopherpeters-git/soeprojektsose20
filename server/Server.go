@@ -38,7 +38,7 @@ func main() {
 	defer lib.InitDataBaseConnection(dbConnections, "mysql", "root", "soe2020", "localhost:3306", lib.UserDBconnectionName, lib.UserDBconnectionName).Close()
 
 	log.Print("Server has started...")
-	http.Handle("/", http.FileServer(http.Dir("test_frontend/")))
+	http.Handle("/", http.FileServer(http.Dir("frontend/")))
 	http.HandleFunc(lib.IncomingGetSearchRequestUrl, handleGetSearchVideos)
 	http.HandleFunc(lib.IncomingGetVideosRequestUrl, handleGetAllVideos)
 	http.HandleFunc(lib.IncomingGetVideosFromChannelRequestUrl, handleGetVideosByChannel)
@@ -321,6 +321,7 @@ func handlePostAddVideoToFavorites(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	incomingVideo := r.FormValue("video")
+	log.Println(incomingVideo)
 	var user lib.User
 	if dErr := lib.IsUserLoggedInWithACookie(r, userDB, &user); dErr != nil {
 		lib.ReportDetailedError(w, dErr)
@@ -344,7 +345,7 @@ func handlePostAddVideoToFavorites(w http.ResponseWriter, r *http.Request) {
 	}
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("Added video to favorites successfully"))
-	log.Println("Answering handlePostAddVideoToFavorites request started...")
+	log.Println("Added video to favorites successfully")
 }
 
 func handleGetVideosByChannel(w http.ResponseWriter, r *http.Request) {

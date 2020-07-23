@@ -12,12 +12,12 @@ class User{
 
 const video =  {
     "channel": "ARD",
-    "title": "\"Plan B\" für Bayern",
-    "show": "\"Plan B\" für Bayern",
-    "releaseDate": "24.06.2020",
-    "duration": "00:42:55",
-    "link": "http://cdn-storage.br.de/b7/2020-06/24/159a1622b65711eabca2984be109059a_C.mp4",
-    "pageLink": "https://www.ardmediathek.de/ard/player/Y3JpZDovL2JyLmRlL3ZpZGVvLzY3ZmY5YjUyLTI5NDYtNDEwMC04MDk1LTg2OTU1NjgxOTMyZA",
+    "title": "2 Mann f\u00fcr alle G\u00e4nge - Roastbeef mit Senfsaatsauce",
+    "show":  "2 Mann f\u00fcr alle G\u00e4nge",
+    "releaseDate": "28.01.2016",
+    "duration": "00:30:00",
+    "link": "http://mediastorage01.sr-online.de/Video/FS/ZMANN/2mann_20160123_180701_L.mp4",
+    "pageLink": "http://www.ardmediathek.de/tv/2-Mann-f%C3%BCr-alle-G%C3%A4nge/2-Mann-f%C3%BCr-alle-G%C3%A4nge-Roastbeef-mit-Se/SR-Fernsehen/Video?bcastId=8638714&documentId=32938818",
     "fileName": "72|X.mp4"
 };
 
@@ -140,7 +140,7 @@ function sendPostRemoveFavoriteRequest(){
     }
     request.open("POST",/removeFromFavorites/,true);
     request.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
-    request.send("video="+JSON.stringify(video));
+    request.send("video="+encodeURIComponent(JSON.stringify(video)));
 }
 
 function sendPostFavoriteRequest(){
@@ -157,7 +157,8 @@ function sendPostFavoriteRequest(){
     }
     request.open("POST",/addToFavorites/,true);
     request.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
-    request.send("video="+JSON.stringify(video));
+    console.log()
+    request.send("video="+encodeURIComponent(JSON.stringify(video)));
 }
 
 

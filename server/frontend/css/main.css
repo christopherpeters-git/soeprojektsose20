@@ -31,9 +31,9 @@ body {
 }
 
 #Login_Screen{
+    position: fixed;
     background-image: url("../media/Sender-Logos/4236532-background-images.jpg");
     background-color: white;
-    position: absolute;
     z-index: 10;
     width: 20%;
     margin-left: 45%;
@@ -61,7 +61,6 @@ body {
     color: white;
     padding: 16px;
     margin-top: -10%;
-
     font-size: 16px;
     border: none;
 }
@@ -69,7 +68,7 @@ body {
 
     display: inline-block;
     margin-left: 20%;
-   position: fixed;
+    position: fixed;
 }
 .Dropdown-content{
     display: none;

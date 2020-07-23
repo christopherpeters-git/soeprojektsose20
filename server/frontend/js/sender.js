@@ -7,29 +7,15 @@ let currentPage =1;
 
 let lastPage;
 
-/*todo
-* searchfunktion
-*
-* */
-
-
-class Videoclass {
-    constructor(channel, title, show, releaseDate, duration, link, pageLink, fileName) {
-        this.channel = channel;
-        this.title = title;
-        this.show = show;
-        this.releaseDate = releaseDate;
-        this.duration = duration;
-        this.link = link;
-        this.pageLink = pageLink;
-        this.fileName = fileName;
-    }
-}
 
 function loadSenderPage(wert) {
-    window.location.href = "/senderpage.html";
+    window.location.href = "/channel.html";
     channelName = wert;
     sessionStorage.setItem('channel', wert);
+
+}
+function openHomePage() {
+    window.location.href = "/index.html";
 
 }
 
@@ -86,7 +72,6 @@ function setPage() {
     videosDiv.id = "videos";
     const vContainer = document.getElementById("videoContainer");
     vContainer.appendChild(videosDiv);
-
     let currentVideo = new Videoclass("", "", "", "", "", "", "", "");
     let lastVideo;
     if(currentPage === lastPage){
@@ -105,7 +90,7 @@ function setPage() {
     show.appendChild(t);
     show.appendChild(document.createElement('br'));
     show.appendChild(document.createElement("hr"));
-    appendShow(lastVideo,show)
+    appendShow(lastVideo,show,(start+((currentPage-1)*30)));
 
     for(let i =(tempStart+1)+((currentPage-1)*tempEnd);i<tempEnd*currentPage;i++){
         console.log(tempEnd);
@@ -120,14 +105,14 @@ function setPage() {
             show.appendChild(document.createElement('br'));
             show.appendChild(document.createElement("hr"));
         }
-        appendShow(currentVideo,show);
+        appendShow(currentVideo,show,i);
         lastVideo = currentVideo;
     }
     videosDiv.appendChild(show);
 
 }
 
-function appendShow(video,showdiv){
+function appendShow(video,showdiv,i){
     const videoDiv = document.createElement("div");
     const header5 = document.createElement("h5");
     header5.className="videoTitle";
@@ -146,7 +131,7 @@ function appendShow(video,showdiv){
     videoDiv.appendChild(header5);
     videoDiv.appendChild(header7);
     videoDiv.addEventListener("click",openVideoPlayer,false);
-    videoDiv.value = video;
+    videoDiv.value = [video,i];
     showdiv.appendChild(videoDiv);
 }
 
@@ -169,18 +154,8 @@ function nextPage() {
 }
 
 function openVideoPlayer() {
+    sessionStorage.setItem('video', JSON.stringify(this.value));
     console.log(this.value);
-
-}
-function Logout() {
-    window.location.href = "/index.html";
-   sendPostLogoutRequest();
+    window.location.href = "/videoPlayer.html";
 }
 
-function openProfil() {
-    window.location.href="/Profil.html";
-}
-function openHome() {
-    window.location.href="/index.html";
-
-}

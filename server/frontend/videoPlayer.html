@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <head>
+        <link  href="css/video-js.css" rel="stylesheet" />
+        <link type="text/css" href="css/videoPlayer.css" rel="stylesheet" media="screen"/>
+        <script src="js/videoplayer.js"></script>
+        <script src="js/videojs-ie8.min.js"></script>
+        <script src="js/VideoFormat.js"></script>
+    </head>
+
+<body onunload="clearVideoPlayer()" onload="setDefaultAutplay()">
+
+<div id="searchBar">
+    <div id="homeIcon" style="width: 10%;float: left">
+        <a href="index.html"> <img id="home_btn" src="media/images/Home-icon.svg.png" width="30%"></a>
+    </div>
+
+    <div class="Dropdown" id="Dropdown" style="width: 10%; float:right">
+        <button class="avatar" style="width:100%; float: left">
+            <img src="media/images/avatar.png" style="width: 40%">
+        </button>
+        <div class="Dropdown-content" >
+            <a onclick="openProfil()">Profil</a>
+            <a onclick="openHome()">Home</a>
+            <a onclick="Logout()">Ausloggen</a>
+        </div>
+    </div>
+
+</div>
+
+<div id="alert"style="display:none">
+
+</div>
+
+
+<div id="videoPlayer">
+<video id="my-video" class="video-js" controls preload="auto" poster="media/Sender-Logos/ard.png" data-setup="{}">
+    <source src="dummy.mp4" type="video/mp4" />
+    <p class="vjs-no-js">
+        To view this video please enable JavaScript, and consider upgrading to a
+        web browser that
+        <a href="https://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>
+    </p>
+
+</video>
+    <div id="videoInformation">
+        <div id="videoTitle"></div>
+        <div id="videoClick"></div>
+        <div id="moreInformation"> </div>
+    </div>
+</div>
+
+<div id="nextVideosList" >Naechste Titel
+    <!--Quelle: https://www.w3schools.com/howto/howto_css_switch.asp -->
+    <!-- Rounded switch -->
+    <div id ="switchContainer"style="float: right">
+        Autoplay
+    <label class="switch" >
+        <input id ="checkboxAutoplay" type="checkbox" onclick="toggleAutoplayVideoplayer()">
+        <span class="slider round"></span>
+    </label>
+    </div>
+
+<div id="nextVideos">
+</div>
+</div>
+<script src="js/video.js"></script>
+<script> initVideoPlayer()</script>
+
+</body>
+
+
+
+</html>

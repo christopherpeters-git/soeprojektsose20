@@ -1,9 +1,20 @@
 let channel;
-sendGetVideos();
+getFlagGetVideos();
+
 
 function setDefaultAutplay() {
     const slider = document.getElementsByClassName("switch");
     slider[0].children[0].checked=false;
+}
+
+function getFlagGetVideos() {
+    console.log("flag: "+ sessionStorage.getItem(("favFlag")));
+    if(sessionStorage.getItem(("favFlag"))==="1"){
+
+    }
+    else{
+        sendGetVideos();
+    }
 }
 
 function initVideoPlayer() {
@@ -36,6 +47,7 @@ function clearVideoPlayer() {
     let myPlayer = document.getElementById("my-video");
     myPlayer = myPlayer.children[0];
     myPlayer.removeEventListener("ended",autoPlayFunction,false);
+    sessionStorage.removeItem("favFlag");
 }
 
 function addVideoinformation(video) {

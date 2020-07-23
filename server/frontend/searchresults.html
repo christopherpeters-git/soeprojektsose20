@@ -9,7 +9,7 @@
     <script src="js/main.js"></script>
 
 </head>
-<body onload="sendGetSearchRequest(), searchOnEnter()">
+<body onload="initSearchPage()">
 <div id="mainPage">
     <div id="homeIcon" style="width: 10%;float: left">
         <a href="index.html"> <img id="home_btn" src="media/images/Home-icon.svg.png" width="30%";></a>
@@ -33,16 +33,16 @@
 
 </div>
 
-<div id="videoResultContainer">
-    <div id="videoResults">
+<div id="videoContainer">
+    <div id="videos">
     </div>
 </div>
 
 
 <div id="buttons">
-    <button id="backButton" onclick="previousPage()">«</button>
+    <button id="backButton" onclick="previousPage(searchResultsJSON)">«</button>
     <input type="text" id="inputButton" placeholder="1" readonly>
-    <button id="forButton" onclick="nextPage()"> »</button>
+    <button id="forButton" onclick="nextPage(searchResultsJSON)"> »</button>
 </div>
 </body>
 </html>

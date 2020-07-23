@@ -1,5 +1,6 @@
 "use strict"
 let searchResultsJSON;
+let pageFlag;
 
 class User{
     constructor(id,name,username,favoriteVideos) {
@@ -67,14 +68,15 @@ function sendPostCookieAuthRequest(){
 
 function sendGetSearchRequest(){
     const request = createAjaxRequest();
-    const searchString = sessionStorage.getItem("search")
+    console.log("SearchRequest: " + sessionStorage.getItem("search"));
+    const searchString = sessionStorage.getItem("search");
     let channel = "none";
     console.log(channel + "  "+ searchString);
     request.onreadystatechange = function () {
         if(4 === this.readyState){
             if(200 === this.status){
                 searchResultsJSON = JSON.parse(this.responseText);
-                fillSearchPage();
+                setPage(searchResultsJSON);
             }else{
                 alert(this.status + ":" + this.responseText);
             }
@@ -94,7 +96,7 @@ function sendGetSearchRequestSearchResults(){
         if(4 === this.readyState){
             if(200 === this.status){
                 searchResultsJSON = JSON.parse(this.responseText);
-                fillSearchPage();
+                setPage(searchResultsJSON);
             }else{
                 alert(this.status + ":" + this.responseText);
             }
@@ -243,6 +245,7 @@ function loginAfterRegister() {
 function openSearchPage() {
     let searchInp = document.getElementById("searchInput").value;
     sessionStorage.setItem('search',searchInp);
+    console.log("OpenSearchPage: " + sessionStorage.getItem("search"));
     window.location.href = "/searchresults.html";
 }
 
@@ -257,6 +260,34 @@ function fillSearchPage() {
         h5.innerText = videoEx.title;
         h2.appendChild(h5);
         vidDiv.appendChild(h2)
+    }
+}
+
+function initChannelPage() {
+    pageFlag = "channel";
+    sessionStorage.setItem("pageflag",pageFlag);
+    sendGetVideos();
+    searchOnEnter();
+    console.log(pageFlag);
+}
+
+function initMainPage() {
+    pageFlag = "main";
+    sessionStorage.setItem("pageflag",pageFlag);
+    sendPostCookieAuthRequest();
+    searchOnEnter();
+    console.log(pageFlag);
+}
+
+function initSearchPage() {
+    searchOnEnter();
+    let whichPage = sessionStorage.getItem("pageflag");
+    console.log("Suche wird aufgerufen: " + whichPage);
+    if(!(whichPage.localeCompare("main"))) {
+        sendGetSearchRequest();
+    }else {
+        console.log("Suche Channel");
+        sendGetSearchRequestChannel();
     }
 }
 
@@ -291,4 +322,8 @@ function searchOnEnter() {
             document.getElementById("searchIcon").click();
         }
     })
+}
+
+function decideSearch() {
+
 }

@@ -12,6 +12,7 @@ const (
 	IncomingGetVideosFromChannelRequestUrl    = "/getVideoByChannel"
 	IncomingGetVideoClickedRequestUrl         = "/clickVideo"
 	IncomingGetVideosRequestUrl               = "/getVideos/"
+	IncomingPostFetchFavoritesRequestUrl      = "/getFavorites/"
 )
 
 //Parameter

@@ -49,10 +49,37 @@ func main() {
 	http.HandleFunc(lib.IncomingPostRegisterRequestUrl, handlePostRegisterUser)
 	http.HandleFunc(lib.IncomingPostLogoutRequestUrl, handlePostLogout)
 	http.HandleFunc(lib.IncomingPostCookieAUthRequestUrl, handlePostCookieAuth)
+	http.HandleFunc(lib.IncomingPostCookieAUthRequestUrl, handlePostCookieAuth)
+	http.HandleFunc(lib.IncomingPostFetchFavoritesRequestUrl, handlePostFetchFavorites)
 	err = http.ListenAndServe(":80", nil)
 	if err != nil {
 		log.Fatal("Starting Server failed: " + err.Error())
 	}
+}
+
+func handlePostFetchFavorites(w http.ResponseWriter, r *http.Request) {
+	log.Println("Answering handlePostFetchFavorites request started...")
+	userDB := dbConnections[lib.UserDBconnectionName]
+	err := userDB.Ping()
+	if err != nil {
+		lib.ReportError(w, http.StatusInternalServerError, lib.InternalServerErrorResponse, "Database connection failed: \n"+err.Error())
+		return
+	}
+	var user lib.User
+	if dErr := lib.IsUserLoggedInWithACookie(r, userDB, &user); dErr != nil {
+		lib.ReportDetailedError(w, dErr)
+		return
+	}
+	rows, err := userDB.Query("select * from user_has_favorite_videos where Users_Username = ?", user.Username)
+	if err != nil {
+		lib.ReportError(w, http.StatusInternalServerError, lib.InternalServerErrorResponse, "SQL query failed")
+		return
+	}
+	favoriteVideos := make([]lib.Video, 0)
+	for rows.Next() {
+		rows.Scan()
+	}
+	log.Println("Answered handlePostFetchFavorites request successfully")
 }
 
 func handleRemoveFromFavorites(w http.ResponseWriter, r *http.Request) {
@@ -394,9 +421,7 @@ func handlePostRegisterUser(w http.ResponseWriter, r *http.Request) {
 	//Check if Username or Name is illegal
 	if !lib.IsStringLegal(incomingUsername) {
 		lib.ReportError(w, http.StatusBadRequest, lib.IllegalParameterResponse+lib.UsernameParameter, "forbidden chars in Username")
-	}
-	if !lib.IsStringLegal(incomingName) {
-		lib.ReportError(w, http.StatusBadRequest, lib.IllegalParameterResponse+lib.NameParameter, "forbidden chars in Name")
+		return
 	}
 	//Get userdata from db for comparison
 	rows, err := userDB.Query("select Username from users where username = ?", incomingUsername)

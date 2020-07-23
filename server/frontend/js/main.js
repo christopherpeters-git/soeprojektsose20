@@ -47,7 +47,6 @@ function createAjaxRequest(){
 }
 
 function sendPostCookieAuthRequest(){
-    //alert("Wir nutzen Cookies du Wichser!");
     const request = createAjaxRequest();
     request.onreadystatechange = function () {
         if(4 === this.readyState){
@@ -90,8 +89,6 @@ function sendGetSearchRequest(){
 function sendGetSearchRequestSearchResults(){
     const request = createAjaxRequest();
     const searchString = document.getElementById("searchInput").value;
-    let channel = "none";
-    console.log(channel + "  "+ searchString);
     request.onreadystatechange = function () {
         if(4 === this.readyState){
             if(200 === this.status){

@@ -84,7 +84,7 @@ hr{
 .Dropdown{
     position: relative;
     display: inline-block;
-    margin-right: 5%;
+    margin-left: 20%;
 }
 .Dropdown-content{
     display: none;

@@ -9,6 +9,7 @@ let lastPage;
 
 
 function loadSenderPage(wert) {
+    sessionStorage.setItem("pageFlag","0");
     window.location.href = "/channel.html";
     channelName = wert;
     sessionStorage.setItem('channel', wert);
@@ -48,9 +49,35 @@ function sendGetVideos() {
             }
         }
     }
+
     request.open("GET", "/getVideoByChannel" + "?channel=" + sessionStorage.getItem('channel'), true);
     request.send();
 }
+function sendGetSearchRequest(callBackFunction){
+    const request = createAjaxRequest();
+    const incomingString = JSON.parse(sessionStorage.getItem("searchString"));
+    console.log(incomingString);
+    let channelString = incomingString [0];
+    let searchString =incomingString[1];
+    request.onreadystatechange = function () {
+        if(4 === this.readyState){
+            if(200 === this.status){
+                channelJson = JSON.parse(this.responseText);
+                channelName = sessionStorage.getItem("channel");
+                console.log(channelJson.length);
+                lastPage = (Math.ceil(channelJson.length/end));
+                console.log(lastPage);
+                setPage();
+                callBackFunction();
+            }else{
+                alert(this.status + ":" + this.responseText);
+            }
+        }
+    }
+    request.open("GET","/search" +"?search="+searchString + "&channel="+channelString,true);
+    request.send();
+}
+
 
 
 function createAjaxRequest() {
@@ -129,7 +156,11 @@ function appendShow(video,showdiv,i){
     videoDiv.appendChild(img);
     videoDiv.appendChild(header5);
     videoDiv.appendChild(header7);
-    videoDiv.addEventListener("click",openVideoPlayer,false);
+    if(sessionStorage.getItem("pageFlag")==="0") {
+        videoDiv.addEventListener("click", openVideoPlayerWithPageResults, false);
+    }else if(sessionStorage.getItem("pageFlag")==="1"){
+        videoDiv.addEventListener("click", openVideoPlayerWithSearchResults, false);
+    }
     videoDiv.value = [video,i];
     showdiv.appendChild(videoDiv);
 }
@@ -152,9 +183,27 @@ function nextPage() {
     }
 }
 
-function openVideoPlayer() {
+function openVideoPlayerWithSearchResults() {
+    sessionStorage.setItem("favFlag","0");
     sessionStorage.setItem('video', JSON.stringify(this.value));
     console.log(this.value);
     window.location.href = "/videoPlayer.html";
 }
 
+function openVideoPlayerWithPageResults() {
+    sessionStorage.setItem("favFlag","0");
+    sessionStorage.setItem('video', JSON.stringify(this.value));
+    console.log(this.value);
+    window.location.href = "/videoPlayer.html";
+}
+
+function checkFlag() {
+    const flag = JSON.parse(sessionStorage.getItem("pageFlag"));
+    if(flag===0){
+        sendGetVideos();
+    }else if(flag===1){
+        sendGetSearchRequest(setSearchResult);
+    }
+
+
+}

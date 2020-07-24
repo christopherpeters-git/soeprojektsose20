@@ -5,6 +5,7 @@
     <link type="text/css" rel="stylesheet" href="css/main.css">
     <script src="js/main.js"></script>
     <script src="js/sender.js"></script>
+    <script src = "js/searchResults.js"></script>
 
 </head>
 
@@ -22,10 +23,8 @@
             <div class="container">
                 <label for="usernameLogin" style="color: white"><b>Username</b></label>
                 <input type="text" id="usernameLogin" placeholder="Enter Username" name="usernameLogin" required>
-
                 <label for="passwordLogin" style="color: white"><b>Password</b></label>
                 <input type="password" id="passwordLogin" placeholder="Enter Password" name="passwordLogin" required>
-
                 <button onclick="sendPostLoginRequest()">Login </button>
             </div>
     </div>
@@ -49,10 +48,10 @@
 <div id="main_site">
 
     <div class="Searchbar" style="width: 60%;float: left">
-        <input id="searchInput" type="text" placeholder="Suchbegriff eingeben" size="70" style="position: center; " >
+        <input id="searchInput" type="text" placeholder="Suchbegriff eingeben: Suche erfolgt Global " size="70" style="position: center; " >
     </div>
     <div id="searchbarIcon" style="width: 10%;float: left">
-        <img src="media/images/icon_Search.png" onclick="sendGetSearchRequest()" title="Suche starten" width="35">
+        <img src="media/images/icon_Search.png" onclick="setSearchtext()" title="Suche starten" width="35">
     </div>
 
     <div class="Dropdown" id="Dropdown" style="width: 10%; float:right; visibility: hidden">
@@ -64,7 +63,6 @@
             <a onclick="sendPostLogoutRequest()">Ausloggen</a>
         </div>
     </div>
-
 
     <div class="Senderliste">
         <from>

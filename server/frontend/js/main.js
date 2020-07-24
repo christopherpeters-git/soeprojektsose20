@@ -228,3 +228,12 @@ function openTab(evt, tabName)  {
     document.getElementById(tabName).style.display = "block";
     evt.currentTarget.className += " active";
 }
+
+function setSearchtext() {
+    const searchValue = document.getElementById("searchInput").value;
+    if(searchValue==="") return;
+    let searchString = JSON.stringify(["none",searchValue]);
+    sessionStorage.setItem("searchString",searchString);
+    console.log(sessionStorage.getItem("searchString"));
+    window.location.href = "/searchResults.html";
+}

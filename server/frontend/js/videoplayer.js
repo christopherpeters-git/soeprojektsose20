@@ -10,10 +10,18 @@ function setDefaultAutplay() {
 function getFlagGetVideos() {
     console.log("flag: "+ sessionStorage.getItem(("favFlag")));
     if(sessionStorage.getItem(("favFlag"))==="1"){
-
+        sendPostFavArrayAuthRequest();
     }
     else{
-        sendGetVideos();
+        const flag = JSON.parse(sessionStorage.getItem("pageFlag"));
+        if(flag===0){
+            sendGetVideos();
+        }
+        else if(flag===1){
+            console.log("pageFlag: "+flag);
+            sendGetSearchRequest();
+        }
+
     }
 }
 
@@ -47,7 +55,7 @@ function clearVideoPlayer() {
     let myPlayer = document.getElementById("my-video");
     myPlayer = myPlayer.children[0];
     myPlayer.removeEventListener("ended",autoPlayFunction,false);
-    sessionStorage.removeItem("favFlag");
+
 }
 
 function addVideoinformation(video) {
@@ -87,12 +95,16 @@ function sendGetClickedVideos(video){
     return clickNumber;
 }
 function shareThisVideo(event){
-    let copInput = document.createElement("textarea");
-    copInput.textContent=this.value;
-    copInput.select();
+    alertSetterFunction("#cccccc",this.value+" kopiert in Zwischenablage",3000);
+    let temInput = document.getElementById("tempInput");
+    temInput.value=this.value;
+    temInput.style.display="block";
+    let copyText = document.getElementById("tempInput");
+    copyText.select();
+    copyText.setSelectionRange(0, 99999)
     document.execCommand("copy");
-    console.log(copInput);
-    alertSetterFunction("#cccccc",this.value);
+    console.log(copyText.value)
+    temInput.style.display="none";
 }
 
 function sendGetVideos() {
@@ -178,6 +190,10 @@ function setMoreInformation(video) {
 function openVideoPlayer() {
     sessionStorage.setItem('video', JSON.stringify(this.value));
     initVideoPlayer();
+    let myPlayer = document.getElementById("my-video");
+    myPlayer = myPlayer.children[0];
+    myPlayer.play();
+
 }
 function addVideoToFav() {
     console.log(this.value);
@@ -189,9 +205,9 @@ function sendPostFavoriteRequest(video){
     request.onreadystatechange = function () {
         if(4 === this.readyState){
             if(200 === this.status){
-                alertSetterFunction("rgba(39,255,0,0.75)",this.responseText);
+                alertSetterFunction("rgba(39,255,0,0.75)",this.responseText,1500);
             }else{
-                alertSetterFunction("rgba(255,0,30,0.75)",this.responseText);
+                alertSetterFunction("rgba(255,0,30,0.75)",this.responseText,1500);
             }
         }
     }
@@ -200,12 +216,22 @@ function sendPostFavoriteRequest(video){
     request.send("video="+video);
 }
 
-function alertSetterFunction(color,message) {
+function alertSetterFunction(color,message,timeout) {
     const alert = document.getElementById("alert");
     alert.textContent= message;
     alert.style.background=color;
     alert.style.display="block"
-    setTimeout(function(){alert.style.display="none"},1500);
+    if(timeout>1500) {
+        let spanBtn = document.createElement("button");
+        spanBtn.className = "closebtn";
+        spanBtn.textContent = "✖"
+        spanBtn.addEventListener("click", closeAlert, false);
+        alert.appendChild(spanBtn);
+    }
+    setTimeout(function(){alert.style.display="none"},timeout);
+}
+function closeAlert() {
+    this.parentElement.style.display='none';
 }
 
 
@@ -235,3 +261,39 @@ function autoPlayFunction() {
         myPlayer.play();
     }
 }
+
+function sendPostFavArrayAuthRequest(){
+    const request = createAjaxRequest();
+    request.onreadystatechange = function () {
+        if(4 === this.readyState){
+            if(200 === this.status){
+                channel = (JSON.parse(this.responseText)).favoriteVideos;
+            }else{
+
+            }
+        }
+    }
+    request.open("POST","/cookieAuth/",false);
+    request.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+    request.send("dummy=dummy");
+}
+function sendGetSearchRequest(){
+    const request = createAjaxRequest();
+    const incomingString = JSON.parse(sessionStorage.getItem("searchString"));
+    console.log(incomingString);
+    let channelString = incomingString [0];
+    let searchString =incomingString[1];
+    request.onreadystatechange = function () {
+        if(4 === this.readyState){
+            if(200 === this.status){
+                channel = JSON.parse(this.responseText);
+
+            }else{
+                alert(this.status + ":" + this.responseText);
+            }
+        }
+    }
+    request.open("GET","/search" +"?search="+searchString + "&channel="+channelString,false);
+    request.send();
+}
+

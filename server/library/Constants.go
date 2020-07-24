@@ -12,7 +12,6 @@ const (
 	IncomingGetVideosFromChannelRequestUrl    = "/getVideoByChannel"
 	IncomingGetVideoClickedRequestUrl         = "/clickVideo"
 	IncomingGetVideosRequestUrl               = "/getVideos/"
-	IncomingPostFetchFavoritesRequestUrl      = "/getFavorites/"
 	IncomingGetFetchProfilePictureRequestUrl  = "/getProfilePicture/"
 	IncomingPostSaveProfilePictureRequestUrl  = "/setProfilePicture/"
 )
@@ -51,4 +50,5 @@ const (
 const (
 	LetterBytes    = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 	AuthCookieName = "mediathekauth"
+	MaxUploadSize  = 10000000 //in byte
 )

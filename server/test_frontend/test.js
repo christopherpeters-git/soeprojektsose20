@@ -34,7 +34,7 @@ function createAjaxRequest(){
 
 function sendPostSaveProfilePicture(){
     const request = createAjaxRequest();
-    const profilePicture = document.getElementById("ppUpload").value;
+    const profilePicture = document.getElementById("ppUpload").files[0];
     const formData = new FormData();
     formData.append("profilepicture",profilePicture)
     request.onreadystatechange = function () {
@@ -47,16 +47,16 @@ function sendPostSaveProfilePicture(){
         }
     }
     request.open("POST","/setProfilePicture/",true);
+    // request.setRequestHeader("Content-Type","multipart/form-data;boundary=&")
     request.send(formData);
 }
 
-function sendGetLoadProfilePicture(){
+function LoadProfilePicture(){
     const request = createAjaxRequest();
     request.onreadystatechange = function () {
         if(4 === this.readyState){
             if(200 === this.status){
-                document.getElementById("pp").value = this.responseText
-                console.log(this.responseText)
+                document.getElementById("pp").src = /getProfilePicture/
             }else{
                 alert(this.status + ":" + this.responseText);
             }
@@ -64,6 +64,7 @@ function sendGetLoadProfilePicture(){
     }
     request.open("GET","/getProfilePicture/",true);
     request.send();
+    document.getElementById("pp").src = /getProfilePicture/
 }
 
 function sendPostCookieAuthRequest(){

@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	_ "github.com/go-sql-driver/mysql"
 	"golang.org/x/crypto/bcrypt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -49,7 +50,6 @@ func main() {
 	http.HandleFunc(lib.IncomingPostRegisterRequestUrl, handlePostRegisterUser)
 	http.HandleFunc(lib.IncomingPostLogoutRequestUrl, handlePostLogout)
 	http.HandleFunc(lib.IncomingPostCookieAUthRequestUrl, handlePostCookieAuth)
-	http.HandleFunc(lib.IncomingPostFetchFavoritesRequestUrl, handlePostFetchFavorites)
 	http.HandleFunc(lib.IncomingPostSaveProfilePictureRequestUrl, handlePostSaveProfilePicture)
 	http.HandleFunc(lib.IncomingGetFetchProfilePictureRequestUrl, handleGetFetchProfilePicture)
 	err = http.ListenAndServe(":80", nil)
@@ -61,18 +61,38 @@ func main() {
 func handlePostSaveProfilePicture(w http.ResponseWriter, r *http.Request) {
 	log.Println("Answering handlePostSaveProfilePicture request started...")
 	userDB := dbConnections[lib.UserDBconnectionName]
+	//Checking DB connection
 	err := userDB.Ping()
 	if err != nil {
 		lib.ReportError(w, http.StatusInternalServerError, lib.InternalServerErrorResponse, "Database connection failed: \n"+err.Error())
 		return
 	}
 	var user lib.User
-	if err = r.ParseForm(); err != nil {
-		lib.ReportError(w, http.StatusInternalServerError, lib.InternalServerErrorResponse, "Parsing request form: \n"+err.Error())
+	if err = r.ParseMultipartForm(lib.MaxUploadSize); err != nil {
+		lib.ReportError(w, http.StatusInternalServerError, lib.InternalServerErrorResponse, "Parsing request form failed: \n"+err.Error())
 		return
 	}
-	user.ProfilePicture = []byte(r.FormValue("profilepicture"))
-	log.Printf("Length of set picture: %d \n", len(user.ProfilePicture))
+	//Parsing FormData File
+	_, header, err := r.FormFile("profilepicture")
+	if err != nil {
+		log.Println("ERROR FORMFILE:\n" + err.Error())
+		return
+	}
+	if header.Size == 0 || header.Size > lib.MaxUploadSize {
+		lib.ReportError(w, http.StatusBadRequest, "Bild ist zu groß!\n Die Grenze beträgt "+strconv.FormatInt(lib.MaxUploadSize, 10)+"kbytes", "file size too large: "+strconv.FormatInt(header.Size, 10))
+		return
+	}
+	imageFile, err := header.Open()
+	if err != nil {
+		lib.ReportError(w, http.StatusInternalServerError, lib.InternalServerErrorResponse, "opening file failed: \n"+err.Error())
+		return
+	}
+	user.ProfilePicture, err = ioutil.ReadAll(imageFile)
+	if err != nil {
+		lib.ReportError(w, http.StatusInternalServerError, lib.InternalServerErrorResponse, "reading file failed: \n"+err.Error())
+		return
+	}
+	log.Printf("max image size: %d\n", lib.MaxUploadSize)
 	if dErr := lib.IsUserLoggedInWithACookie(r, userDB, &user); dErr != nil {
 		lib.ReportDetailedError(w, dErr)
 		return
@@ -118,34 +138,6 @@ func handleGetFetchProfilePicture(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Write(user.ProfilePicture)
 	log.Println("Answered handleGetFetchProfilePicture request successfully")
-}
-
-func handlePostFetchFavorites(w http.ResponseWriter, r *http.Request) {
-	log.Println("Answering handlePostFetchFavorites request started...")
-	userDB := dbConnections[lib.UserDBconnectionName]
-	err := userDB.Ping()
-	if err != nil {
-		lib.ReportError(w, http.StatusInternalServerError, lib.InternalServerErrorResponse, "Database connection failed: \n"+err.Error())
-		return
-	}
-	var user lib.User
-	if dErr := lib.IsUserLoggedInWithACookie(r, userDB, &user); dErr != nil {
-		lib.ReportDetailedError(w, dErr)
-		return
-	}
-	if err = lib.FillUserVideoArray(&user, userDB); err != nil {
-		lib.ReportError(w, http.StatusInternalServerError, lib.InternalServerErrorResponse, "FillUserVideoArray failed:\n"+err.Error())
-		return
-	}
-	videosInBytes, err := json.MarshalIndent(user.FavoriteVideos, "", " ")
-	if err != nil {
-		lib.ReportError(w, http.StatusInternalServerError, lib.InternalServerErrorResponse, "marshaling failed: "+err.Error())
-		return
-	}
-
-	w.WriteHeader(http.StatusOK)
-	w.Write(videosInBytes)
-	log.Println("Answered handlePostFetchFavorites request successfully")
 }
 
 func handleRemoveFromFavorites(w http.ResponseWriter, r *http.Request) {

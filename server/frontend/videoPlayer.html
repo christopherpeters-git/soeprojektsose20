@@ -7,16 +7,15 @@
         <link type="text/css" href="css/videoPlayer.css" rel="stylesheet" media="screen"/>
         <script src="js/videoplayer.js"></script>
         <script src="js/videojs-ie8.min.js"></script>
-        <script src="js/videoFormat.js"></script>
+        <script src="js/VideoFormat.js"></script>
     </head>
 
 <body onunload="clearVideoPlayer()" onload="setDefaultAutplay()">
 
 <div id="searchBar">
-    <div id="homeIcon" style="width: 10%;float: left">
-        <a href="index.html"> <img id="home_btn" src="media/images/Home-icon.svg.png" width="30%"></a>
+    <div id="homeIcon" style="width: 10%;float: left" onclick="openHome()">
+        <img id="home_btn" src="media/images/Home-icon.svg.png" width="30%";>
     </div>
-
     <div class="Dropdown" id="Dropdown" style="width: 10%; float:right">
         <button class="avatar" style="width:100%; float: left">
             <img src="media/images/avatar.png" style="width: 40%">
@@ -31,7 +30,7 @@
 </div>
 
 <div id="alert"style="display:none">
-
+    <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
 </div>
 
 
@@ -68,7 +67,7 @@
 </div>
 <script src="js/video.js"></script>
 <script> initVideoPlayer()</script>
-
+<input id="tempInput" type="text" style="display: none">
 </body>
 
 

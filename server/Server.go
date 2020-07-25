@@ -272,18 +272,6 @@ func handleGetSearchVideos(w http.ResponseWriter, r *http.Request) {
 				break
 			}
 		}
-		//Check if searchstring is a show
-		if !videosFound {
-			for _, v := range videosSortedAfterChannels {
-				for k2, v2 := range v {
-					if strings.EqualFold(k2, searchString) {
-						searchResult = v2
-						videosFound = true
-						break
-					}
-				}
-			}
-		}
 		//Search for a substring in the title
 		if !videosFound {
 			lowerSearchString := strings.ToLower(searchString)
@@ -303,14 +291,6 @@ func handleGetSearchVideos(w http.ResponseWriter, r *http.Request) {
 		if videosFromChannel == nil {
 			lib.ReportError(w, http.StatusNotFound, "Sender '"+channelString+"' nicht gefunden!", channelString+" doesnt exist")
 			return
-		}
-		//Search for the show
-		for k, v := range videosFromChannel {
-			if strings.EqualFold(k, searchString) {
-				searchResult = v
-				videosFound = true
-				break
-			}
 		}
 		//Search for a substring in the title
 		if !videosFound {

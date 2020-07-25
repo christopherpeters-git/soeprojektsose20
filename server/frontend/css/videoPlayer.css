@@ -173,6 +173,12 @@
     color: white;
 }
 
+.closebtn{
+    float: right;
+    background-color: #cccccc;
+    cursor: pointer;
+    border-style: none;
+}
 
 /*###########################toggle Button##################*/
 /* The switch - the box around the slider */

@@ -24,7 +24,6 @@ function sendPostCookieAuthRequest(){
         if(4 === this.readyState){
             if(200 === this.status){
                 userInformation=JSON.parse(this.responseText);
-                console.log(userInformation);
                 setFavList();
             }else{
                 console.log(this.status + ":" + this.responseText);
@@ -39,10 +38,39 @@ function sendPostCookieAuthRequest(){
 }
 
 function setFavList(){
-    const favDiv= document.getElementById(" favorites");
+    const favDiv= document.getElementById("favorites");
+    favDiv.innerHTML="";
+    favDiv.textContent="Favoriten";
+    const editBtn =document.createElement("button");
+    editBtn.textContent= "✎";
+    editBtn.id= "editBtn";
+    editBtn.className="favBtn";
+    editBtn.addEventListener("click",setFav,false);
+    const safeBtn =document.createElement("button");
+    safeBtn.textContent= "✔";
+    safeBtn.className="favBtn";
+    safeBtn.id="safeBtn";
+    safeBtn.addEventListener("click",startDeletingFav,false);
+    const abortBtn =document.createElement("button");
+    abortBtn.textContent= "✖";
+    abortBtn.className="favBtn";
+    abortBtn.id ="abortBtn";
+    abortBtn.addEventListener("click",abortFav,false);
+    const selectAllBtn =document.createElement("button");
+    selectAllBtn.textContent= "All";
+    selectAllBtn.className="favBtn";
+    selectAllBtn.id ="selectAllBtn";
+    selectAllBtn.addEventListener("click",selectAllFavorites,false);
+    favDiv.appendChild(editBtn);
+    favDiv.appendChild(document.createElement("br"));
+    favDiv.appendChild(selectAllBtn);
+    favDiv.appendChild(safeBtn);
+    favDiv.appendChild(abortBtn);
+    favDiv.appendChild(document.createElement("hr"));
     for(let i =0;i<userInformation.favoriteVideos.length;i++){
         appendFav(userInformation.favoriteVideos[i],favDiv,i,"openFavVideoPlayer");
     }
+    favDiv.appendChild(document.createElement("hr"));
 }
 
 
@@ -74,10 +102,81 @@ function appendFav(video,showdiv,i){
 }
 
 function openFavVideoPlayer() {
-    alert("test");
+    sessionStorage.setItem("favFlag","1");
+    sessionStorage.setItem('video', JSON.stringify(this.value));
+    console.log(this.value);
+    window.location.href = "/videoPlayer.html";
+}
+
+function setFav(event) {
+    const favList = document.getElementById("favorites");
+    const checkedBtn = document.getElementsByClassName("checkBoxFav");
+    const editBtn = document.getElementById("editBtn");
+    const safeBtn = document.getElementById("safeBtn");
+    const abortBtn = document.getElementById("abortBtn");
+    const selectAll = document.getElementById("selectAllBtn");
+
+    for(let i =0;i<checkedBtn.length;i++){
+       checkedBtn[i].style.visibility="visible";
+    }
+    for(let i =0;i<favList.children.length;i++){
+        favList.children[i].removeEventListener("click",openFavVideoPlayer,false);
+    }
+    editBtn.style.visibility="hidden";
+    selectAll.style.visibility="visible";
+    safeBtn.style.display="block";
+    abortBtn.style.display="block";
 
 }
 
-function tester(event) {
+function abortFav() {
+    const editBtn = document.getElementById("editBtn");
+    const safeBtn = document.getElementById("safeBtn");
+    const abortBtn = document.getElementById("abortBtn");
+    const checkedBtn = document.getElementsByClassName("checkBoxFav");
+    editBtn.style.visibility="visible";
+    safeBtn.style.display="none";
+    abortBtn.style.display="none";
+    for(let i =0;i<checkedBtn.length;i++){
+        checkedBtn[i].style.visibility="hidden";
+    }
 
+}
+function startDeletingFav() {
+    const listFav = document.getElementById("favorites");
+    console.log(listFav.children[5].value);
+    for(let i =6;i<listFav.children.length-1;i++){
+        if(listFav.children[i].children[0].checked){
+           sendPostRemoveFavoriteRequest(listFav.children[i].value[0]);
+        }
+    }
+    /*todo
+    * delay after request
+    * */
+    setTimeout(() => { location.reload();  }, 200);
+}
+
+
+function sendPostRemoveFavoriteRequest(video){
+    const request = createAjaxRequest();
+    request.onreadystatechange = function () {
+        if(4 === this.readyState){
+            if(200 === this.status){
+            }else{
+                alert(this.status + ":" + this.responseText);
+            }
+            console.log(this);
+        }
+    }
+    request.open("POST",/removeFromFavorites/,true);
+    request.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+    request.send("video="+encodeURIComponent(JSON.stringify(video)));
+}
+
+function selectAllFavorites() {
+    const listFav = document.getElementById("favorites");
+    console.log(listFav);
+    for(let i =6;i<listFav.children.length-1;i++){
+        listFav.children[i].children[0].checked = true;
+    }
 }

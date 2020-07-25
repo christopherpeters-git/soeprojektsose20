@@ -1,5 +1,5 @@
-let channelJson;
-let channelName;
+let channelJson=null;
+let channelName=null;
 const start =0;
 const end = 30;
 
@@ -8,14 +8,12 @@ let currentPage =1;
 let lastPage;
 
 
+
 function loadSenderPage(wert) {
+    sessionStorage.setItem("pageFlag","0");
     window.location.href = "/channel.html";
     channelName = wert;
     sessionStorage.setItem('channel', wert);
-
-}
-function openHomePage() {
-    window.location.href = "/index.html";
 
 }
 
@@ -37,9 +35,7 @@ function sendGetVideos() {
                     window.location.href="/index.html";
                 }
                 channelName = sessionStorage.getItem("channel");
-                console.log(channelJson.length);
                 lastPage = (Math.ceil(channelJson.length/end));
-                console.log(lastPage);
                 setPage();
                 setSenderPagePicture(channelJson[1]);
 
@@ -48,9 +44,32 @@ function sendGetVideos() {
             }
         }
     }
+
     request.open("GET", "/getVideoByChannel" + "?channel=" + sessionStorage.getItem('channel'), true);
     request.send();
 }
+function sendGetSearchRequest(callBackFunction){
+    const request = createAjaxRequest();
+    const incomingString = JSON.parse(sessionStorage.getItem("searchString"));
+    console.log(incomingString);
+    let channelString = incomingString [0];
+    let searchString =incomingString[1];
+    request.onreadystatechange = function () {
+        if(4 === this.readyState){
+            if(200 === this.status){
+                channelJson = JSON.parse(this.responseText);
+                lastPage = (Math.ceil(channelJson.length/end));
+                setPage();
+                callBackFunction();
+            }else{
+                alert(this.status + ":" + this.responseText);
+            }
+        }
+    }
+    request.open("GET","/search" +"?search="+searchString + "&channel="+channelString,true);
+    request.send();
+}
+
 
 
 function createAjaxRequest() {
@@ -92,7 +111,6 @@ function setPage() {
     show.appendChild(document.createElement("hr"));
     appendShow(lastVideo,show,(start+((currentPage-1)*30)));
     for(let i =(tempStart+1)+((currentPage-1)*tempEnd);i<tempEnd*currentPage;i++){
-        console.log(tempEnd);
         currentVideo = channelJson[i];
         if(lastVideo.show !== currentVideo.show){
             videosDiv.appendChild(show);
@@ -129,8 +147,13 @@ function appendShow(video,showdiv,i){
     videoDiv.appendChild(img);
     videoDiv.appendChild(header5);
     videoDiv.appendChild(header7);
-    videoDiv.addEventListener("click",openVideoPlayer,false);
+    if(sessionStorage.getItem("pageFlag")==="0") {
+        videoDiv.addEventListener("click", openVideoPlayerWithPageResults, false);
+    }else if(sessionStorage.getItem("pageFlag")==="1"){
+        videoDiv.addEventListener("click", openVideoPlayerWithSearchResults, false);
+    }
     videoDiv.value = [video,i];
+
     showdiv.appendChild(videoDiv);
 }
 
@@ -152,9 +175,36 @@ function nextPage() {
     }
 }
 
-function openVideoPlayer() {
+function openVideoPlayerWithSearchResults() {
+    sessionStorage.setItem("favFlag","0");
     sessionStorage.setItem('video', JSON.stringify(this.value));
     console.log(this.value);
     window.location.href = "/videoPlayer.html";
 }
 
+function openVideoPlayerWithPageResults() {
+    sessionStorage.setItem("favFlag","0");
+    sessionStorage.setItem('video', JSON.stringify(this.value));
+    console.log(this.value);
+    window.location.href = "/videoPlayer.html";
+}
+
+function checkFlag() {
+    const flag = JSON.parse(sessionStorage.getItem("pageFlag"));
+    console.log(flag);
+    if(flag===0){
+        sendGetVideos();
+    }else if(flag===1){
+        sendGetSearchRequest(setSearchResult);
+    }
+}
+
+function setSearchTextWithChannel() {
+    console.log(channelName);
+    const searchValue = document.getElementById("searchInput").value;
+    if(searchValue==="") return;
+    let searchString;
+    searchString= JSON.stringify([channelName, searchValue]);
+    sessionStorage.setItem("searchString",searchString);
+    window.location.href = "/searchResults.html";
+}

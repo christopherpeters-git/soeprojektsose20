@@ -1,5 +1,5 @@
-let channelJson;
-let channelName;
+let channelJson=null;
+let channelName=null;
 const start =0;
 const end = 30;
 
@@ -7,37 +7,13 @@ let currentPage =1;
 
 let lastPage;
 
-function sendGetSearchRequestChannel(){
-    const request = createAjaxRequest();
-    const searchString = sessionStorage.getItem("search");
-    let channel = sessionStorage.getItem("channel");
-    console.log(channel + "  "+ searchString);
-    request.onreadystatechange = function () {
-        if(4 === this.readyState){
-            if(200 === this.status){
-                searchResultsJSON = JSON.parse(this.responseText);
-                setPage(searchResultsJSON);
-            }else{
-                alert(this.status + ":" + this.responseText);
-            }
-        }
-    }
-
-    request.open("GET","/search" +"?search="+searchString+"&"+"channel="+channel,true);
-    request.send();
-}
-
-
 
 
 function loadSenderPage(wert) {
+    sessionStorage.setItem("pageFlag","0");
     window.location.href = "/channel.html";
     channelName = wert;
     sessionStorage.setItem('channel', wert);
-
-}
-function openHomePage() {
-    window.location.href = "/index.html";
 
 }
 
@@ -59,10 +35,8 @@ function sendGetVideos() {
                     window.location.href="/index.html";
                 }
                 channelName = sessionStorage.getItem("channel");
-                console.log(channelJson.length);
                 lastPage = (Math.ceil(channelJson.length/end));
-                console.log(lastPage);
-                setPage(channelJson);
+                setPage();
                 setSenderPagePicture(channelJson[1]);
 
             } else {
@@ -70,9 +44,32 @@ function sendGetVideos() {
             }
         }
     }
+
     request.open("GET", "/getVideoByChannel" + "?channel=" + sessionStorage.getItem('channel'), true);
     request.send();
 }
+function sendGetSearchRequest(callBackFunction){
+    const request = createAjaxRequest();
+    const incomingString = JSON.parse(sessionStorage.getItem("searchString"));
+    console.log(incomingString);
+    let channelString = incomingString [0];
+    let searchString =incomingString[1];
+    request.onreadystatechange = function () {
+        if(4 === this.readyState){
+            if(200 === this.status){
+                channelJson = JSON.parse(this.responseText);
+                lastPage = (Math.ceil(channelJson.length/end));
+                setPage();
+                callBackFunction();
+            }else{
+                alert(this.status + ":" + this.responseText);
+            }
+        }
+    }
+    request.open("GET","/search" +"?search="+searchString + "&channel="+channelString,true);
+    request.send();
+}
+
 
 
 function createAjaxRequest() {
@@ -85,29 +82,27 @@ function createAjaxRequest() {
     return request;
 }
 
-function setPage(JsonServer) {
+function setPage() {
     let tempStart=start;
     let tempEnd =end;
     let videosDiv = document.getElementById("videos");
-   /* videosDiv.remove();
+    videosDiv.remove();
     videosDiv = document.createElement("div");
     videosDiv.id = "videos";
     const vContainer = document.getElementById("videoContainer");
-    vContainer.appendChild(videosDiv);*/
-    videosDiv.innerHTML = "";
-
+    vContainer.appendChild(videosDiv);
     let currentVideo = new Videoclass("", "", "", "", "", "", "", "");
     let lastVideo;
     if(currentPage === lastPage){
-        if(JsonServer.length<30){
-            tempEnd=JsonServer.length;
+        if(channelJson.length<30){
+            tempEnd=channelJson.length;
         }
         else {
-            tempEnd = (lastPage * 30) - JsonServer.length;
+            tempEnd = (lastPage * 30) - channelJson.length;
         }
     }
     let show =  document.createElement("div");
-    lastVideo = JsonServer[start+((currentPage-1)*30)];
+    lastVideo = channelJson[start+((currentPage-1)*30)];
     show.id = lastVideo.show;
     show.className= "showClass";
     let t = document.createTextNode(lastVideo.show);
@@ -115,10 +110,8 @@ function setPage(JsonServer) {
     show.appendChild(document.createElement('br'));
     show.appendChild(document.createElement("hr"));
     appendShow(lastVideo,show,(start+((currentPage-1)*30)));
-
     for(let i =(tempStart+1)+((currentPage-1)*tempEnd);i<tempEnd*currentPage;i++){
-        console.log(tempEnd);
-        currentVideo = JsonServer[i];
+        currentVideo = channelJson[i];
         if(lastVideo.show !== currentVideo.show){
             videosDiv.appendChild(show);
             show =  document.createElement("div");
@@ -154,39 +147,64 @@ function appendShow(video,showdiv,i){
     videoDiv.appendChild(img);
     videoDiv.appendChild(header5);
     videoDiv.appendChild(header7);
-    videoDiv.addEventListener("click",openVideoPlayer,false);
+    if(sessionStorage.getItem("pageFlag")==="0") {
+        videoDiv.addEventListener("click", openVideoPlayerWithPageResults, false);
+    }else if(sessionStorage.getItem("pageFlag")==="1"){
+        videoDiv.addEventListener("click", openVideoPlayerWithSearchResults, false);
+    }
     videoDiv.value = [video,i];
+
     showdiv.appendChild(videoDiv);
 }
 
-function previousPage(JsonServer){
+function previousPage(){
     if((currentPage-1)<1);
     else {
         currentPage = currentPage - 1;
-        setPage(JsonServer);
+        setPage();
         document.getElementById("inputButton").value=JSON.stringify(currentPage);
 
     }
 }
-function nextPage(JsonServer) {
+function nextPage() {
     if((currentPage+1)>lastPage);
     else {
         currentPage = currentPage + 1;
-        setPage(JsonServer);
+        setPage();
         document.getElementById("inputButton").value = JSON.stringify(currentPage);
     }
 }
 
-function openVideoPlayer() {
+function openVideoPlayerWithSearchResults() {
+    sessionStorage.setItem("favFlag","0");
     sessionStorage.setItem('video', JSON.stringify(this.value));
     console.log(this.value);
     window.location.href = "/videoPlayer.html";
 }
 
-function openProfil() {
-    window.location.href="/Profil.html";
+function openVideoPlayerWithPageResults() {
+    sessionStorage.setItem("favFlag","0");
+    sessionStorage.setItem('video', JSON.stringify(this.value));
+    console.log(this.value);
+    window.location.href = "/videoPlayer.html";
 }
-function openHome() {
-    window.location.href="/index.html";
 
+function checkFlag() {
+    const flag = JSON.parse(sessionStorage.getItem("pageFlag"));
+    console.log(flag);
+    if(flag===0){
+        sendGetVideos();
+    }else if(flag===1){
+        sendGetSearchRequest(setSearchResult);
+    }
+}
+
+function setSearchTextWithChannel() {
+    console.log(channelName);
+    const searchValue = document.getElementById("searchInput").value;
+    if(searchValue==="") return;
+    let searchString;
+    searchString= JSON.stringify([channelName, searchValue]);
+    sessionStorage.setItem("searchString",searchString);
+    window.location.href = "/searchResults.html";
 }

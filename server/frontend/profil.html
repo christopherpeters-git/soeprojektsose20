@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-    <link type="text/css" rel="stylesheet" href="css/Profil.css">
+    <link type="text/css" rel="stylesheet" href="css/profil.css">
     <script src="js/Profil.js"></script>
     <script src="js/VideoFormat.js"></script>
 </head>
-<body>
+<body >
 
 </div>
 <div id="favPage">
@@ -20,10 +20,22 @@
             <a onclick="Logout()">Ausloggen</a>
         </div>
     </div>
-    <div id="homeIcon" style="width: 10%;float: right">
-        <a href="index.html"> <img id="home_btn" src="media/images/Home-icon.svg.png" width="30%"></a>
+    <div id="homeIcon" style="width: 10%;float: left" onclick="openHome()">
+        <img id="home_btn" src="media/images/Home-icon.svg.png" width="30%";>
     </div>
 </div>
+<center><div id="profileInformation" style="width: 35%; float: right" >
+    <img id="profilePicture" src="media/images/avatar.png" style="width: 30%">
+    <div id="display">
+        <div id="displayName">Name</div>
+    <div id="displayUsername">Username</div>
+    </div>
+</div></center>
+<div id="favList">
+    <div id="favorites">
+    </div>
+</div>
+
 
 </body>
 </html>

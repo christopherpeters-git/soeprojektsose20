@@ -22,16 +22,17 @@ function createAjaxRequest(){
 }
 
 function Logout() {
+    sessionStorage.clear();
     window.location.href = "/index.html";
     sendPostLogoutRequest();
 }
 
 function openProfil() {
-    window.location.href="/Profil.html";
+    window.location.href="/profil.html";
 }
 function openHome() {
+    sessionStorage.clear();
     window.location.href="/index.html";
-
 }
 
 function sendPostLogoutRequest(){

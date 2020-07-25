@@ -6,20 +6,20 @@
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <link type="text/css" rel="stylesheet" href="css/searchresults.css">
     <script src="js/sender.js"></script>
-    <script src="js/main.js"></script>
     <script src="js/VideoFormat.js"></script>
+    <script src="js/searchResults.js"></script>
 
 </head>
-<body onload="initSearchPage()">
+<body onload="initSearchResults()" onunload="clearPage()">
 <div id="mainPage">
-    <div id="homeIcon" style="width: 10%;float: left">
-        <a href="index.html"> <img id="home_btn" src="media/images/Home-icon.svg.png" width="30%";></a>
+    <div id="homeIcon" style="width: 10%;float: left" onclick="openHome()">
+       <img id="home_btn" src="media/images/Home-icon.svg.png" width="30%";>
     </div>
     <div class="Searchbar" style="width: 50%;float: left">
         <input id="searchInput" type="text" placeholder="Suchbegriff eingeben" size="70" style="position: center;" >
     </div>
     <div id="searchbarIcon" style="width: 10%;float: left">
-        <img id="searchIcon" src="media/images/icon_Search.png" onclick="sendGetSearchRequestSearchResults()" title="Suche starten" width="35">
+        <img id="searchIcon" src="media/images/icon_Search.png" onclick="setSearchTextWithResults()" title="Suche starten" width="35">
     </div>
     <div class="Dropdown" id="Dropdown" style="width: 10%; float:right">
         <button class="avatar" style="width:100%; float: left">
@@ -41,9 +41,9 @@
 
 
 <div id="buttons">
-    <button id="backButton" onclick="previousPage(searchResultsJSON)">«</button>
+    <button id="backButton" onclick="previousPage()">«</button>
     <input type="text" id="inputButton" placeholder="1" readonly>
-    <button id="forButton" onclick="nextPage(searchResultsJSON)"> »</button>
+    <button id="forButton" onclick="nextPage()"> »</button>
 </div>
 </body>
 </html>

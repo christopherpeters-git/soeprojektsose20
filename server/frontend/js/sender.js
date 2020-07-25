@@ -212,12 +212,7 @@ function setSearchTextWithChannel() {
     const searchValue = document.getElementById("searchInput").value;
     if(searchValue==="") return;
     let searchString;
-    if(channelName===undefined){
-        searchString=JSON.stringify(["none",searchValue]);
-    }else {
-        searchString= JSON.stringify([channelName, searchValue]);
-    }
+    searchString= JSON.stringify([channelName, searchValue]);
     sessionStorage.setItem("searchString",searchString);
-    console.log(sessionStorage.getItem("searchString"));
     window.location.href = "/searchResults.html";
 }

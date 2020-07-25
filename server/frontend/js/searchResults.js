@@ -1,5 +1,3 @@
-let searchJson;
-
 
 function initSearchResults() {
     sessionStorage.setItem("pageFlag","1");
@@ -11,6 +9,9 @@ function setSearchResult(){
 }
 
 function setSearchTextWithResults(){
+    currentPage=1;
+    const inputValue = document.getElementById("inputButton");
+    inputValue.value = currentPage;
     const searchValue = document.getElementById("searchInput").value;
     if(searchValue==="") return;
     let searchString;

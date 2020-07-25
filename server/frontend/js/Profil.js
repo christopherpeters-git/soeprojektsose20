@@ -1,7 +1,7 @@
 let userInformation=sendPostCookieAuthRequest();
 function Logout() {
     window.location.href = "/index.html";
-    sendPostLogoutRequest();
+    sendGetLogoutRequest();
 
 }
 function openHome() {
@@ -18,7 +18,7 @@ function createAjaxRequest(){
     return request;
 }
 
-function sendPostCookieAuthRequest(){
+function sendGetCookieAuthRequest(){
     const request = createAjaxRequest();
     request.onreadystatechange = function () {
         if(4 === this.readyState){
@@ -32,9 +32,8 @@ function sendPostCookieAuthRequest(){
             }
         }
     }
-    request.open("POST","/cookieAuth/",true);
-    request.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
-    request.send("dummy=dummy");
+    request.open("GET","/cookieAuth/",true);
+    request.send();
 }
 
 function setFavList(){

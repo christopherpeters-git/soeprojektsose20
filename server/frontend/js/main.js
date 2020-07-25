@@ -32,7 +32,7 @@ function createAjaxRequest(){
     return request;
 }
 
-function sendPostCookieAuthRequest(){
+function sendGetCookieAuthRequest(){
     const request = createAjaxRequest();
     request.onreadystatechange = function () {
         if(4 === this.readyState){
@@ -46,9 +46,8 @@ function sendPostCookieAuthRequest(){
             }
         }
     }
-    request.open("POST","/cookieAuth/",true);
-    request.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
-    request.send("dummy=dummy");
+    request.open("GET","/cookieAuth/",true);
+    request.send();
 }
 
 function sendGetSearchRequest(){
@@ -92,7 +91,7 @@ function sendPostLoginRequest(){
     request.send("usernameInput="+usernameInput+"&"+"passwordInput="+passwordInput);
 }
 
-function sendPostLogoutRequest(){
+function sendGetLogoutRequest(){
     const request = createAjaxRequest();
     request.onreadystatechange = function () {
         if(4 === this.readyState){
@@ -105,9 +104,8 @@ function sendPostLogoutRequest(){
             }
         }
     }
-    request.open("POST",/logout/,true);
-    request.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
-    request.send("dummy=dummy");
+    request.open("GET",/logout/,true);
+    request.send();
 }
 
 function sendPostRegisterRequest(){
@@ -133,7 +131,7 @@ function sendPostRegisterRequest(){
     request.send("usernameInput="+usernameInput+"&"+"passwordInput="+passwordInput+"&"+"nameInput="+name);
 }
 
-function sendPostFavoriteRequest(){
+function sendGetFavoriteRequest(){
     const request = createAjaxRequest();
     request.onreadystatechange = function () {
         if(4 === this.readyState){
@@ -145,8 +143,7 @@ function sendPostFavoriteRequest(){
             console.log(this);
         }
     }
-    request.open("POST",/addToFavorites/,true);
-    request.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+    request.open("GET",/addToFavorites/,true);
     request.send("video="+JSON.stringify(video));
 }
 

@@ -47,7 +47,6 @@ function sendPostSaveProfilePicture(){
         }
     }
     request.open("POST","/setProfilePicture/",true);
-    // request.setRequestHeader("Content-Type","multipart/form-data;boundary=&")
     request.send(formData);
 }
 
@@ -82,7 +81,7 @@ function sendGetCookieAuthRequest(){
     request.send();
 }
 
-function sendPostFetchFavoritesRequest(){
+function sendGetFetchFavoritesRequest(){
     const request = createAjaxRequest();
     request.onreadystatechange = function () {
         if(4 === this.readyState){
@@ -93,9 +92,8 @@ function sendPostFetchFavoritesRequest(){
             }
         }
     }
-    request.open("POST","/getFavorites/",true);
-    request.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
-    request.send("dummy=dummy");
+    request.open("GET","/getFavorites/",true);
+    request.send();
 }
 
 function sendGetSearchRequest(){
@@ -150,9 +148,8 @@ function sendPostLogoutRequest(){
             }
         }
     }
-    request.open("POST",/logout/,true);
-    request.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
-    request.send("dummy=dummy");
+    request.open("GET",/logout/,true);
+    request.send();
 }
 
 function sendPostRegisterRequest(){

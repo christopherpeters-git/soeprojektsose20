@@ -6,14 +6,15 @@ const (
 	IncomingPostRegisterRequestUrl            = "/register/"
 	IncomingPostAddToFavoritesRequestUrl      = "/addToFavorites/"
 	IncomingPostRemoveFromFavoritesRequestUrl = "/removeFromFavorites/"
-	IncomingPostLogoutRequestUrl              = "/logout/"
-	IncomingGetCookieAUthRequestUrl           = "/cookieAuth/"
+	IncomingGetLogoutRequestUrl               = "/logout/"
+	IncomingGetCookieAuthRequestUrl           = "/cookieAuth/"
 	IncomingGetSearchRequestUrl               = "/search"
 	IncomingGetVideosFromChannelRequestUrl    = "/getVideoByChannel"
 	IncomingGetVideoClickedRequestUrl         = "/clickVideo"
 	IncomingGetVideosRequestUrl               = "/getVideos/"
 	IncomingGetFetchProfilePictureRequestUrl  = "/getProfilePicture/"
 	IncomingPostSaveProfilePictureRequestUrl  = "/setProfilePicture/"
+	IncomingPostFetchFavoritesRequestUrl      = "/getFavorites/"
 )
 
 //Parameter

@@ -45,17 +45,46 @@ func main() {
 	http.HandleFunc(lib.IncomingGetVideosFromChannelRequestUrl, handleGetVideosByChannel)
 	http.HandleFunc(lib.IncomingGetVideoClickedRequestUrl, handleGetVideoClicked)
 	http.HandleFunc(lib.IncomingGetFetchProfilePictureRequestUrl, handleGetFetchProfilePicture)
-	http.HandleFunc(lib.IncomingPostRemoveFromFavoritesRequestUrl, handleRemoveFromFavorites)
+	http.HandleFunc(lib.IncomingPostRemoveFromFavoritesRequestUrl, handlePostRemoveFromFavorites)
 	http.HandleFunc(lib.IncomingPostUserRequestUrl, handlePostLogin)
 	http.HandleFunc(lib.IncomingPostAddToFavoritesRequestUrl, handlePostAddVideoToFavorites)
 	http.HandleFunc(lib.IncomingPostRegisterRequestUrl, handlePostRegisterUser)
-	http.HandleFunc(lib.IncomingPostLogoutRequestUrl, handlePostLogout)
-	http.HandleFunc(lib.IncomingGetCookieAUthRequestUrl, handleGetCookieAuth)
+	http.HandleFunc(lib.IncomingGetLogoutRequestUrl, handleGetLogout)
+	http.HandleFunc(lib.IncomingGetCookieAuthRequestUrl, handleGetCookieAuth)
+	http.HandleFunc(lib.IncomingPostFetchFavoritesRequestUrl, handleGetFetchFavorites)
 	http.HandleFunc(lib.IncomingPostSaveProfilePictureRequestUrl, handlePostSaveProfilePicture)
 	err = http.ListenAndServe(":80", nil)
 	if err != nil {
 		log.Fatal("Starting Server failed: " + err.Error())
 	}
+}
+
+func handleGetFetchFavorites(w http.ResponseWriter, r *http.Request) {
+	log.Println("Answering handleGetFetchFavorites request started...")
+	userDB := dbConnections[lib.UserDBconnectionName]
+	err := userDB.Ping()
+	if err != nil {
+		lib.ReportError(w, http.StatusInternalServerError, lib.InternalServerErrorResponse, "Database connection failed: \n"+err.Error())
+		return
+	}
+	var user lib.User
+	if dErr := lib.IsUserLoggedInWithACookie(r, userDB, &user); dErr != nil {
+		lib.ReportDetailedError(w, dErr)
+		return
+	}
+	if err = lib.FillUserVideoArray(&user, userDB); err != nil {
+		lib.ReportError(w, http.StatusInternalServerError, lib.InternalServerErrorResponse, "FillUserVideoArray failed:\n"+err.Error())
+		return
+	}
+	videosInBytes, err := json.MarshalIndent(user.FavoriteVideos, "", " ")
+	if err != nil {
+		lib.ReportError(w, http.StatusInternalServerError, lib.InternalServerErrorResponse, "marshaling failed: \n"+err.Error())
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Write(videosInBytes)
+	log.Println("Answered handleGetFetchFavorites request successfully")
 }
 
 func handlePostSaveProfilePicture(w http.ResponseWriter, r *http.Request) {
@@ -140,8 +169,8 @@ func handleGetFetchProfilePicture(w http.ResponseWriter, r *http.Request) {
 	log.Println("Answered handleGetFetchProfilePicture request successfully")
 }
 
-func handleRemoveFromFavorites(w http.ResponseWriter, r *http.Request) {
-	log.Println("Answering handleRemoveFromFavorites request started...")
+func handlePostRemoveFromFavorites(w http.ResponseWriter, r *http.Request) {
+	log.Println("Answering handlePostRemoveFromFavorites request started...")
 	//Check connection
 	userDB := dbConnections[lib.UserDBconnectionName]
 	err := userDB.Ping()
@@ -182,7 +211,7 @@ func handleRemoveFromFavorites(w http.ResponseWriter, r *http.Request) {
 	}
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("Video aus den Favoriten entfernt!"))
-	log.Println("Answered handleRemoveFromFavorites request successfully")
+	log.Println("Answered handlePostRemoveFromFavorites request successfully")
 }
 
 func handleGetCookieAuth(w http.ResponseWriter, r *http.Request) {
@@ -198,11 +227,6 @@ func handleGetCookieAuth(w http.ResponseWriter, r *http.Request) {
 		lib.ReportDetailedError(w, dErr)
 		return
 	}
-	err = lib.FillUserVideoArray(&user, userDB)
-	if err != nil {
-		lib.ReportError(w, http.StatusInternalServerError, lib.InternalServerErrorResponse, "Failed filling the favorite videos array: \n"+err.Error())
-		return
-	}
 	userInBytes, err := json.MarshalIndent(user, "", "   ")
 	if err != nil {
 		lib.ReportError(w, http.StatusInternalServerError, lib.InternalServerErrorResponse, "Marshaling failed: \n"+err.Error())
@@ -213,8 +237,8 @@ func handleGetCookieAuth(w http.ResponseWriter, r *http.Request) {
 	log.Println("Answered handleGetCookieAuth successfully")
 }
 
-func handlePostLogout(w http.ResponseWriter, r *http.Request) {
-	log.Println("Answering handlePostLogout request started...")
+func handleGetLogout(w http.ResponseWriter, r *http.Request) {
+	log.Println("Answering handleGetLogout request started...")
 	userDB := dbConnections[lib.UserDBconnectionName]
 	err := userDB.Ping()
 	if err != nil {
@@ -234,7 +258,7 @@ func handlePostLogout(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("Abgemeldet!"))
-	log.Println("Answered handlePostLogout successfully")
+	log.Println("Answered handleGetLogout successfully")
 }
 
 func handleGetSearchVideos(w http.ResponseWriter, r *http.Request) {

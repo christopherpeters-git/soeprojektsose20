@@ -64,7 +64,6 @@ function sendGetSearchRequest(callBackFunction){
         if(4 === this.readyState){
             if(200 === this.status){
                 channelJson = JSON.parse(this.responseText);
-                channelName = sessionStorage.getItem("channel");
                 console.log(channelJson.length);
                 lastPage = (Math.ceil(channelJson.length/end));
                 console.log(lastPage);
@@ -209,10 +208,11 @@ function checkFlag() {
 }
 
 function setSearchTextWithChannel() {
+    console.log(channelName);
     const searchValue = document.getElementById("searchInput").value;
     if(searchValue==="") return;
     let searchString;
-    if(channelName===null){
+    if(channelName===undefined){
         searchString=JSON.stringify(["none",searchValue]);
     }else {
         searchString= JSON.stringify([channelName, searchValue]);

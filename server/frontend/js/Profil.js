@@ -1,8 +1,9 @@
-let userInformation=sendPostCookieAuthRequest();
+let userInformation=sendPostCookieAuthRequest(callBackFunctionSetUserArray);
+
+
 function Logout() {
     window.location.href = "/index.html";
     sendPostLogoutRequest();
-
 }
 function openHome() {
     window.location.href = "/index.html";
@@ -18,24 +19,15 @@ function createAjaxRequest(){
     return request;
 }
 
-function sendPostCookieAuthRequest(){
-    const request = createAjaxRequest();
-    request.onreadystatechange = function () {
-        if(4 === this.readyState){
-            if(200 === this.status){
-                userInformation=JSON.parse(this.responseText);
-                setFavList();
-            }else{
-                console.log(this.status + ":" + this.responseText);
-                document.getElementById("Login_Screen").style.visibility="visible";
-
-            }
-        }
+function callBackFunctionSetUserArray(status) {
+    if(200 === status.status){
+        userInformation=JSON.parse(status.responseText);
+        setFavList();
+    }else{
+        console.log(status.status + ":" + status.responseText);
     }
-    request.open("POST","/cookieAuth/",true);
-    request.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
-    request.send("dummy=dummy");
 }
+
 
 function setFavList(){
     const favDiv= document.getElementById("favorites");
@@ -154,23 +146,6 @@ function startDeletingFav() {
     * delay after request
     * */
     setTimeout(() => { location.reload();  }, 200);
-}
-
-
-function sendPostRemoveFavoriteRequest(video){
-    const request = createAjaxRequest();
-    request.onreadystatechange = function () {
-        if(4 === this.readyState){
-            if(200 === this.status){
-            }else{
-                alert(this.status + ":" + this.responseText);
-            }
-            console.log(this);
-        }
-    }
-    request.open("POST",/removeFromFavorites/,true);
-    request.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
-    request.send("video="+encodeURIComponent(JSON.stringify(video)));
 }
 
 function selectAllFavorites() {

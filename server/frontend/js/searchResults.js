@@ -4,9 +4,6 @@ function initSearchResults() {
     checkFlag();
 }
 
-function setSearchResult(){
-
-}
 
 function setSearchTextWithResults(){
     currentPage=1;
@@ -26,6 +23,12 @@ function setSearchTextWithResults(){
 }
 
 function clearPage() {
-    sessionStorage.clear();
+    /*todo
+    * F5 löscht zurzeit den Sessionspeicher muss bearbeitet werden
+    *
+    * */
 
+    const currentSite = window.location;
+    console.log(currentSite);
+    sessionStorage.clear();
 }

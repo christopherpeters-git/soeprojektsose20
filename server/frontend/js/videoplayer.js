@@ -156,6 +156,7 @@ function fillNextVideos(video) {
         videoDiv.appendChild(header7);
         videoDiv.addEventListener("click", openVideoPlayer, false);
         videoDiv.value = [channel[i], i];
+        videoDiv.appendChild(document.createElement("br"));
         nxtVideos.appendChild(videoDiv);
     }
 }

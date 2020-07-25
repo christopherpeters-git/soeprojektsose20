@@ -51,5 +51,5 @@ const (
 const (
 	LetterBytes    = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 	AuthCookieName = "mediathekauth"
-	MaxUploadSize  = 10000000 //in byte
+	MaxUploadSize  = 1000000 //in byte
 )

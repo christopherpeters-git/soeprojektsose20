@@ -50,19 +50,7 @@ function sendPostSaveProfilePicture(){
     request.send(formData);
 }
 
-function LoadProfilePicture(){
-    const request = createAjaxRequest();
-    request.onreadystatechange = function () {
-        if(4 === this.readyState){
-            if(200 === this.status){
-                document.getElementById("pp").src = /getProfilePicture/
-            }else{
-                alert(this.status + ":" + this.responseText);
-            }
-        }
-    }
-    request.open("GET","/getProfilePicture/",true);
-    request.send();
+function loadProfilePicture(){
     document.getElementById("pp").src = /getProfilePicture/
 }
 

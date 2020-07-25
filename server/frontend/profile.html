@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <link type="text/css" rel="stylesheet" href="css/profil.css">
-    <script src="js/Profil.js"></script>
+    <script src="js/profile.js"></script>
     <script src="js/VideoFormat.js"></script>
 </head>
 <body >
@@ -13,7 +13,7 @@
 <div id="favPage">
     <div class="Dropdown" id="Dropdown" style="width: 10%; float:right">
         <button class="avatar" style="width:100%; float: left">
-            <img src="media/images/avatar.png" style="width: 40%">
+            <img id="profilePictureMini" src="media/images/avatar.png" style="width: 40%">
         </button>
         <div class="Dropdown-content" >
             <a onclick="openHome()">Home</a>
@@ -26,6 +26,11 @@
 </div>
 <center><div id="profileInformation" style="width: 35%; float: right" >
     <img id="profilePicture" src="media/images/avatar.png" style="width: 30%">
+    <div id="setProfilePictureArea">
+        <label for="ppUpload">Profilbild auswählen</label>
+        <input id="ppUpload" type="file">
+        <button onclick="sendPostSaveProfilePicture()">Profilbild hochladen</button>
+    </div>
     <div id="display">
         <div id="displayName">Name</div>
     <div id="displayUsername">Username</div>

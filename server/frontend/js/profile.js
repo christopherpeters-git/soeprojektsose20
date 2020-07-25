@@ -1,4 +1,4 @@
-let userInformation=sendPostCookieAuthRequest();
+let userInformation=sendGetCookieAuthRequest();
 function Logout() {
     window.location.href = "/index.html";
     sendGetLogoutRequest();
@@ -18,12 +18,58 @@ function createAjaxRequest(){
     return request;
 }
 
+function sendPostSaveProfilePicture(){
+    const request = createAjaxRequest();
+    const profilePicture = document.getElementById("ppUpload").files[0];
+    if (profilePicture == null){
+        alert("No picture set!");
+        return;
+    }
+    const formData = new FormData();
+    formData.append("profilepicture",profilePicture)
+    request.onreadystatechange = function () {
+        if(4 === this.readyState){
+            if(200 === this.status){
+                alert(this.responseText)
+                loadProfilePicture()
+            }else{
+                alert(this.status + ":" + this.responseText);
+            }
+        }
+    }
+    request.open("POST","/setProfilePicture/",true);
+    request.send(formData);
+}
+
+function loadProfilePicture(){
+    document.getElementById("profilePicture").src = /getProfilePicture/
+    document.getElementById("profilePictureMini").src = /getProfilePicture/
+}
+
+function sendGetFetchFavoritesRequest(){
+    const request = createAjaxRequest();
+    request.onreadystatechange = function () {
+        if(4 === this.readyState){
+            if(200 === this.status){
+                userInformation.favoriteVideos = JSON.parse(this.responseText);
+                console.log(userInformation.favoriteVideos);
+            }else{
+                alert(this.status + ":" + this.responseText);
+            }
+        }
+    }
+    request.open("GET","/getFavorites/",true);
+    request.send();
+}
+
+
 function sendGetCookieAuthRequest(){
     const request = createAjaxRequest();
     request.onreadystatechange = function () {
         if(4 === this.readyState){
             if(200 === this.status){
                 userInformation=JSON.parse(this.responseText);
+                sendGetFetchFavoritesRequest();
                 setFavList();
             }else{
                 console.log(this.status + ":" + this.responseText);
@@ -66,10 +112,12 @@ function setFavList(){
     favDiv.appendChild(safeBtn);
     favDiv.appendChild(abortBtn);
     favDiv.appendChild(document.createElement("hr"));
-    for(let i =0;i<userInformation.favoriteVideos.length;i++){
-        appendFav(userInformation.favoriteVideos[i],favDiv,i,"openFavVideoPlayer");
+    if (userInformation.favoriteVideos != null){
+        for(let i =0;i<userInformation.favoriteVideos.length;i++){
+            appendFav(userInformation.favoriteVideos[i],favDiv,i,"openFavVideoPlayer");
+        }
+        favDiv.appendChild(document.createElement("hr"));
     }
-    favDiv.appendChild(document.createElement("hr"));
 }
 
 

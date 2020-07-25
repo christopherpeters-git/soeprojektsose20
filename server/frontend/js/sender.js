@@ -1,5 +1,5 @@
-let channelJson;
-let channelName;
+let channelJson=null;
+let channelName=null;
 const start =0;
 const end = 30;
 
@@ -14,10 +14,6 @@ function loadSenderPage(wert) {
     window.location.href = "/channel.html";
     channelName = wert;
     sessionStorage.setItem('channel', wert);
-
-}
-function openHomePage() {
-    window.location.href = "/index.html";
 
 }
 
@@ -39,9 +35,7 @@ function sendGetVideos() {
                     window.location.href="/index.html";
                 }
                 channelName = sessionStorage.getItem("channel");
-                console.log(channelJson.length);
                 lastPage = (Math.ceil(channelJson.length/end));
-                console.log(lastPage);
                 setPage();
                 setSenderPagePicture(channelJson[1]);
 
@@ -64,9 +58,7 @@ function sendGetSearchRequest(callBackFunction){
         if(4 === this.readyState){
             if(200 === this.status){
                 channelJson = JSON.parse(this.responseText);
-                console.log(channelJson.length);
                 lastPage = (Math.ceil(channelJson.length/end));
-                console.log(lastPage);
                 setPage();
                 callBackFunction();
             }else{
@@ -119,7 +111,6 @@ function setPage() {
     show.appendChild(document.createElement("hr"));
     appendShow(lastVideo,show,(start+((currentPage-1)*30)));
     for(let i =(tempStart+1)+((currentPage-1)*tempEnd);i<tempEnd*currentPage;i++){
-        console.log(tempEnd);
         currentVideo = channelJson[i];
         if(lastVideo.show !== currentVideo.show){
             videosDiv.appendChild(show);
@@ -200,6 +191,7 @@ function openVideoPlayerWithPageResults() {
 
 function checkFlag() {
     const flag = JSON.parse(sessionStorage.getItem("pageFlag"));
+    console.log(flag);
     if(flag===0){
         sendGetVideos();
     }else if(flag===1){

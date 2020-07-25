@@ -7,7 +7,7 @@ const (
 	IncomingPostAddToFavoritesRequestUrl      = "/addToFavorites/"
 	IncomingPostRemoveFromFavoritesRequestUrl = "/removeFromFavorites/"
 	IncomingPostLogoutRequestUrl              = "/logout/"
-	IncomingPostCookieAUthRequestUrl          = "/cookieAuth/"
+	IncomingGetCookieAUthRequestUrl           = "/cookieAuth/"
 	IncomingGetSearchRequestUrl               = "/search"
 	IncomingGetVideosFromChannelRequestUrl    = "/getVideoByChannel"
 	IncomingGetVideoClickedRequestUrl         = "/clickVideo"

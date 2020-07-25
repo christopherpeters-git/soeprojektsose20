@@ -44,14 +44,14 @@ func main() {
 	http.HandleFunc(lib.IncomingGetVideosRequestUrl, handleGetAllVideos)
 	http.HandleFunc(lib.IncomingGetVideosFromChannelRequestUrl, handleGetVideosByChannel)
 	http.HandleFunc(lib.IncomingGetVideoClickedRequestUrl, handleGetVideoClicked)
+	http.HandleFunc(lib.IncomingGetFetchProfilePictureRequestUrl, handleGetFetchProfilePicture)
 	http.HandleFunc(lib.IncomingPostRemoveFromFavoritesRequestUrl, handleRemoveFromFavorites)
 	http.HandleFunc(lib.IncomingPostUserRequestUrl, handlePostLogin)
 	http.HandleFunc(lib.IncomingPostAddToFavoritesRequestUrl, handlePostAddVideoToFavorites)
 	http.HandleFunc(lib.IncomingPostRegisterRequestUrl, handlePostRegisterUser)
 	http.HandleFunc(lib.IncomingPostLogoutRequestUrl, handlePostLogout)
-	http.HandleFunc(lib.IncomingPostCookieAUthRequestUrl, handlePostCookieAuth)
+	http.HandleFunc(lib.IncomingGetCookieAUthRequestUrl, handleGetCookieAuth)
 	http.HandleFunc(lib.IncomingPostSaveProfilePictureRequestUrl, handlePostSaveProfilePicture)
-	http.HandleFunc(lib.IncomingGetFetchProfilePictureRequestUrl, handleGetFetchProfilePicture)
 	err = http.ListenAndServe(":80", nil)
 	if err != nil {
 		log.Fatal("Starting Server failed: " + err.Error())
@@ -185,8 +185,8 @@ func handleRemoveFromFavorites(w http.ResponseWriter, r *http.Request) {
 	log.Println("Answered handleRemoveFromFavorites request successfully")
 }
 
-func handlePostCookieAuth(w http.ResponseWriter, r *http.Request) {
-	log.Println("Answering handlePostCookieAuth request started...")
+func handleGetCookieAuth(w http.ResponseWriter, r *http.Request) {
+	log.Println("Answering handleGetCookieAuth request started...")
 	userDB := dbConnections[lib.UserDBconnectionName]
 	err := userDB.Ping()
 	if err != nil {
@@ -210,7 +210,7 @@ func handlePostCookieAuth(w http.ResponseWriter, r *http.Request) {
 	}
 	w.WriteHeader(http.StatusOK)
 	w.Write(userInBytes)
-	log.Println("Answered handlePostCookieAuth successfully")
+	log.Println("Answered handleGetCookieAuth successfully")
 }
 
 func handlePostLogout(w http.ResponseWriter, r *http.Request) {

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Suchresultate</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <link type="text/css" rel="stylesheet" href="css/searchresults.css">
+    <script src="js/sender.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/VideoFormat.js"></script>
+
+</head>
+<body onload="initSearchPage()">
+<div id="mainPage">
+    <div id="homeIcon" style="width: 10%;float: left">
+        <a href="index.html"> <img id="home_btn" src="media/images/Home-icon.svg.png" width="30%";></a>
+    </div>
+    <div class="Searchbar" style="width: 50%;float: left">
+        <input id="searchInput" type="text" placeholder="Suchbegriff eingeben" size="70" style="position: center;" >
+    </div>
+    <div id="searchbarIcon" style="width: 10%;float: left">
+        <img id="searchIcon" src="media/images/icon_Search.png" onclick="sendGetSearchRequestSearchResults()" title="Suche starten" width="35">
+    </div>
+    <div class="Dropdown" id="Dropdown" style="width: 10%; float:right">
+        <button class="avatar" style="width:100%; float: left">
+            <img src="media/images/avatar.png" style="width: 40%">
+        </button>
+        <div class="Dropdown-content" >
+            <a onclick="openProfil()">Profil</a>
+            <a onclick="openHome()">Home</a>
+            <a onclick="Logout()">Ausloggen</a>
+        </div>
+    </div>
+
+</div>
+
+<div id="videoContainer">
+    <div id="videos">
+    </div>
+</div>
+
+
+<div id="buttons">
+    <button id="backButton" onclick="previousPage(searchResultsJSON)">«</button>
+    <input type="text" id="inputButton" placeholder="1" readonly>
+    <button id="forButton" onclick="nextPage(searchResultsJSON)"> »</button>
+</div>
+</body>
+</html>

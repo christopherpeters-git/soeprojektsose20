@@ -69,7 +69,6 @@ function sendGetCookieAuthRequest(){
         if(4 === this.readyState){
             if(200 === this.status){
                 userInformation=JSON.parse(this.responseText);
-                sendGetFetchFavoritesRequest();
                 setFavList();
             }else{
                 console.log(this.status + ":" + this.responseText);
@@ -112,12 +111,10 @@ function setFavList(){
     favDiv.appendChild(safeBtn);
     favDiv.appendChild(abortBtn);
     favDiv.appendChild(document.createElement("hr"));
-    if (userInformation.favoriteVideos != null){
-        for(let i =0;i<userInformation.favoriteVideos.length;i++){
-            appendFav(userInformation.favoriteVideos[i],favDiv,i,"openFavVideoPlayer");
-        }
-        favDiv.appendChild(document.createElement("hr"));
+    for(let i =0;i<userInformation.favoriteVideos.length;i++){
+        appendFav(userInformation.favoriteVideos[i],favDiv,i,"openFavVideoPlayer");
     }
+    favDiv.appendChild(document.createElement("hr"));
 }
 
 

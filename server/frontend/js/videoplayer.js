@@ -10,11 +10,9 @@ function setDefaultAutplay() {
 function getFlagGetVideos() {
     console.log("flag: "+ sessionStorage.getItem(("favFlag")));
     if(sessionStorage.getItem(("favFlag"))==="1"){
-        sendPostCookieAuthRequest(function (status) {
-            if(200 === status.status){
-                channel = (JSON.parse(status.responseText)).favoriteVideos;
-            }
-        },false);
+        sendGetFetchFavoritesRequest((response)=>{
+            channel = JSON.parse(response.responseText);
+        },false)
     }
     else{
         const flag = JSON.parse(sessionStorage.getItem("pageFlag"));

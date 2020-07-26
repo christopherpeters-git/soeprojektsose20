@@ -1,28 +1,44 @@
-let userInformation=sendPostCookieAuthRequest(callBackFunctionSetUserArray);
+let userInformation;
+sendGetCookieAuthRequest(callBackFunctionSetUserArray);
+sendGetFetchFavoritesRequest((response) => {
+    console.log(response.responseText)
+    userInformation.favoriteVideos = JSON.parse(response.responseText);
+    setFavList();
+});
 
+function toggleUploadButtons(){
+    const uploadButtons = document.getElementById("uploadButtons");
+    if (uploadButtons.style.visibility === "visible"){
+        uploadButtons.style.visibility = "hidden";
+    }else{
+        uploadButtons.style.visibility = "visible";
+    }
+}
+
+function saveProfilePicture(){
+    sendPostSaveProfilePicture(()=>{
+        loadProfilePicture();
+        console.log("profile picture set successfully")
+    });
+}
+
+function loadProfilePicture(){
+    const pp = document.getElementById("profilePicture");
+    pp.setAttribute("src","/getProfilePicture/");
+    window.location.reload();
+}
 
 function Logout() {
     window.location.href = "/index.html";
-    sendPostLogoutRequest();
+    sendGetLogoutRequest();
 }
 function openHome() {
     window.location.href = "/index.html";
 }
 
-function createAjaxRequest(){
-    let request;
-    if(window.XMLHttpRequest){
-        request = new XMLHttpRequest();
-    }else{
-        request = new ActiveXObject("Microsoft.XMLHTTP");
-    }
-    return request;
-}
-
 function callBackFunctionSetUserArray(status) {
     if(200 === status.status){
         userInformation=JSON.parse(status.responseText);
-        setFavList();
     }else{
         console.log(status.status + ":" + status.responseText);
     }

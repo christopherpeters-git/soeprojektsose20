@@ -8,16 +8,52 @@ function createAjaxRequest(){
     return request;
 }
 
-function sendPostCookieAuthRequest(callbackFunction,async=true){
+function sendPostSaveProfilePicture(callbackFunction){
+    const request = createAjaxRequest();
+    const profilePicture = document.getElementById("ppUpload").files[0];
+    if (profilePicture == null){
+        alert("No picture set!");
+        return;
+    }
+    const formData = new FormData();
+    formData.append("profilepicture",profilePicture)
+    request.onreadystatechange = function () {
+        if(4 === this.readyState){
+            if(200 === this.status){
+                callbackFunction(this);
+            }else{
+                console.log(this.status + ":" + this.responseText);
+            }
+        }
+    }
+    request.open("POST","/setProfilePicture/",true);
+    request.send(formData);
+}
+
+function sendGetCookieAuthRequest(callbackFunction, async=true){
     const request = createAjaxRequest();
     request.onreadystatechange = function () {
         if(4 === this.readyState){
            callbackFunction(this);
         }
     }
-    request.open("POST","/cookieAuth/",async);
-    request.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
-    request.send("dummy=dummy");
+    request.open("GET","/cookieAuth/",async);
+    request.send();
+}
+
+function sendGetFetchFavoritesRequest(callbackFunction, async = true){
+    const request = createAjaxRequest();
+    request.onreadystatechange = function () {
+        if(4 === this.readyState){
+            if(200 == this.status){
+                callbackFunction(this);
+            }else{
+                console.log(this.status + ":" + this.responseText);
+            }
+        }
+    }
+    request.open("GET","/getFavorites/",async);
+    request.send();
 }
 
 function sendPostLoginRequest(callbackFunction){
@@ -34,16 +70,15 @@ function sendPostLoginRequest(callbackFunction){
     request.send("usernameInput="+usernameInput+"&"+"passwordInput="+passwordInput);
 }
 
-function sendPostLogoutRequest(callbackFunction){
+function sendGetLogoutRequest(callbackFunction){
     const request = createAjaxRequest();
     request.onreadystatechange = function () {
         if(4 === this.readyState){
             callbackFunction(this);
         }
     }
-    request.open("POST",/logout/,true);
-    request.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
-    request.send("dummy=dummy");
+    request.open("GET",/logout/,true);
+    request.send();
 }
 
 function sendPostRegisterRequest(callbackFunction){

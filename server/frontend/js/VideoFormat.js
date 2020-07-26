@@ -14,7 +14,7 @@ class Videoclass {
 function Logout() {
     sessionStorage.clear();
     window.location.href = "/index.html";
-    sendPostLogoutRequest(function (status) {
+    sendGetLogoutRequest(function (status) {
         if(200 === status.status){
             alert(status.responseText)
             hideAvatar();

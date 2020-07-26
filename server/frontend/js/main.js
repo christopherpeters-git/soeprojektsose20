@@ -10,159 +10,45 @@ class User{
 
 }
 
-const video =  {
-    "channel": "ARD",
-    "title": "\"Plan B\" für Bayern",
-    "show": "\"Plan B\" für Bayern",
-    "releaseDate": "24.06.2020",
-    "duration": "00:42:55",
-    "link": "http://cdn-storage.br.de/b7/2020-06/24/159a1622b65711eabca2984be109059a_C.mp4",
-    "pageLink": "https://www.ardmediathek.de/ard/player/Y3JpZDovL2JyLmRlL3ZpZGVvLzY3ZmY5YjUyLTI5NDYtNDEwMC04MDk1LTg2OTU1NjgxOTMyZA",
-    "fileName": "72|X.mp4"
-};
 
-
-function createAjaxRequest(){
-    let request;
-    if(window.XMLHttpRequest){
-        request = new XMLHttpRequest();
+function callBackFunctionCookieAuthRequest(status){
+    if(status.status===200){
+        hideVBlockerAndLogin();
+        unhideAvatar();
+        const currentSite = window.location;
+        console.log(currentSite);
     }else{
-        request = new ActiveXObject("Microsoft.XMLHTTP");
+        console.log(status.status + ":" + status.responseText);
+        document.getElementById("Login_Screen").style.visibility="visible";
     }
-    return request;
 }
 
-function sendGetCookieAuthRequest(){
-    const request = createAjaxRequest();
-    request.onreadystatechange = function () {
-        if(4 === this.readyState){
-            if(200 === this.status){
-                hideVBlockerAndLogin();
-                unhideAvatar();
-            }else{
-                console.log(this.status + ":" + this.responseText);
-                document.getElementById("Login_Screen").style.visibility="visible";
-
-            }
-        }
+function callBackFunctionLogin(status){
+    if(200 === status.status){
+        hideVBlockerAndLogin();
+        unhideAvatar();
+    }else{
+        alert(status.status + ":" + status.responseText);
     }
-    request.open("GET","/cookieAuth/",true);
-    request.send();
 }
 
-function sendGetSearchRequest(){
-    const request = createAjaxRequest();
-    const searchString = document.getElementById("searchInput").value;
-    request.onreadystatechange = function () {
-        if(4 === this.readyState){
-            if(200 === this.status){
-                alert(this.responseText);
-            }else{
-                alert(this.status + ":" + this.responseText);
-            }
-        }
+function callBackFunctionLogout(status) {
+    if(200 === status.status){
+        unhideVBlockerAndLogin();
+        hideAvatar();
+    }else{
+        alert(status.status + ":" + status.responseText);
     }
-
-    request.open("GET","/search" +"?search="+searchString,true);
-    request.send();
 }
 
-function sendPostLoginRequest(){
-    const usernameInput = document.getElementById("usernameLogin").value;
-    const passwordInput = document.getElementById("passwordLogin").value;
-    const request = createAjaxRequest();
-    request.onreadystatechange = function () {
-        if(4 === this.readyState){
-            if(200 === this.status){
-                alert(this.responseText)
-                let user = new User("","","",null);
-                user = JSON.parse(this.responseText);
-                console.log(user);
-                hideVBlockerAndLogin();
-                unhideAvatar();
-            }else{
-                alert(this.status + ":" + this.responseText);
-            }
-        }
+function callBackFunctionRegister(status) {
+    if(200 === status.status){
+        hideVBlockerAndLogin();
+        unhideAvatar();
+        loginAfterRegister();
+    }else{
+        alert(status.status + ":" + status.responseText);
     }
-    request.open("POST",/login/,true);
-    request.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
-    console.log("" + usernameInput + " " + passwordInput);
-    request.send("usernameInput="+usernameInput+"&"+"passwordInput="+passwordInput);
-}
-
-function sendGetLogoutRequest(){
-    const request = createAjaxRequest();
-    request.onreadystatechange = function () {
-        if(4 === this.readyState){
-            if(200 === this.status){
-                alert(this.responseText)
-                unhideVBlockerAndLogin();
-                hideAvatar();
-            }else{
-                alert(this.status + ":" + this.responseText);
-            }
-        }
-    }
-    request.open("GET",/logout/,true);
-    request.send();
-}
-
-function sendPostRegisterRequest(){
-    const name = document.getElementById("fullname").value;
-    const usernameInput = document.getElementById("usernameReg").value;
-    const passwordInput = document.getElementById("passwordReg").value;
-    const request = createAjaxRequest();
-    request.onreadystatechange = function () {
-        if(4 === this.readyState){
-            if(200 === this.status){
-                alert(this.responseText)
-                hideVBlockerAndLogin();
-                unhideAvatar();
-                loginAfterRegister();
-            }else{
-                alert(this.status + ":" + this.responseText);
-            }
-        }
-    }
-    request.open("POST",/register/,true);
-    request.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
-    console.log("" + usernameInput + " " + passwordInput);
-    request.send("usernameInput="+usernameInput+"&"+"passwordInput="+passwordInput+"&"+"nameInput="+name);
-}
-
-function sendGetFavoriteRequest(){
-    const request = createAjaxRequest();
-    request.onreadystatechange = function () {
-        if(4 === this.readyState){
-            if(200 === this.status){
-                alert(this.responseText);
-            }else{
-                alert(this.status + ":" + this.responseText);
-            }
-            console.log(this);
-        }
-    }
-    request.open("GET",/addToFavorites/,true);
-    request.send("video="+JSON.stringify(video));
-}
-
-
-
-function sendGetClickedVideos(){
-    const request = createAjaxRequest();
-    request.onreadystatechange = function () {
-        if(4 === this.readyState){
-            if(200 === this.status){
-                alert(this.responseText);
-            }else{
-                alert(this.status + ":" + this.responseText);
-            }
-        }
-    }
-
-    request.open("GET","/clickVideo" +"?videoTitle="+"\"Plan B\" für Bayern",true);
-    request.send();
 }
 
 function hideVBlockerAndLogin() {
@@ -189,7 +75,7 @@ function unhideAvatar() {
 }
 
 function openProfil() {
-    window.location.href="/profile.html";
+    window.location.href="/profil.html";
 }
 
 
@@ -199,7 +85,7 @@ function loginAfterRegister() {
    let userPass = document.getElementById("passwordLogin");
    userLogin.value = document.getElementById("usernameReg").value;
    userPass.value = document.getElementById("passwordReg").value;
-   sendPostLoginRequest();
+   sendPostLoginRequest(callBackFunctionLogin);
 }
 
 

@@ -1,8 +1,9 @@
-let userInformation=sendGetCookieAuthRequest();
+let userInformation=sendPostCookieAuthRequest(callBackFunctionSetUserArray);
+
+
 function Logout() {
     window.location.href = "/index.html";
-    sendGetLogoutRequest();
-
+    sendPostLogoutRequest();
 }
 function openHome() {
     window.location.href = "/index.html";
@@ -18,68 +19,15 @@ function createAjaxRequest(){
     return request;
 }
 
-function sendPostSaveProfilePicture(){
-    const request = createAjaxRequest();
-    const profilePicture = document.getElementById("ppUpload").files[0];
-    if (profilePicture == null){
-        alert("No picture set!");
-        return;
+function callBackFunctionSetUserArray(status) {
+    if(200 === status.status){
+        userInformation=JSON.parse(status.responseText);
+        setFavList();
+    }else{
+        console.log(status.status + ":" + status.responseText);
     }
-    const formData = new FormData();
-    formData.append("profilepicture",profilePicture)
-    request.onreadystatechange = function () {
-        if(4 === this.readyState){
-            if(200 === this.status){
-                alert(this.responseText)
-                loadProfilePicture()
-            }else{
-                alert(this.status + ":" + this.responseText);
-            }
-        }
-    }
-    request.open("POST","/setProfilePicture/",true);
-    request.send(formData);
 }
 
-function loadProfilePicture(){
-    document.getElementById("profilePicture").src = /getProfilePicture/
-    document.getElementById("profilePictureMini").src = /getProfilePicture/
-}
-
-function sendGetFetchFavoritesRequest(){
-    const request = createAjaxRequest();
-    request.onreadystatechange = function () {
-        if(4 === this.readyState){
-            if(200 === this.status){
-                userInformation.favoriteVideos = JSON.parse(this.responseText);
-                console.log(userInformation.favoriteVideos);
-            }else{
-                alert(this.status + ":" + this.responseText);
-            }
-        }
-    }
-    request.open("GET","/getFavorites/",true);
-    request.send();
-}
-
-
-function sendGetCookieAuthRequest(){
-    const request = createAjaxRequest();
-    request.onreadystatechange = function () {
-        if(4 === this.readyState){
-            if(200 === this.status){
-                userInformation=JSON.parse(this.responseText);
-                setFavList();
-            }else{
-                console.log(this.status + ":" + this.responseText);
-                document.getElementById("Login_Screen").style.visibility="visible";
-
-            }
-        }
-    }
-    request.open("GET","/cookieAuth/",true);
-    request.send();
-}
 
 function setFavList(){
     const favDiv= document.getElementById("favorites");
@@ -198,23 +146,6 @@ function startDeletingFav() {
     * delay after request
     * */
     setTimeout(() => { location.reload();  }, 200);
-}
-
-
-function sendPostRemoveFavoriteRequest(video){
-    const request = createAjaxRequest();
-    request.onreadystatechange = function () {
-        if(4 === this.readyState){
-            if(200 === this.status){
-            }else{
-                alert(this.status + ":" + this.responseText);
-            }
-            console.log(this);
-        }
-    }
-    request.open("POST",/removeFromFavorites/,true);
-    request.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
-    request.send("video="+encodeURIComponent(JSON.stringify(video)));
 }
 
 function selectAllFavorites() {

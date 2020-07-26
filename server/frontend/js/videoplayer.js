@@ -10,16 +10,27 @@ function setDefaultAutplay() {
 function getFlagGetVideos() {
     console.log("flag: "+ sessionStorage.getItem(("favFlag")));
     if(sessionStorage.getItem(("favFlag"))==="1"){
-        sendPostFavArrayAuthRequest();
+        sendPostCookieAuthRequest(function (status) {
+            if(200 === status.status){
+                channel = (JSON.parse(status.responseText)).favoriteVideos;
+            }
+        },false);
     }
     else{
         const flag = JSON.parse(sessionStorage.getItem("pageFlag"));
         if(flag===0){
-            sendGetVideos();
+            sendGetVideos(callBackFunctionGetVideosForVideoPlayer,false);
         }
         else if(flag===1){
             console.log("pageFlag: "+flag);
-            sendGetSearchRequest();
+            sendGetSearchRequest(function (status) {
+                if(200 === status.status){
+                    channel = JSON.parse(status.responseText);
+
+                }else{
+                    console.log(status.status + ":" + status.responseText);
+                }
+            },false);
         }
 
     }
@@ -41,16 +52,6 @@ function initVideoPlayer() {
 }
 
 
-function createAjaxRequest(){
-    let request;
-    if(window.XMLHttpRequest){
-        request = new XMLHttpRequest();
-    }else{
-        request = new ActiveXObject("Microsoft.XMLHTTP");
-    }
-    return request;
-}
-
 function clearVideoPlayer() {
     let myPlayer = document.getElementById("my-video");
     myPlayer = myPlayer.children[0];
@@ -60,7 +61,7 @@ function clearVideoPlayer() {
 
 function addVideoinformation(video) {
     const videoClick = document.getElementById("videoClick");
-    let clickNumber = sendGetClickedVideos(video);
+    let clickNumber = sendGetClickedVideos(video,false);
     videoClick.textContent = clickNumber +" Aufrufe• " + video[0].releaseDate;
     let shareButton = document.createElement("button");
     shareButton.id= "shareButton";
@@ -78,22 +79,8 @@ function addVideoinformation(video) {
     videoClick.appendChild(document.createElement("br")); videoClick.appendChild(document.createElement("br"));
 }
 
-function sendGetClickedVideos(video){
-    let clickNumber=1;
-    const request = createAjaxRequest();
-    request.onreadystatechange = function () {
-        if(4 === this.readyState){
-            if(200 === this.status){
-                clickNumber = this.responseText;
-            }else{
-                alert(this.status + ":" + this.responseText);
-            }
-        }
-    }
-    request.open("GET","/clickVideo" +"?videoTitle="+video[0].title,false);
-    request.send();
-    return clickNumber;
-}
+
+
 function shareThisVideo(event){
     alertSetterFunction("#cccccc",this.value+" kopiert in Zwischenablage",3000);
     let temInput = document.getElementById("tempInput");
@@ -107,24 +94,16 @@ function shareThisVideo(event){
     temInput.style.display="none";
 }
 
-function sendGetVideos() {
-    const request = createAjaxRequest();
-    request.onreadystatechange = function () {
-        if (4 === this.readyState) {
-            if (200 === this.status) {
-                channel = JSON.parse(this.responseText);
-                if(channel===null) {
-                    window.location.href = "/index.html";
-                }
-            } else {
-                alert(this.status + ":" + this.responseText);
-            }
+function callBackFunctionGetVideosForVideoPlayer(status){
+    if (200 === status.status) {
+        channel = JSON.parse(status.responseText);
+        if(channel===null) {
+            window.location.href = "/index.html";
         }
+    } else {
+        alert(status.status + ":" + status.responseText);
     }
-    request.open("GET", "/getVideoByChannel" + "?channel=" + sessionStorage.getItem('channel'), false);
-    request.send();
 }
-
 function fillNextVideos(video) {
     const nxtVideos =document.getElementById("nextVideos");
     const start = video[1];
@@ -201,21 +180,7 @@ function addVideoToFav() {
     sendPostFavoriteRequest(encodeURIComponent(this.value));
 }
 
-function sendPostFavoriteRequest(video){
-    const request = createAjaxRequest();
-    request.onreadystatechange = function () {
-        if(4 === this.readyState){
-            if(200 === this.status){
-                alertSetterFunction("rgba(39,255,0,0.75)",this.responseText,1500);
-            }else{
-                alertSetterFunction("rgba(255,0,30,0.75)",this.responseText,1500);
-            }
-        }
-    }
-    request.open("POST",/addToFavorites/,true);
-    request.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
-    request.send("video="+video);
-}
+
 
 function alertSetterFunction(color,message,timeout) {
     const alert = document.getElementById("alert");
@@ -248,8 +213,6 @@ function toggleAutoplayVideoplayer() {
     }
 }
 
-
-
 function autoPlayFunction() {
     console.log("started new Video");
     let listVideos = document.getElementById("nextVideos");
@@ -263,38 +226,5 @@ function autoPlayFunction() {
     }
 }
 
-function sendPostFavArrayAuthRequest(){
-    const request = createAjaxRequest();
-    request.onreadystatechange = function () {
-        if(4 === this.readyState){
-            if(200 === this.status){
-                channel = (JSON.parse(this.responseText)).favoriteVideos;
-            }else{
 
-            }
-        }
-    }
-    request.open("POST","/cookieAuth/",false);
-    request.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
-    request.send("dummy=dummy");
-}
-function sendGetSearchRequest(){
-    const request = createAjaxRequest();
-    const incomingString = JSON.parse(sessionStorage.getItem("searchString"));
-    console.log(incomingString);
-    let channelString = incomingString [0];
-    let searchString =incomingString[1];
-    request.onreadystatechange = function () {
-        if(4 === this.readyState){
-            if(200 === this.status){
-                channel = JSON.parse(this.responseText);
-
-            }else{
-                alert(this.status + ":" + this.responseText);
-            }
-        }
-    }
-    request.open("GET","/search" +"?search="+searchString + "&channel="+channelString,false);
-    request.send();
-}
 

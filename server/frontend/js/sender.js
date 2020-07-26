@@ -2,9 +2,7 @@ let channelJson=null;
 let channelName=null;
 const start =0;
 const end = 30;
-
 let currentPage =1;
-
 let lastPage;
 
 
@@ -25,62 +23,33 @@ function setSenderPagePicture(channel) {
     senderPagePic.appendChild(img);
 }
 
-function sendGetVideos() {
-    const request = createAjaxRequest();
-    request.onreadystatechange = function () {
-        if (4 === this.readyState) {
-            if (200 === this.status) {
-                channelJson = JSON.parse(this.responseText);
-                if(channelJson===null){
-                    window.location.href="/index.html";
-                }
-                channelName = sessionStorage.getItem("channel");
-                lastPage = (Math.ceil(channelJson.length/end));
-                setPage();
-                setSenderPagePicture(channelJson[1]);
-
-            } else {
-                alert(this.status + ":" + this.responseText);
-            }
+function callBackFunctionGetVideos(status){
+    if (200 === status.status) {
+        channelJson = JSON.parse(status.responseText);
+        if(channelJson===null){
+            window.location.href="/index.html";
         }
-    }
+        channelName = sessionStorage.getItem("channel");
+        lastPage = (Math.ceil(channelJson.length/end));
+        setPage();
+        setSenderPagePicture(channelJson[1]);
 
-    request.open("GET", "/getVideoByChannel" + "?channel=" + sessionStorage.getItem('channel'), true);
-    request.send();
-}
-function sendGetSearchRequest(callBackFunction){
-    const request = createAjaxRequest();
-    const incomingString = JSON.parse(sessionStorage.getItem("searchString"));
-    console.log(incomingString);
-    let channelString = incomingString [0];
-    let searchString =incomingString[1];
-    request.onreadystatechange = function () {
-        if(4 === this.readyState){
-            if(200 === this.status){
-                channelJson = JSON.parse(this.responseText);
-                lastPage = (Math.ceil(channelJson.length/end));
-                setPage();
-                callBackFunction();
-            }else{
-                alert(this.status + ":" + this.responseText);
-            }
-        }
-    }
-    request.open("GET","/search" +"?search="+searchString + "&channel="+channelString,true);
-    request.send();
-}
-
-
-
-function createAjaxRequest() {
-    let request;
-    if (window.XMLHttpRequest) {
-        request = new XMLHttpRequest();
     } else {
-        request = new ActiveXObject("Microsoft.XMLHTTP");
+        console.log(status.status + ":" + status.responseText);
     }
-    return request;
 }
+
+function callbackFunctionSetSearchRequest(status) {
+    if(200 === status.status){
+        channelJson = JSON.parse(status.responseText);
+        lastPage = (Math.ceil(channelJson.length/end));
+        setPage();
+
+    }else{
+        console.log(status.status + ":" + status.responseText);
+    }
+}
+
 
 function setPage() {
     let tempStart=start;
@@ -193,9 +162,9 @@ function checkFlag() {
     const flag = JSON.parse(sessionStorage.getItem("pageFlag"));
     console.log(flag);
     if(flag===0){
-        sendGetVideos();
+        sendGetVideos(callBackFunctionGetVideos);
     }else if(flag===1){
-        sendGetSearchRequest(setSearchResult);
+        sendGetSearchRequest(callbackFunctionSetSearchRequest);
     }
 }
 

@@ -159,7 +159,14 @@ func handleGetFetchProfilePicture(w http.ResponseWriter, r *http.Request) {
 	}
 	var user lib.User
 	if dErr := lib.IsUserLoggedInWithACookie(r, userDB, &user); dErr != nil {
-		lib.ReportDetailedError(w, dErr)
+		log.Println("authentication failed, loading standard picture")
+		user.ProfilePicture, err = ioutil.ReadFile(lib.StandardAvatarPath)
+		if err != nil {
+			lib.ReportError(w, http.StatusInternalServerError, lib.InternalServerErrorResponse, "Reading avatar.png failed: \n"+err.Error())
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+		w.Write(user.ProfilePicture)
 		return
 	}
 	rows, err := userDB.Query("select profile_picture from users where username = ?", user.Username)

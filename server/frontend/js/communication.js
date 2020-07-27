@@ -1,3 +1,5 @@
+const illegalStrings = ["/",".","<",">"];
+
 function createAjaxRequest(){
     let request;
     if(window.XMLHttpRequest){
@@ -59,6 +61,11 @@ function sendGetFetchFavoritesRequest(callbackFunction, async = true){
 function sendPostLoginRequest(callbackFunction){
     const usernameInput = document.getElementById("usernameLogin").value;
     const passwordInput = document.getElementById("passwordLogin").value;
+    const stringArray = [usernameInput,passwordInput];
+    if(areStringsIllegal(stringArray)){
+        console.alert("Illegale strings");
+        return;
+    }
     const request = createAjaxRequest();
     request.onreadystatechange = function () {
         if(4 === this.readyState){
@@ -126,6 +133,10 @@ function sendGetVideos(callbackFunction,async=true) {
 function sendGetSearchRequest(callBackFunction,async=true){
     const request = createAjaxRequest();
     const incomingString = JSON.parse(sessionStorage.getItem("searchString"));
+    if(areStringsIllegal(incomingString)) {
+        alert("Illegaler String!");
+        return;
+    }
     console.log(incomingString);
     let channelString = incomingString [0];
     let searchString =incomingString[1];
@@ -169,4 +180,13 @@ function sendPostFavoriteRequest(video){
     request.open("POST",/addToFavorites/,true);
     request.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
     request.send("video="+video);
+}
+
+function areStringsIllegal(EnteredStringArray) {
+    for (let i = 0; i<illegalStrings.length;i++) {
+        if (EnteredStringArray[1].includes(illegalStrings[i])) {
+            return true;
+        }
+    }
+    return false;
 }

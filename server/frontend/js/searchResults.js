@@ -21,14 +21,3 @@ function setSearchTextWithResults(){
     sessionStorage.setItem("searchString",searchString);
     initSearchResults();
 }
-
-function clearPage() {
-    /*todo
-    * F5 löscht zurzeit den Sessionspeicher muss bearbeitet werden
-    *
-    * */
-
-    const currentSite = window.location;
-    console.log(currentSite);
-    sessionStorage.clear();
-}

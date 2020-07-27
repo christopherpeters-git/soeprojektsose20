@@ -9,7 +9,6 @@ class User{
         this.name = name;
         this.favoriteVideos= favoriteVideos;
     }
-
 }
 
 

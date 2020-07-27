@@ -228,5 +228,6 @@ span.psw {
   background-color: #15181a;
 }
 
-
-
+#Icon {
+    cursor: pointer;
+}

@@ -1,5 +1,7 @@
 "use strict"
 
+
+
 class User{
     constructor(id,name,username,favoriteVideos) {
         this.id = id;
@@ -15,8 +17,7 @@ function callBackFunctionCookieAuthRequest(status){
     if(status.status===200){
         hideVBlockerAndLogin();
         unhideAvatar();
-        const currentSite = window.location;
-        console.log(currentSite);
+        deleteEventListener();
     }else{
         console.log(status.status + ":" + status.responseText);
         document.getElementById("Login_Screen").style.visibility="visible";
@@ -27,6 +28,7 @@ function callBackFunctionLogin(status){
     if(200 === status.status){
         hideVBlockerAndLogin();
         unhideAvatar();
+        deleteEventListener();
     }else{
         alert(status.status + ":" + status.responseText);
     }
@@ -36,6 +38,7 @@ function callBackFunctionLogout(status) {
     if(200 === status.status){
         unhideVBlockerAndLogin();
         hideAvatar();
+        setEventListener();
     }else{
         alert(status.status + ":" + status.responseText);
     }
@@ -46,6 +49,7 @@ function callBackFunctionRegister(status) {
         hideVBlockerAndLogin();
         unhideAvatar();
         loginAfterRegister();
+        deleteEventListener();
     }else{
         alert(status.status + ":" + status.responseText);
     }
@@ -120,4 +124,31 @@ function setSearchtext() {
     sessionStorage.setItem("searchString",searchString);
     console.log(sessionStorage.getItem("searchString"));
     window.location.href = "/searchResults.html";
+}
+
+//#########################EventListener####################################################################
+function setEventListener() {
+    const passwordLogin = document.getElementById("passwordLogin");
+    const passwordReg = document.getElementById("passwordReg");
+    passwordLogin.addEventListener("keydown", loginOnEnter, false);
+    passwordReg.addEventListener("keydown", registerOnEnter, false);
+}
+
+function loginOnEnter(event) {
+    if(event.key ==="Enter") {
+        sendPostLoginRequest(callBackFunctionLogin);
+    }
+}
+
+function registerOnEnter(event) {
+    if(event.key ==="Enter") {
+        sendPostRegisterRequest(callBackFunctionRegister);
+    }
+}
+
+function deleteEventListener() {
+    const passwordLogin = document.getElementById("passwordLogin");
+    const passwordReg = document.getElementById("passwordReg");
+    passwordReg.removeEventListener("keydown",registerOnEnter,false);
+    passwordLogin.removeEventListener("keydown",loginOnEnter,false);
 }

@@ -62,6 +62,7 @@ function sendPostLoginRequest(callbackFunction){
     const usernameInput = document.getElementById("usernameLogin").value;
     const passwordInput = document.getElementById("passwordLogin").value;
     const stringArray = [usernameInput,passwordInput];
+    alert("Wir benutzen einen Cookie, um die automatische Authentifizierung zu ermöglichen.");
     if(areStringsIllegal(stringArray)){
         console.alert("Illegale strings");
         return;

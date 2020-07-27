@@ -10,7 +10,7 @@
 
 </head>
 
-<body >
+<body>
 
 </div>
 <div id="favPage">
@@ -27,18 +27,16 @@
         <img id="home_btn" src="media/images/Home-icon.svg.png" width="30%";>
     </div>
 </div>
-<center><div id="profileInformation" style="width: 35%; float: right" >
-    <div id="profilePictureWrapper">
-        <img id="profilePicture" src="/getProfilePicture/" style="width: 30%">
-    </div>
+<center><div id="profileInformation" style="width: 35%;" >
+    <img id="profilePicture" src="/getProfilePicture/" alt="ProfilePicture" style="width: 30%">
     <button id="toggleUpload" class="favBtn" onclick="toggleUploadButtons()">✎</button>
     <div id="uploadButtons" style="visibility: hidden;">
-        <input id="ppUpload" type="file">
+        <input id="ppUpload" type="file" accept="image/png">
         <button onclick="saveProfilePicture()">Profilbild hochladen</button>
     </div>
     <div id="display">
-        <div id="displayName">Name</div>
-    <div id="displayUsername">Username</div>
+        <div id="displayName"></div>
+        <div id="displayUsername"></div>
     </div>
 </div></center>
 <div id="favList">

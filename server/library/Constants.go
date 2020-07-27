@@ -43,8 +43,9 @@ const (
 
 //Paths
 const (
-	CrawlerDirName = "crawler"
-	VideoJsonPath  = CrawlerDirName + "/good.json"
+	CrawlerDirName     = "crawler"
+	VideoJsonPath      = CrawlerDirName + "/good.json"
+	StandardAvatarPath = "./frontend/media/images/avatar.png"
 )
 
 //miscellaneous

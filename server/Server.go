@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	_ "github.com/go-sql-driver/mysql"
 	"golang.org/x/crypto/bcrypt"
+	"image/png"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -45,12 +46,12 @@ func main() {
 	http.HandleFunc(lib.IncomingGetVideosFromChannelRequestUrl, handleGetVideosByChannel)
 	http.HandleFunc(lib.IncomingGetVideoClickedRequestUrl, handleGetVideoClicked)
 	http.HandleFunc(lib.IncomingGetFetchProfilePictureRequestUrl, handleGetFetchProfilePicture)
+	http.HandleFunc(lib.IncomingGetLogoutRequestUrl, handleGetLogout)
+	http.HandleFunc(lib.IncomingGetCookieAuthRequestUrl, handleGetCookieAuth)
 	http.HandleFunc(lib.IncomingPostRemoveFromFavoritesRequestUrl, handlePostRemoveFromFavorites)
 	http.HandleFunc(lib.IncomingPostUserRequestUrl, handlePostLogin)
 	http.HandleFunc(lib.IncomingPostAddToFavoritesRequestUrl, handlePostAddVideoToFavorites)
 	http.HandleFunc(lib.IncomingPostRegisterRequestUrl, handlePostRegisterUser)
-	http.HandleFunc(lib.IncomingGetLogoutRequestUrl, handleGetLogout)
-	http.HandleFunc(lib.IncomingGetCookieAuthRequestUrl, handleGetCookieAuth)
 	http.HandleFunc(lib.IncomingPostFetchFavoritesRequestUrl, handleGetFetchFavorites)
 	http.HandleFunc(lib.IncomingPostSaveProfilePictureRequestUrl, handlePostSaveProfilePicture)
 	err = http.ListenAndServe(":80", nil)
@@ -97,6 +98,10 @@ func handlePostSaveProfilePicture(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var user lib.User
+	if dErr := lib.IsUserLoggedInWithACookie(r, userDB, &user); dErr != nil {
+		lib.ReportDetailedError(w, dErr)
+		return
+	}
 	if err = r.ParseMultipartForm(lib.MaxUploadSize); err != nil {
 		lib.ReportError(w, http.StatusInternalServerError, lib.InternalServerErrorResponse, "Parsing request form failed: \n"+err.Error())
 		return
@@ -111,7 +116,19 @@ func handlePostSaveProfilePicture(w http.ResponseWriter, r *http.Request) {
 		lib.ReportError(w, http.StatusBadRequest, "Bild ist zu groß!\n Die Grenze beträgt "+strconv.FormatInt(lib.MaxUploadSize, 10)+"kbytes", "file size too large: "+strconv.FormatInt(header.Size, 10))
 		return
 	}
+	//Open file and trying to decode it to png
 	imageFile, err := header.Open()
+	if err != nil {
+		lib.ReportError(w, http.StatusInternalServerError, lib.InternalServerErrorResponse, "opening file failed: \n"+err.Error())
+		return
+	}
+	_, err = png.Decode(imageFile)
+	if err != nil {
+		lib.ReportError(w, http.StatusBadRequest, "Datei ist kein PNG-Bild!", "Decoding png failed: \n"+err.Error())
+		return
+	}
+	//Open and save file to DB
+	imageFile, err = header.Open()
 	if err != nil {
 		lib.ReportError(w, http.StatusInternalServerError, lib.InternalServerErrorResponse, "opening file failed: \n"+err.Error())
 		return
@@ -121,11 +138,7 @@ func handlePostSaveProfilePicture(w http.ResponseWriter, r *http.Request) {
 		lib.ReportError(w, http.StatusInternalServerError, lib.InternalServerErrorResponse, "reading file failed: \n"+err.Error())
 		return
 	}
-	log.Printf("max image size: %d\n", lib.MaxUploadSize)
-	if dErr := lib.IsUserLoggedInWithACookie(r, userDB, &user); dErr != nil {
-		lib.ReportDetailedError(w, dErr)
-		return
-	}
+	log.Printf("SAVED PROFILE PIC: %d \n", len(user.ProfilePicture))
 	_, err = userDB.Exec("UPDATE users SET profile_picture = ? WHERE username = ?", user.ProfilePicture, user.Username)
 	if err != nil {
 		lib.ReportError(w, http.StatusInternalServerError, lib.InternalServerErrorResponse, "SQL update failed: \n"+err.Error())
@@ -160,8 +173,18 @@ func handleGetFetchProfilePicture(w http.ResponseWriter, r *http.Request) {
 			lib.ReportError(w, http.StatusInternalServerError, lib.InternalServerErrorResponse, "scanning failed: \n"+err.Error())
 			return
 		}
+		if user.ProfilePicture == nil {
+			log.Println("no picture found, loading standard picture")
+			user.ProfilePicture, err = ioutil.ReadFile(lib.StandardAvatarPath)
+			if err != nil {
+				lib.ReportError(w, http.StatusInternalServerError, lib.InternalServerErrorResponse, "Reading avatar.png failed: \n"+err.Error())
+				return
+			}
+		}
 	} else {
-		log.Println("No picture found")
+		log.Println("no user found, loading standard picture")
+		lib.ReportError(w, http.StatusInternalServerError, lib.InternalServerErrorResponse, "Logged in user not found!")
+		return
 	}
 	log.Printf("picture byte array len: %d\n", len(user.ProfilePicture))
 	w.WriteHeader(http.StatusOK)

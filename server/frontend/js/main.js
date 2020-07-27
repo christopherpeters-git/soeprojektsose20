@@ -71,6 +71,7 @@ function hideAvatar() {
 }
 function unhideAvatar() {
     var avatar = document.getElementById("Dropdown");
+    avatar.src = /getVideos/;
     avatar.style.visibility = "visible";
 }
 

@@ -6,6 +6,19 @@ sendGetFetchFavoritesRequest((response) => {
     setFavList();
 });
 
+
+
+function displayProfileInformation(){
+    const name = document.getElementById("displayName");
+    const username = document.getElementById("displayUsername");
+    const nameText = document.createElement("h3");
+    const usernameText = document.createElement("h3");
+    nameText.innerHTML = "Name: " + userInformation.name;
+    usernameText.innerHTML = "Username: " + userInformation.username;
+    name.appendChild(nameText);
+    username.appendChild(usernameText);
+}
+
 function toggleUploadButtons(){
     const uploadButtons = document.getElementById("uploadButtons");
     if (uploadButtons.style.visibility === "visible"){
@@ -39,6 +52,7 @@ function openHome() {
 function callBackFunctionSetUserArray(status) {
     if(200 === status.status){
         userInformation=JSON.parse(status.responseText);
+        displayProfileInformation();
     }else{
         console.log(status.status + ":" + status.responseText);
     }

@@ -57,7 +57,7 @@ function sendGetSearchRequest(){
     request.onreadystatechange = function () {
         if(4 === this.readyState){
             if(200 === this.status){
-                alert(this.responseText);
+
             }else{
                 alert(this.status + ":" + this.responseText);
             }
@@ -72,10 +72,10 @@ function sendPostLoginRequest(){
     const usernameInput = document.getElementById("usernameLogin").value;
     const passwordInput = document.getElementById("passwordLogin").value;
     const request = createAjaxRequest();
+    cookieInfo();
     request.onreadystatechange = function () {
         if(4 === this.readyState){
             if(200 === this.status){
-                alert(this.responseText)
                 let user = new User("","","",null);
                 user = JSON.parse(this.responseText);
                 console.log(user);
@@ -118,7 +118,6 @@ function sendPostRegisterRequest(){
     request.onreadystatechange = function () {
         if(4 === this.readyState){
             if(200 === this.status){
-                alert(this.responseText)
                 hideVBlockerAndLogin();
                 unhideAvatar();
                 loginAfterRegister();
@@ -138,7 +137,6 @@ function sendPostFavoriteRequest(){
     request.onreadystatechange = function () {
         if(4 === this.readyState){
             if(200 === this.status){
-                alert(this.responseText);
             }else{
                 alert(this.status + ":" + this.responseText);
             }
@@ -157,7 +155,7 @@ function sendGetClickedVideos(){
     request.onreadystatechange = function () {
         if(4 === this.readyState){
             if(200 === this.status){
-                alert(this.responseText);
+
             }else{
                 alert(this.status + ":" + this.responseText);
             }
@@ -194,7 +192,9 @@ function unhideAvatar() {
 function openProfil() {
     window.location.href="/profil.html";
 }
-
+function cookieInfo(){
+alert("Wir benutzen Cookies, um Inhalte und Anzeigen zu personalisieren.")
+}
 
 
 function loginAfterRegister() {

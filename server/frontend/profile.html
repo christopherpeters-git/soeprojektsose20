@@ -7,16 +7,16 @@
     <script src="js/communication.js"></script>
     <script src="js/profile.js"></script>
     <script src="js/VideoFormat.js"></script>
+    <title>Profil</title>
 
 </head>
 
 <body>
 
-</div>
 <div id="favPage">
     <div class="Dropdown" id="Dropdown" style="width: 10%; float:right">
         <button class="avatar" style="width:100%; float: left">
-            <img src="/getProfilePicture/" style="width: 40%">
+            <img src="/getProfilePicture/" style="width: 40%" alt="pp">
         </button>
         <div class="Dropdown-content" >
             <a onclick="openHome()">Home</a>
@@ -24,10 +24,10 @@
         </div>
     </div>
     <div id="homeIcon" style="width: 10%;float: left" onclick="openHome()">
-        <img id="home_btn" src="media/images/Home-icon.svg.png" width="30%";>
+        <img id="home_btn" src="media/images/Home-icon.svg.png" width=45 alt="home">
     </div>
 </div>
-<center><div id="profileInformation" style="width: 35%;" >
+<div id="profileInformation" style="width: 35%;" >
     <img id="profilePicture" src="/getProfilePicture/" alt="ProfilePicture" style="width: 30%">
     <button id="toggleUpload" class="favBtn" onclick="toggleUploadButtons()">✎</button>
     <div id="uploadButtons" style="visibility: hidden;">
@@ -38,7 +38,7 @@
         <div id="displayName"></div>
         <div id="displayUsername"></div>
     </div>
-</div></center>
+</div>
 <div id="favList">
     <div id="favorites">
     </div>

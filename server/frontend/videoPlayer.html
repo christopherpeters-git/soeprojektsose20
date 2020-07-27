@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
-    <meta charset="UTF-8">
-    <title>Title</title>
     <head>
+        <meta charset="UTF-8">
+        <title>Title</title>
         <link  href="css/video-js.css" rel="stylesheet" />
         <link type="text/css" href="css/videoPlayer.css" rel="stylesheet" media="screen"/>
         <script src="js/communication.js"></script>
@@ -15,11 +15,11 @@
 
 <div id="searchBar">
     <div id="homeIcon" style="width: 10%;float: left" onclick="openHome()">
-        <img id="home_btn" src="media/images/Home-icon.svg.png" width="30%";>
+        <img id="home_btn" src="media/images/Home-icon.svg.png" width=45 alt="home">
     </div>
     <div class="Dropdown" id="Dropdown" style="width: 10%; float:right">
         <button class="avatar" style="width:100%; float: left">
-            <img src="/getProfilePicture/" style="width: 40%">
+            <img src="/getProfilePicture/" style="width: 40%" alt="pp">
         </button>
         <div class="Dropdown-content" >
             <a onclick="openProfil()">Profil</a>
@@ -30,7 +30,7 @@
 
 </div>
 
-<div id="alert"style="display:none">
+<div id="alert" style="display:none">
     <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
 </div>
 
@@ -55,7 +55,7 @@
 <div id="nextVideosList" >Naechste Titel
     <!--Quelle: https://www.w3schools.com/howto/howto_css_switch.asp -->
     <!-- Rounded switch -->
-    <div id ="switchContainer"style="float: right">
+    <div id ="switchContainer" style="float: right">
         Autoplay
     <label class="switch" >
         <input id ="checkboxAutoplay" type="checkbox" onclick="toggleAutoplayVideoplayer()">

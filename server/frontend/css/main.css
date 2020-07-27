@@ -200,6 +200,7 @@ span.psw {
   .dropup {
     position: relative;
     display: inline-block;
+      margin-left: 40%;
  }
   
   .dropup-content {
@@ -209,6 +210,7 @@ span.psw {
     min-width: 160px;
     bottom: 50px;
     z-index: 1;
+
     
   }
   

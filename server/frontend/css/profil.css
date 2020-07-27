@@ -7,9 +7,9 @@
     border-color: black;
 }
 
-#profileInformation{
+#profileInformation {
+    margin-left: 40%;
     clear: both;
-    margin: auto;
 }
 
 .sender{

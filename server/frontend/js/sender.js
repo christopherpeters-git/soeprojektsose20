@@ -7,7 +7,8 @@ let lastPage;
 
 
 
-function loadSenderPage(wert) {
+function loadSenderPage() {
+    let wert = this.value;
     sessionStorage.setItem("pageFlag","0");
     window.location.href = "/channel.html";
     channelName = wert;
@@ -52,6 +53,9 @@ function callbackFunctionSetSearchRequest(status) {
 
 
 function setPage() {
+    if(channelJson.length<1){
+       return 0;
+    }
     let tempStart=start;
     let tempEnd =end;
     let videosDiv = document.getElementById("videos");
@@ -176,4 +180,16 @@ function setSearchTextWithChannel() {
     searchString= JSON.stringify([channelName, searchValue]);
     sessionStorage.setItem("searchString",searchString);
     window.location.href = "/searchResults.html";
+}
+
+function addEventListenerSenderPage() {
+    const  searchInput = document.getElementById("searchInput");
+    searchInput.addEventListener("keydown",searchOnEnter,false);
+
+}
+
+function searchOnEnter(event) {
+    if(event.key ==="Enter") {
+        setSearchTextWithChannel();
+    }
 }

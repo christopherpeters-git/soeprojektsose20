@@ -1,5 +1,5 @@
 "use strict"
-
+const c_channelNames=["ARD","ZDF","ZDF-tivi","PHOENIX","3Sat","NDR","MDR","RBB","HR","ORF","SR","SRF","SRF.Podcast","SWR","ARTE.DE","ARTE.FR","KiKA","BR","DW","rbtv"];
 
 
 class User{
@@ -129,8 +129,20 @@ function setSearchtext() {
 function setEventListener() {
     const passwordLogin = document.getElementById("passwordLogin");
     const passwordReg = document.getElementById("passwordReg");
+    const searchInput = document.getElementById("searchInput");
+    const inputArray = document.getElementsByClassName("Senderliste");
     passwordLogin.addEventListener("keydown", loginOnEnter, false);
     passwordReg.addEventListener("keydown", registerOnEnter, false);
+    searchInput.addEventListener("keydown",searchOnEnter,false);
+    for(let i =0;i<inputArray[0].children.length;i++){
+        inputArray[0].children[i].value = c_channelNames[i];
+        inputArray[0].children[i].addEventListener("click",loadSenderPage,false);
+    }
+}
+function searchOnEnter(event) {
+    if(event.key ==="Enter") {
+        setSearchtext();
+    }
 }
 
 function loginOnEnter(event) {

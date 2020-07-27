@@ -1,3 +1,4 @@
+
 <html lang="de">
 <head>
     <meta charset="utf-8">
@@ -7,8 +8,7 @@
     <script src="js/main.js"></script>
     <script src="js/sender.js"></script>
     <script src="js/searchResults.js"></script>
-
-
+    <title>mediathek</title>
 </head>
 
 <body onload="sendGetCookieAuthRequest(callBackFunctionCookieAuthRequest)">
@@ -50,15 +50,15 @@
 <div id="main_site">
 
     <div class="Searchbar" style="width: 60%;float: left">
-        <input id="searchInput" type="text" placeholder="Suchbegriff eingeben: Suche erfolgt Global " size="70" style="position: center; " >
+        <input id="searchInput" type="text" placeholder="Suchbegriff eingeben: Suche erfolgt Global " size="70">
     </div>
     <div id="searchbarIcon" style="width: 10%;float: left">
-        <img src="media/images/icon_Search.png" onclick="setSearchtext()" title="Suche starten" width="35" id="Icon">
+        <img src="media/images/icon_Search.png" onclick="setSearchtext()" title="Suche starten" width="35" id="Icon" alt="SearchIcon">
     </div>
 
     <div class="Dropdown" id="Dropdown" style="width: 10%; float:right; visibility: hidden">
         <button class="avatar" style="width:100%; float: left">
-            <img src="/getProfilePicture/" style="width: 40%">
+            <img src="/getProfilePicture/" style="width: 40%" alt="pp">
         </button>
         <div class="Dropdown-content" >
             <a onclick="openProfil()">Profil</a>
@@ -66,41 +66,39 @@
         </div>
     </div>
     <div class="Senderliste">
-        <from>
-            <input id="ard" type="image" src="media/Sender-Logos/ard.png" class="sender" value="ARD" onclick="loadSenderPage(value)">
-            <input id="zdf" type="image" src="media/Sender-Logos/zdf.png" class="sender" value="ZDF" onclick="loadSenderPage(value)">
-            <input id="zdf-tivi" type="image" src="media/Sender-Logos/ZDF-tivi.png" class="sender" value="ZDF-tivi"  onclick="loadSenderPage(value)">
-            <input id="phoenix" type="image" src="media/Sender-Logos/phoenix.png" class="sender"  value="PHOENIX" onclick="loadSenderPage(value)">
-            <input id="dreisat" type="image" src="media/Sender-Logos/3sat.png" class="sender" value="3Sat"  onclick="loadSenderPage(value)">
-            <input id="ndr" type="image" src="media/Sender-Logos/ndr.png" class="sender" value="NDR"  onclick="loadSenderPage(value)">
-            <input id="mdr" type="image" src="media/Sender-Logos/mdr.png" class="sender" value="MDR"  onclick="loadSenderPage(value)">
-            <input id="rbb" type="image" src="media/Sender-Logos/rbb.png" class="sender" value="RBB"  onclick="loadSenderPage(value)">
-            <input id="hr" type="image" src="media/Sender-Logos/hr.png" class="sender" value="HR"  onclick="loadSenderPage(value)">
-            <input id="orf" type="image" src="media/Sender-Logos/orf.png" class="sender" value="ORF"  onclick="loadSenderPage(value)">
-            <input id="sr" type="image" src="media/Sender-Logos/sr.png" class="sender" value="SR"  onclick="loadSenderPage(value)">
-            <input id="srf" type="image" src="media/Sender-Logos/SRF.PNG" class="sender" value="SRF"  onclick="loadSenderPage(value)">
-            <input id="srfPd" type="image" src="media/Sender-Logos/SRF.Podcast.PNG" class="sender" value="SRF.Podcast" onclick="loadSenderPage(value)">
-            <input id="swr" type="image" src="media/Sender-Logos/swr.png" class="sender" value="SWR"  onclick="loadSenderPage(value)">
-            <input id="arte" type="image" src="media/Sender-Logos/arte.de.png" class="sender" value="ARTE.DE" onclick="loadSenderPage(value)">
-            <input id="artefr" type="image" src="media/Sender-Logos/arte.fr.png" class="sender" value="ARTE.FR" onclick="loadSenderPage(value)">
-            <input id="kika" type="image" src="media/Sender-Logos/Kika.PNG" class="sender" value="KiKA"  onclick="loadSenderPage(value)">
-            <input id="br" type="image" src="media/Sender-Logos/br.png" class="sender" value="BR"  onclick="loadSenderPage(value)">
-            <input id="DW" type="image" src="media/Sender-Logos/DW.png" class="sender" value="DW"  onclick="loadSenderPage(value)">
-            <input id="rb-tv" type="image" src="media/Sender-Logos/rbtv.png" class="sender" value="rbtv" onclick="loadSenderPage(value)">
-        </from>
+            <input id="ard" type="image" src="media/Sender-Logos/ard.png" class="sender" alt="ARD">
+            <input id="zdf" type="image" src="media/Sender-Logos/zdf.png" class="sender" alt="ZDF" >
+            <input id="zdf-tivi" type="image" src="media/Sender-Logos/ZDF-tivi.png" class="sender" alt="ZDF-tivi">
+            <input id="phoenix" type="image" src="media/Sender-Logos/phoenix.png" class="sender" alt="PHOENIX">
+            <input id="dreisat" type="image" src="media/Sender-Logos/3sat.png" class="sender"  alt="3Sat">
+            <input id="ndr" type="image" src="media/Sender-Logos/ndr.png" class="sender"  alt="NDR">
+            <input id="mdr" type="image" src="media/Sender-Logos/mdr.png" class="sender"  alt="MDR">
+            <input id="rbb" type="image" src="media/Sender-Logos/rbb.png" class="sender" alt="RBB">
+            <input id="hr" type="image" src="media/Sender-Logos/hr.png" class="sender"  alt="HR">
+            <input id="orf" type="image" src="media/Sender-Logos/orf.png" class="sender"  alt="ORF" >
+            <input id="sr" type="image" src="media/Sender-Logos/sr.png" class="sender"  alt="SR" >
+            <input id="srf" type="image" src="media/Sender-Logos/SRF.PNG" class="sender" alt="SRF" >
+            <input id="srfPd" type="image" src="media/Sender-Logos/SRF.Podcast.PNG" class="sender" alt="SRF.Podcast">
+            <input id="swr" type="image" src="media/Sender-Logos/swr.png" class="sender"  alt="SWR">
+            <input id="arte" type="image" src="media/Sender-Logos/arte.de.png" class="sender" alt="ARTE.DE">
+            <input id="artefr" type="image" src="media/Sender-Logos/arte.fr.png" class="sender" alt="ARTE.FR">
+            <input id="kika" type="image" src="media/Sender-Logos/Kika.PNG" class="sender"  alt="KiKA" >
+            <input id="br" type="image" src="media/Sender-Logos/br.png" class="sender"  alt="BR">
+            <input id="DW" type="image" src="media/Sender-Logos/DW.png" class="sender" alt="DW" >
+            <input id="rb-tv" type="image" src="media/Sender-Logos/rbtv.png" class="sender"  alt="rbtv">
     </div>
     <script>
         setEventListener();
     </script>
-    <center><div class ="dropup" style="width: 30%;">
+    <div class ="dropup" style="width: 30%;">
         <button class= "dropbtn" >Impressum</button>
-        <center> <div class="dropup-content" style="width: 100%;">
+        <div class="dropup-content" style="width: 100%;">
               <br> <br>
               E-Mail: m.kannathasan@ostfalia.de,
               c.peters@ostfalia.de, d.dietrich@ostfalia.de, ti.fricke@ostfalia.de<br> <br>
               Matrikelnummern: Mathusan Kannathasan: 70463094, Christopher Peters: 70463991, Daniel Dietrich: 70462732, Till Fricke: 70463997<br> <br>
-          </div></center>
-      </div></center>
+          </div>
+      </div>
 </div>
 </body>
 

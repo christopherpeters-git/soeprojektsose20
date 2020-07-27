@@ -21,3 +21,15 @@ function setSearchTextWithResults(){
     sessionStorage.setItem("searchString",searchString);
     initSearchResults();
 }
+
+function addEventListenerOnSearchPage() {
+    const searchInput = document.getElementById("searchInput");
+    searchInput.addEventListener("keydown", searchAgainOnEnter, false);
+
+}
+
+function searchAgainOnEnter(event) {
+    if(event.key ==="Enter") {
+        setSearchTextWithResults();
+    }
+}

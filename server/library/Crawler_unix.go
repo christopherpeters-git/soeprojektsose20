@@ -3,6 +3,7 @@
 package library
 
 import (
+	"errors"
 	"os/exec"
 )
 

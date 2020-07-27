@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
 <head>
     <meta charset="UTF-8">
-    <title>Suchresultate</title>
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <link type="text/css" rel="stylesheet" href="css/searchresults.css">
+    <title>Suchresultate</title>
     <script src="js/communication.js"></script>
     <script src="js/sender.js"></script>
     <script src="js/VideoFormat.js"></script>
@@ -14,17 +14,17 @@
 <body onload="initSearchResults()">
 <div id="mainPage">
     <div id="homeIcon" style="width: 10%;float: left" onclick="openHome()">
-       <img id="home_btn" src="media/images/Home-icon.svg.png" width="30%";>
+       <img id="home_btn" src="media/images/Home-icon.svg.png" width=45 alt="home">
     </div>
     <div class="Searchbar" style="width: 50%;float: left">
-        <input id="searchInput" type="text" placeholder="Suchbegriff eingeben" size="70" style="position: center;" >
+        <input id="searchInput" type="text" placeholder="Suchbegriff eingeben" size="70" >
     </div>
     <div id="searchbarIcon" style="width: 10%;float: left">
         <img id="searchIcon" src="media/images/icon_Search.png" onclick="setSearchTextWithResults()" title="Suche starten" width="35">
     </div>
     <div class="Dropdown" id="Dropdown" style="width: 10%; float:right">
         <button class="avatar" style="width:100%; float: left">
-            <img src="/getProfilePicture/" style="width: 40%">
+            <img src="/getProfilePicture/" style="width: 40%" alt="pp">
         </button>
         <div class="Dropdown-content" >
             <a onclick="openProfil()">Profil</a>
@@ -32,9 +32,8 @@
             <a onclick="Logout()">Ausloggen</a>
         </div>
     </div>
-
 </div>
-
+<script> addEventListenerOnSearchPage()</script>
 <div id="videoContainer">
     <div id="videos">
     </div>

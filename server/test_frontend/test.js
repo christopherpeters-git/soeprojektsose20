@@ -32,7 +32,29 @@ function createAjaxRequest(){
     return request;
 }
 
-function sendPostCookieAuthRequest(){
+function sendPostSaveProfilePicture(){
+    const request = createAjaxRequest();
+    const profilePicture = document.getElementById("ppUpload").files[0];
+    const formData = new FormData();
+    formData.append("profilepicture",profilePicture)
+    request.onreadystatechange = function () {
+        if(4 === this.readyState){
+            if(200 === this.status){
+                alert(this.responseText)
+            }else{
+                alert(this.status + ":" + this.responseText);
+            }
+        }
+    }
+    request.open("POST","/setProfilePicture/",true);
+    request.send(formData);
+}
+
+function loadProfilePicture(){
+    document.getElementById("pp").src = /getProfilePicture/
+}
+
+function sendGetCookieAuthRequest(){
     const request = createAjaxRequest();
     request.onreadystatechange = function () {
         if(4 === this.readyState){
@@ -43,9 +65,23 @@ function sendPostCookieAuthRequest(){
             }
         }
     }
-    request.open("POST","/cookieAuth/",true);
-    request.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
-    request.send("dummy=dummy");
+    request.open("GET","/cookieAuth/",true);
+    request.send();
+}
+
+function sendGetFetchFavoritesRequest(){
+    const request = createAjaxRequest();
+    request.onreadystatechange = function () {
+        if(4 === this.readyState){
+            if(200 === this.status){
+                alert(this.responseText)
+            }else{
+                alert(this.status + ":" + this.responseText);
+            }
+        }
+    }
+    request.open("GET","/getFavorites/",true);
+    request.send();
 }
 
 function sendGetSearchRequest(){
@@ -100,9 +136,8 @@ function sendPostLogoutRequest(){
             }
         }
     }
-    request.open("POST",/logout/,true);
-    request.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
-    request.send("dummy=dummy");
+    request.open("GET",/logout/,true);
+    request.send();
 }
 
 function sendPostRegisterRequest(){

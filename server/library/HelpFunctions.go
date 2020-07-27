@@ -159,7 +159,7 @@ func IsUserLoggedInWithACookie(r *http.Request, userDB *sql.DB, user *User) Deta
 		if cookie.Value == "0" {
 			return &ClientError{http.StatusForbidden, AuthenticationFailedResponse, errors.New("session ID in cookie is 0")}
 		}
-		rows, err := userDB.Query("select * from users where session_id = ?", cookie.Value)
+		rows, err := userDB.Query("select id,name,username,passwordhash,session_id from users where session_id = ?", cookie.Value)
 		if err != nil {
 			return &ServerError{http.StatusInternalServerError, InternalServerErrorResponse, errors.New("SQL query failed: \n" + err.Error())}
 		}
@@ -181,7 +181,7 @@ func IsUserLoggedInWithACookie(r *http.Request, userDB *sql.DB, user *User) Deta
 //Returns true if user exists and fills user with user information from the DB
 func LoginUser(userDB *sql.DB, user *User, incomingUsername string, incomingPassword string) DetailedHttpError {
 	//Get userdata from db for comparison
-	rows, err := userDB.Query("select * from users where username = ?", incomingUsername)
+	rows, err := userDB.Query("select id,name,username,passwordhash,session_id from users where username = ?", incomingUsername)
 	if err != nil {
 		return &ServerError{http.StatusInternalServerError, InternalServerErrorResponse, errors.New("sql query failed: \n" + err.Error())}
 	}

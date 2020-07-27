@@ -6,6 +6,8 @@ import (
 	"encoding/json"
 	_ "github.com/go-sql-driver/mysql"
 	"golang.org/x/crypto/bcrypt"
+	"image/png"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -43,20 +45,155 @@ func main() {
 	http.HandleFunc(lib.IncomingGetVideosRequestUrl, handleGetAllVideos)
 	http.HandleFunc(lib.IncomingGetVideosFromChannelRequestUrl, handleGetVideosByChannel)
 	http.HandleFunc(lib.IncomingGetVideoClickedRequestUrl, handleGetVideoClicked)
-	http.HandleFunc(lib.IncomingPostRemoveFromFavoritesRequestUrl, handleRemoveFromFavorites)
+	http.HandleFunc(lib.IncomingGetFetchProfilePictureRequestUrl, handleGetFetchProfilePicture)
+	http.HandleFunc(lib.IncomingGetLogoutRequestUrl, handleGetLogout)
+	http.HandleFunc(lib.IncomingGetCookieAuthRequestUrl, handleGetCookieAuth)
+	http.HandleFunc(lib.IncomingPostRemoveFromFavoritesRequestUrl, handlePostRemoveFromFavorites)
 	http.HandleFunc(lib.IncomingPostUserRequestUrl, handlePostLogin)
 	http.HandleFunc(lib.IncomingPostAddToFavoritesRequestUrl, handlePostAddVideoToFavorites)
 	http.HandleFunc(lib.IncomingPostRegisterRequestUrl, handlePostRegisterUser)
-	http.HandleFunc(lib.IncomingPostLogoutRequestUrl, handlePostLogout)
-	http.HandleFunc(lib.IncomingPostCookieAUthRequestUrl, handlePostCookieAuth)
+	http.HandleFunc(lib.IncomingPostFetchFavoritesRequestUrl, handleGetFetchFavorites)
+	http.HandleFunc(lib.IncomingPostSaveProfilePictureRequestUrl, handlePostSaveProfilePicture)
 	err = http.ListenAndServe(":80", nil)
 	if err != nil {
 		log.Fatal("Starting Server failed: " + err.Error())
 	}
 }
 
-func handleRemoveFromFavorites(w http.ResponseWriter, r *http.Request) {
-	log.Println("Answering handleRemoveFromFavorites request started...")
+func handleGetFetchFavorites(w http.ResponseWriter, r *http.Request) {
+	log.Println("Answering handleGetFetchFavorites request started...")
+	userDB := dbConnections[lib.UserDBconnectionName]
+	err := userDB.Ping()
+	if err != nil {
+		lib.ReportError(w, http.StatusInternalServerError, lib.InternalServerErrorResponse, "Database connection failed: \n"+err.Error())
+		return
+	}
+	var user lib.User
+	if dErr := lib.IsUserLoggedInWithACookie(r, userDB, &user); dErr != nil {
+		lib.ReportDetailedError(w, dErr)
+		return
+	}
+	if err = lib.FillUserVideoArray(&user, userDB); err != nil {
+		lib.ReportError(w, http.StatusInternalServerError, lib.InternalServerErrorResponse, "FillUserVideoArray failed:\n"+err.Error())
+		return
+	}
+	videosInBytes, err := json.MarshalIndent(user.FavoriteVideos, "", " ")
+	if err != nil {
+		lib.ReportError(w, http.StatusInternalServerError, lib.InternalServerErrorResponse, "marshaling failed: \n"+err.Error())
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Write(videosInBytes)
+	log.Println("Answered handleGetFetchFavorites request successfully")
+}
+
+func handlePostSaveProfilePicture(w http.ResponseWriter, r *http.Request) {
+	log.Println("Answering handlePostSaveProfilePicture request started...")
+	userDB := dbConnections[lib.UserDBconnectionName]
+	//Checking DB connection
+	err := userDB.Ping()
+	if err != nil {
+		lib.ReportError(w, http.StatusInternalServerError, lib.InternalServerErrorResponse, "Database connection failed: \n"+err.Error())
+		return
+	}
+	var user lib.User
+	if dErr := lib.IsUserLoggedInWithACookie(r, userDB, &user); dErr != nil {
+		lib.ReportDetailedError(w, dErr)
+		return
+	}
+	if err = r.ParseMultipartForm(lib.MaxUploadSize); err != nil {
+		lib.ReportError(w, http.StatusInternalServerError, lib.InternalServerErrorResponse, "Parsing request form failed: \n"+err.Error())
+		return
+	}
+	//Parsing FormData File
+	_, header, err := r.FormFile("profilepicture")
+	if err != nil {
+		log.Println("ERROR FORMFILE:\n" + err.Error())
+		return
+	}
+	if header.Size == 0 || header.Size > lib.MaxUploadSize {
+		lib.ReportError(w, http.StatusBadRequest, "Bild ist zu groß!\n Die Grenze beträgt "+strconv.FormatInt(lib.MaxUploadSize, 10)+"kbytes", "file size too large: "+strconv.FormatInt(header.Size, 10))
+		return
+	}
+	//Open file and trying to decode it to png
+	imageFile, err := header.Open()
+	if err != nil {
+		lib.ReportError(w, http.StatusInternalServerError, lib.InternalServerErrorResponse, "opening file failed: \n"+err.Error())
+		return
+	}
+	_, err = png.Decode(imageFile)
+	if err != nil {
+		lib.ReportError(w, http.StatusBadRequest, "Datei ist kein PNG-Bild!", "Decoding png failed: \n"+err.Error())
+		return
+	}
+	//Open and save file to DB
+	imageFile, err = header.Open()
+	if err != nil {
+		lib.ReportError(w, http.StatusInternalServerError, lib.InternalServerErrorResponse, "opening file failed: \n"+err.Error())
+		return
+	}
+	user.ProfilePicture, err = ioutil.ReadAll(imageFile)
+	if err != nil {
+		lib.ReportError(w, http.StatusInternalServerError, lib.InternalServerErrorResponse, "reading file failed: \n"+err.Error())
+		return
+	}
+	log.Printf("SAVED PROFILE PIC: %d \n", len(user.ProfilePicture))
+	_, err = userDB.Exec("UPDATE users SET profile_picture = ? WHERE username = ?", user.ProfilePicture, user.Username)
+	if err != nil {
+		lib.ReportError(w, http.StatusInternalServerError, lib.InternalServerErrorResponse, "SQL update failed: \n"+err.Error())
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("Profile picture set"))
+	log.Println("Answered handlePostSaveProfilePicture request successfully")
+}
+
+func handleGetFetchProfilePicture(w http.ResponseWriter, r *http.Request) {
+	log.Println("Answering handleGetFetchProfilePicture request started...")
+	userDB := dbConnections[lib.UserDBconnectionName]
+	err := userDB.Ping()
+	if err != nil {
+		lib.ReportError(w, http.StatusInternalServerError, lib.InternalServerErrorResponse, "Database connection failed: \n"+err.Error())
+		return
+	}
+	var user lib.User
+	if dErr := lib.IsUserLoggedInWithACookie(r, userDB, &user); dErr != nil {
+		lib.ReportDetailedError(w, dErr)
+		return
+	}
+	rows, err := userDB.Query("select profile_picture from users where username = ?", user.Username)
+	if err != nil {
+		lib.ReportError(w, http.StatusInternalServerError, lib.InternalServerErrorResponse, "sql query failed: \n"+err.Error())
+		return
+	}
+	if rows.Next() {
+		err := rows.Scan(&user.ProfilePicture)
+		if err != nil {
+			lib.ReportError(w, http.StatusInternalServerError, lib.InternalServerErrorResponse, "scanning failed: \n"+err.Error())
+			return
+		}
+		if user.ProfilePicture == nil {
+			log.Println("no picture found, loading standard picture")
+			user.ProfilePicture, err = ioutil.ReadFile(lib.StandardAvatarPath)
+			if err != nil {
+				lib.ReportError(w, http.StatusInternalServerError, lib.InternalServerErrorResponse, "Reading avatar.png failed: \n"+err.Error())
+				return
+			}
+		}
+	} else {
+		log.Println("no user found, loading standard picture")
+		lib.ReportError(w, http.StatusInternalServerError, lib.InternalServerErrorResponse, "Logged in user not found!")
+		return
+	}
+	log.Printf("picture byte array len: %d\n", len(user.ProfilePicture))
+	w.WriteHeader(http.StatusOK)
+	w.Write(user.ProfilePicture)
+	log.Println("Answered handleGetFetchProfilePicture request successfully")
+}
+
+func handlePostRemoveFromFavorites(w http.ResponseWriter, r *http.Request) {
+	log.Println("Answering handlePostRemoveFromFavorites request started...")
 	//Check connection
 	userDB := dbConnections[lib.UserDBconnectionName]
 	err := userDB.Ping()
@@ -97,11 +234,11 @@ func handleRemoveFromFavorites(w http.ResponseWriter, r *http.Request) {
 	}
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("Video aus den Favoriten entfernt!"))
-	log.Println("Answered handleRemoveFromFavorites request successfully")
+	log.Println("Answered handlePostRemoveFromFavorites request successfully")
 }
 
-func handlePostCookieAuth(w http.ResponseWriter, r *http.Request) {
-	log.Println("Answering handlePostCookieAuth request started...")
+func handleGetCookieAuth(w http.ResponseWriter, r *http.Request) {
+	log.Println("Answering handleGetCookieAuth request started...")
 	userDB := dbConnections[lib.UserDBconnectionName]
 	err := userDB.Ping()
 	if err != nil {
@@ -113,11 +250,6 @@ func handlePostCookieAuth(w http.ResponseWriter, r *http.Request) {
 		lib.ReportDetailedError(w, dErr)
 		return
 	}
-	err = lib.FillUserVideoArray(&user, userDB)
-	if err != nil {
-		lib.ReportError(w, http.StatusInternalServerError, lib.InternalServerErrorResponse, "Failed filling the favorite videos array: \n"+err.Error())
-		return
-	}
 	userInBytes, err := json.MarshalIndent(user, "", "   ")
 	if err != nil {
 		lib.ReportError(w, http.StatusInternalServerError, lib.InternalServerErrorResponse, "Marshaling failed: \n"+err.Error())
@@ -125,11 +257,11 @@ func handlePostCookieAuth(w http.ResponseWriter, r *http.Request) {
 	}
 	w.WriteHeader(http.StatusOK)
 	w.Write(userInBytes)
-	log.Println("Answered handlePostCookieAuth successfully")
+	log.Println("Answered handleGetCookieAuth successfully")
 }
 
-func handlePostLogout(w http.ResponseWriter, r *http.Request) {
-	log.Println("Answering handlePostLogout request started...")
+func handleGetLogout(w http.ResponseWriter, r *http.Request) {
+	log.Println("Answering handleGetLogout request started...")
 	userDB := dbConnections[lib.UserDBconnectionName]
 	err := userDB.Ping()
 	if err != nil {
@@ -149,7 +281,7 @@ func handlePostLogout(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("Abgemeldet!"))
-	log.Println("Answered handlePostLogout successfully")
+	log.Println("Answered handleGetLogout successfully")
 }
 
 func handleGetSearchVideos(w http.ResponseWriter, r *http.Request) {
@@ -171,11 +303,6 @@ func handleGetSearchVideos(w http.ResponseWriter, r *http.Request) {
 	videosFound := false
 	if searchString == "" || searchString == " " {
 		lib.ReportError(w, http.StatusBadRequest, lib.EmptyParameterResponse+lib.SearchParameter, lib.EmptyParameterResponse+lib.SearchParameter)
-		return
-	}
-
-	if !lib.IsStringLegal(searchString) {
-		lib.ReportError(w, http.StatusBadRequest, lib.IllegalParameterResponse+lib.SearchParameter, lib.IllegalParameterResponse+lib.SearchParameter)
 		return
 	}
 
@@ -374,9 +501,7 @@ func handlePostRegisterUser(w http.ResponseWriter, r *http.Request) {
 	//Check if Username or Name is illegal
 	if !lib.IsStringLegal(incomingUsername) {
 		lib.ReportError(w, http.StatusBadRequest, lib.IllegalParameterResponse+lib.UsernameParameter, "forbidden chars in Username")
-	}
-	if !lib.IsStringLegal(incomingName) {
-		lib.ReportError(w, http.StatusBadRequest, lib.IllegalParameterResponse+lib.NameParameter, "forbidden chars in Name")
+		return
 	}
 	//Get userdata from db for comparison
 	rows, err := userDB.Query("select Username from users where username = ?", incomingUsername)

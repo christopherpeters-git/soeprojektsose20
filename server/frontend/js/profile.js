@@ -1,41 +1,63 @@
-let userInformation=sendPostCookieAuthRequest();
+let userInformation;
+sendGetCookieAuthRequest(callBackFunctionSetUserArray);
+sendGetFetchFavoritesRequest((response) => {
+    console.log(response.responseText)
+    userInformation.favoriteVideos = JSON.parse(response.responseText);
+    setFavList();
+});
+
+
+
+function displayProfileInformation(){
+    const name = document.getElementById("displayName");
+    const username = document.getElementById("displayUsername");
+    const nameText = document.createElement("h3");
+    const usernameText = document.createElement("h3");
+    nameText.innerHTML = "Name: " + userInformation.name;
+    usernameText.innerHTML = "Username: " + userInformation.username;
+    name.appendChild(nameText);
+    username.appendChild(usernameText);
+}
+
+function toggleUploadButtons(){
+    const uploadButtons = document.getElementById("uploadButtons");
+    if (uploadButtons.style.visibility === "visible"){
+        uploadButtons.style.visibility = "hidden";
+    }else{
+        uploadButtons.style.visibility = "visible";
+    }
+}
+
+function saveProfilePicture(){
+    sendPostSaveProfilePicture(()=>{
+        loadProfilePicture();
+        console.log("profile picture set successfully")
+    });
+}
+
+function loadProfilePicture(){
+    const pp = document.getElementById("profilePicture");
+    pp.setAttribute("src","/getProfilePicture/");
+    window.location.reload();
+}
+
 function Logout() {
     window.location.href = "/index.html";
-    sendPostLogoutRequest();
-
+    sendGetLogoutRequest();
 }
 function openHome() {
     window.location.href = "/index.html";
 }
 
-function createAjaxRequest(){
-    let request;
-    if(window.XMLHttpRequest){
-        request = new XMLHttpRequest();
+function callBackFunctionSetUserArray(status) {
+    if(200 === status.status){
+        userInformation=JSON.parse(status.responseText);
+        displayProfileInformation();
     }else{
-        request = new ActiveXObject("Microsoft.XMLHTTP");
+        console.log(status.status + ":" + status.responseText);
     }
-    return request;
 }
 
-function sendPostCookieAuthRequest(){
-    const request = createAjaxRequest();
-    request.onreadystatechange = function () {
-        if(4 === this.readyState){
-            if(200 === this.status){
-                userInformation=JSON.parse(this.responseText);
-                setFavList();
-            }else{
-                console.log(this.status + ":" + this.responseText);
-                document.getElementById("Login_Screen").style.visibility="visible";
-
-            }
-        }
-    }
-    request.open("POST","/cookieAuth/",true);
-    request.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
-    request.send("dummy=dummy");
-}
 
 function setFavList(){
     const favDiv= document.getElementById("favorites");
@@ -154,23 +176,6 @@ function startDeletingFav() {
     * delay after request
     * */
     setTimeout(() => { location.reload();  }, 200);
-}
-
-
-function sendPostRemoveFavoriteRequest(video){
-    const request = createAjaxRequest();
-    request.onreadystatechange = function () {
-        if(4 === this.readyState){
-            if(200 === this.status){
-            }else{
-                alert(this.status + ":" + this.responseText);
-            }
-            console.log(this);
-        }
-    }
-    request.open("POST",/removeFromFavorites/,true);
-    request.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
-    request.send("video="+encodeURIComponent(JSON.stringify(video)));
 }
 
 function selectAllFavorites() {

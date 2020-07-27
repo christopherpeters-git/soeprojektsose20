@@ -11,48 +11,23 @@ class Videoclass {
     }
 }
 
-function createAjaxRequest(){
-    let request;
-    if(window.XMLHttpRequest){
-        request = new XMLHttpRequest();
-    }else{
-        request = new ActiveXObject("Microsoft.XMLHTTP");
-    }
-    return request;
-}
-
 function Logout() {
     sessionStorage.clear();
     window.location.href = "/index.html";
-    sendPostLogoutRequest();
+    sendGetLogoutRequest(function (status) {
+        if(200 === status.status){
+            alert(status.responseText)
+            hideAvatar();
+        }else{
+            alert(status.status + ":" + status.responseText);
+        }
+    });
 }
 
 function openProfil() {
-    window.location.href="/profil.html";
+    window.location.href="/profile.html";
 }
 function openHome() {
     sessionStorage.clear();
     window.location.href="/index.html";
 }
-
-function sendPostLogoutRequest(){
-    const request = createAjaxRequest();
-    request.onreadystatechange = function () {
-        if(4 === this.readyState){
-            if(200 === this.status){
-                alert(this.responseText)
-
-                hideAvatar();
-            }else{
-                alert(this.status + ":" + this.responseText);
-            }
-        }
-    }
-    request.open("POST",/logout/,true);
-    request.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
-    request.send("dummy=dummy");
-}
-
-
-
-

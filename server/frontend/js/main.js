@@ -1,5 +1,7 @@
 "use strict"
 
+
+
 class User{
     constructor(id,name,username,favoriteVideos) {
         this.id = id;
@@ -7,163 +9,49 @@ class User{
         this.name = name;
         this.favoriteVideos= favoriteVideos;
     }
-
 }
 
-const video =  {
-    "channel": "ARD",
-    "title": "\"Plan B\" für Bayern",
-    "show": "\"Plan B\" für Bayern",
-    "releaseDate": "24.06.2020",
-    "duration": "00:42:55",
-    "link": "http://cdn-storage.br.de/b7/2020-06/24/159a1622b65711eabca2984be109059a_C.mp4",
-    "pageLink": "https://www.ardmediathek.de/ard/player/Y3JpZDovL2JyLmRlL3ZpZGVvLzY3ZmY5YjUyLTI5NDYtNDEwMC04MDk1LTg2OTU1NjgxOTMyZA",
-    "fileName": "72|X.mp4"
-};
 
-
-function createAjaxRequest(){
-    let request;
-    if(window.XMLHttpRequest){
-        request = new XMLHttpRequest();
+function callBackFunctionCookieAuthRequest(status){
+    if(status.status===200){
+        hideVBlockerAndLogin();
+        unhideAvatar();
+        deleteEventListener();
     }else{
-        request = new ActiveXObject("Microsoft.XMLHTTP");
+        console.log(status.status + ":" + status.responseText);
+        document.getElementById("Login_Screen").style.visibility="visible";
     }
-    return request;
 }
 
-function sendPostCookieAuthRequest(){
-    const request = createAjaxRequest();
-    request.onreadystatechange = function () {
-        if(4 === this.readyState){
-            if(200 === this.status){
-                hideVBlockerAndLogin();
-                unhideAvatar();
-            }else{
-                console.log(this.status + ":" + this.responseText);
-                document.getElementById("Login_Screen").style.visibility="visible";
-
-            }
-        }
+function callBackFunctionLogin(status){
+    if(200 === status.status){
+        hideVBlockerAndLogin();
+        unhideAvatar();
+        deleteEventListener();
+    }else{
+        alert(status.status + ":" + status.responseText);
     }
-    request.open("POST","/cookieAuth/",true);
-    request.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
-    request.send("dummy=dummy");
 }
 
-function sendGetSearchRequest(){
-    const request = createAjaxRequest();
-    const searchString = document.getElementById("searchInput").value;
-    request.onreadystatechange = function () {
-        if(4 === this.readyState){
-            if(200 === this.status){
-
-            }else{
-                alert(this.status + ":" + this.responseText);
-            }
-        }
+function callBackFunctionLogout(status) {
+    if(200 === status.status){
+        unhideVBlockerAndLogin();
+        hideAvatar();
+        setEventListener();
+    }else{
+        alert(status.status + ":" + status.responseText);
     }
-
-    request.open("GET","/search" +"?search="+searchString,true);
-    request.send();
 }
 
-function sendPostLoginRequest(){
-    const usernameInput = document.getElementById("usernameLogin").value;
-    const passwordInput = document.getElementById("passwordLogin").value;
-    const request = createAjaxRequest();
-    cookieInfo();
-    request.onreadystatechange = function () {
-        if(4 === this.readyState){
-            if(200 === this.status){
-                let user = new User("","","",null);
-                user = JSON.parse(this.responseText);
-                console.log(user);
-                hideVBlockerAndLogin();
-                unhideAvatar();
-            }else{
-                alert(this.status + ":" + this.responseText);
-            }
-        }
+function callBackFunctionRegister(status) {
+    if(200 === status.status){
+        hideVBlockerAndLogin();
+        unhideAvatar();
+        loginAfterRegister();
+        deleteEventListener();
+    }else{
+        alert(status.status + ":" + status.responseText);
     }
-    request.open("POST",/login/,true);
-    request.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
-    console.log("" + usernameInput + " " + passwordInput);
-    request.send("usernameInput="+usernameInput+"&"+"passwordInput="+passwordInput);
-}
-
-function sendPostLogoutRequest(){
-    const request = createAjaxRequest();
-    request.onreadystatechange = function () {
-        if(4 === this.readyState){
-            if(200 === this.status){
-                alert(this.responseText)
-                unhideVBlockerAndLogin();
-                hideAvatar();
-            }else{
-                alert(this.status + ":" + this.responseText);
-            }
-        }
-    }
-    request.open("POST",/logout/,true);
-    request.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
-    request.send("dummy=dummy");
-}
-
-function sendPostRegisterRequest(){
-    const name = document.getElementById("fullname").value;
-    const usernameInput = document.getElementById("usernameReg").value;
-    const passwordInput = document.getElementById("passwordReg").value;
-    const request = createAjaxRequest();
-    request.onreadystatechange = function () {
-        if(4 === this.readyState){
-            if(200 === this.status){
-                hideVBlockerAndLogin();
-                unhideAvatar();
-                loginAfterRegister();
-            }else{
-                alert(this.status + ":" + this.responseText);
-            }
-        }
-    }
-    request.open("POST",/register/,true);
-    request.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
-    console.log("" + usernameInput + " " + passwordInput);
-    request.send("usernameInput="+usernameInput+"&"+"passwordInput="+passwordInput+"&"+"nameInput="+name);
-}
-
-function sendPostFavoriteRequest(){
-    const request = createAjaxRequest();
-    request.onreadystatechange = function () {
-        if(4 === this.readyState){
-            if(200 === this.status){
-            }else{
-                alert(this.status + ":" + this.responseText);
-            }
-            console.log(this);
-        }
-    }
-    request.open("POST",/addToFavorites/,true);
-    request.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
-    request.send("video="+JSON.stringify(video));
-}
-
-
-
-function sendGetClickedVideos(){
-    const request = createAjaxRequest();
-    request.onreadystatechange = function () {
-        if(4 === this.readyState){
-            if(200 === this.status){
-
-            }else{
-                alert(this.status + ":" + this.responseText);
-            }
-        }
-    }
-
-    request.open("GET","/clickVideo" +"?videoTitle="+"\"Plan B\" für Bayern",true);
-    request.send();
 }
 
 function hideVBlockerAndLogin() {
@@ -186,15 +74,14 @@ function hideAvatar() {
 }
 function unhideAvatar() {
     var avatar = document.getElementById("Dropdown");
+    avatar.src = /getVideos/;
     avatar.style.visibility = "visible";
 }
 
 function openProfil() {
-    window.location.href="/profil.html";
+    window.location.href="/profile.html";
 }
-function cookieInfo(){
-alert("Wir benutzen Cookies, um Inhalte und Anzeigen zu personalisieren.")
-}
+
 
 
 function loginAfterRegister() {
@@ -202,7 +89,7 @@ function loginAfterRegister() {
    let userPass = document.getElementById("passwordLogin");
    userLogin.value = document.getElementById("usernameReg").value;
    userPass.value = document.getElementById("passwordReg").value;
-   sendPostLoginRequest();
+   sendPostLoginRequest(callBackFunctionLogin);
 }
 
 
@@ -236,4 +123,31 @@ function setSearchtext() {
     sessionStorage.setItem("searchString",searchString);
     console.log(sessionStorage.getItem("searchString"));
     window.location.href = "/searchResults.html";
+}
+
+//#########################EventListener####################################################################
+function setEventListener() {
+    const passwordLogin = document.getElementById("passwordLogin");
+    const passwordReg = document.getElementById("passwordReg");
+    passwordLogin.addEventListener("keydown", loginOnEnter, false);
+    passwordReg.addEventListener("keydown", registerOnEnter, false);
+}
+
+function loginOnEnter(event) {
+    if(event.key ==="Enter") {
+        sendPostLoginRequest(callBackFunctionLogin);
+    }
+}
+
+function registerOnEnter(event) {
+    if(event.key ==="Enter") {
+        sendPostRegisterRequest(callBackFunctionRegister);
+    }
+}
+
+function deleteEventListener() {
+    const passwordLogin = document.getElementById("passwordLogin");
+    const passwordReg = document.getElementById("passwordReg");
+    passwordReg.removeEventListener("keydown",registerOnEnter,false);
+    passwordLogin.removeEventListener("keydown",loginOnEnter,false);
 }

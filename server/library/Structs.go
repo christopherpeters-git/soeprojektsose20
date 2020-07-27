@@ -67,6 +67,7 @@ type User struct {
 	passwordHash   string
 	sessionId      string
 	FavoriteVideos []Video `json:"favoriteVideos"`
+	ProfilePicture []byte  `json:"profilePicture"`
 }
 
 func (r *User) Equals(u *User) bool {

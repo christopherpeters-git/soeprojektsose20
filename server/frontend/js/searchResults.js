@@ -4,9 +4,6 @@ function initSearchResults() {
     checkFlag();
 }
 
-function setSearchResult(){
-
-}
 
 function setSearchTextWithResults(){
     currentPage=1;
@@ -23,9 +20,4 @@ function setSearchTextWithResults(){
     }
     sessionStorage.setItem("searchString",searchString);
     initSearchResults();
-}
-
-function clearPage() {
-    sessionStorage.clear();
-
 }

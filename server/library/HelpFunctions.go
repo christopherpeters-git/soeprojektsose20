@@ -34,7 +34,7 @@ func IsStringLegal(str string) bool {
 //Creates the array of favorite videos for a given user
 func FillUserVideoArray(user *User, userDB *sql.DB) error {
 	//Getting the informations about the user
-	rows, err := userDB.Query("select * from user_has_favorite_videos where Users_Username = ?", user.Username)
+	rows, err := userDB.Query("select users_username,video from user_has_favorite_videos where Users_Username = ?", user.Username)
 	if err != nil {
 		return errors.New("SQL query failed: \n" + err.Error())
 	}

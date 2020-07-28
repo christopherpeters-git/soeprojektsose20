@@ -1,6 +1,6 @@
 package library
 
-//URL'publicErrorMessage
+//URL's
 const (
 	IncomingPostUserRequestUrl                = "/login/"
 	IncomingPostRegisterRequestUrl            = "/register/"

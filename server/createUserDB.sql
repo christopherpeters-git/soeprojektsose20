@@ -17,8 +17,9 @@ CREATE TABLE videos (
 );
 
 CREATE TABLE user_has_favorite_videos (
+    Id int NOT NULL AUTO_INCREMENT,
     Users_Username varchar(255) NOT NULL,
     Video varchar(650) NOT NULL,
-    PRIMARY KEY(Users_Username,Video),
+    PRIMARY KEY(Id),
     FOREIGN KEY (Users_Username) REFERENCES users(Username)
 );

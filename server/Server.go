@@ -442,7 +442,7 @@ func handlePostAddVideoToFavorites(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	//Check if video is already in favorites
-	rows, err := userDB.Query("Select * from user_has_favorite_videos where Users_Username = ? and Video = ?", user.Username, incomingVideo)
+	rows, err := userDB.Query("Select users_username,video from user_has_favorite_videos where users_username = ? and video = ?", user.Username, incomingVideo)
 	if err != nil {
 		lib.ReportError(w, http.StatusInternalServerError, lib.InternalServerErrorResponse, "SQL query checking for username and video failed: \n"+err.Error())
 		return

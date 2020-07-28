@@ -458,7 +458,7 @@ func handlePostAddVideoToFavorites(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Added video to favorites successfully"))
+	w.Write([]byte("Video hinzugefügt!"))
 	log.Println("Added video to favorites successfully")
 }
 

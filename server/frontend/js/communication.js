@@ -140,6 +140,9 @@ function sendGetSearchRequest(callBackFunction,async=true){
     }
     console.log(incomingString);
     let channelString = incomingString [0];
+    if(channelString==null){
+        channelString="none";
+    }
     let searchString =incomingString[1];
     request.onreadystatechange = function () {
         if(4 === this.readyState){

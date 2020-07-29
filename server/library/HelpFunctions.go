@@ -47,7 +47,6 @@ func FillUserVideoArray(user *User, userDB *sql.DB) error {
 			return errors.New("Scanning rows failed: \n" + err.Error())
 		}
 		var video Video
-		log.Println(videoStr)
 		err = json.Unmarshal([]byte(videoStr), &video)
 		if err != nil {
 			return errors.New("unmarshalling failed: \n" + err.Error())

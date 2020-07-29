@@ -48,11 +48,11 @@ func main() {
 	http.HandleFunc(lib.IncomingGetFetchProfilePictureRequestUrl, handleGetFetchProfilePicture)
 	http.HandleFunc(lib.IncomingGetLogoutRequestUrl, handleGetLogout)
 	http.HandleFunc(lib.IncomingGetCookieAuthRequestUrl, handleGetCookieAuth)
+	http.HandleFunc(lib.IncomingGetFetchFavoritesRequestUrl, handleGetFetchFavorites)
 	http.HandleFunc(lib.IncomingPostRemoveFromFavoritesRequestUrl, handlePostRemoveFromFavorites)
 	http.HandleFunc(lib.IncomingPostUserRequestUrl, handlePostLogin)
 	http.HandleFunc(lib.IncomingPostAddToFavoritesRequestUrl, handlePostAddVideoToFavorites)
 	http.HandleFunc(lib.IncomingPostRegisterRequestUrl, handlePostRegisterUser)
-	http.HandleFunc(lib.IncomingPostFetchFavoritesRequestUrl, handleGetFetchFavorites)
 	http.HandleFunc(lib.IncomingPostSaveProfilePictureRequestUrl, handlePostSaveProfilePicture)
 	err = http.ListenAndServe(":80", nil)
 	if err != nil {
@@ -109,11 +109,11 @@ func handlePostSaveProfilePicture(w http.ResponseWriter, r *http.Request) {
 	//Parsing FormData File
 	_, header, err := r.FormFile("profilepicture")
 	if err != nil {
-		log.Println("ERROR FORMFILE:\n" + err.Error())
+		lib.ReportError(w, http.StatusBadRequest, "Keinen Wert für 'profilepicture' gefunden", "error getting value for profilepicture: \n"+err.Error())
 		return
 	}
 	if header.Size == 0 || header.Size > lib.MaxUploadSize {
-		lib.ReportError(w, http.StatusBadRequest, "Bild ist zu groß!\n Die Grenze beträgt "+strconv.FormatInt(lib.MaxUploadSize, 10)+"kbytes", "file size too large: "+strconv.FormatInt(header.Size, 10))
+		lib.ReportError(w, http.StatusBadRequest, "Bild ist zu groß!\n Die Grenze beträgt "+strconv.FormatInt(lib.MaxUploadSize, 10)+"bytes", "file size too large: "+strconv.FormatInt(header.Size, 10))
 		return
 	}
 	//Open file and trying to decode it to png
@@ -389,7 +389,6 @@ func handleGetVideoClicked(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	title := queryResults[0]
-	log.Println("Content of parameter '" + lib.ChannelNameParameter + "': " + title)
 	//Get videos from db
 	rows, err := userDB.Query("select * from videos where VideoTitle = ?", title)
 	if err != nil {
@@ -458,7 +457,7 @@ func handlePostAddVideoToFavorites(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Added video to favorites successfully"))
+	w.Write([]byte("Video hinzugefügt!"))
 	log.Println("Added video to favorites successfully")
 }
 
@@ -505,7 +504,7 @@ func handlePostRegisterUser(w http.ResponseWriter, r *http.Request) {
 		lib.ReportError(w, http.StatusBadRequest, lib.EmptyParameterResponse, "one or more received strings is empty\n")
 		return
 	}
-	//Check if Username or Name is illegal
+	//Check if Username is illegal
 	if !lib.IsStringLegal(incomingUsername) {
 		lib.ReportError(w, http.StatusBadRequest, lib.IllegalParameterResponse+lib.UsernameParameter, "forbidden chars in Username")
 		return
@@ -517,25 +516,17 @@ func handlePostRegisterUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	//Check if username is in use
-	var username string
 	for rows.Next() {
-		err = rows.Scan(&username)
-		if err != nil {
-			lib.ReportError(w, http.StatusInternalServerError, lib.InternalServerErrorResponse, "Scanning rows failed: \n"+err.Error())
-			return
-		}
-		if username == incomingUsername {
-			lib.ReportError(w, http.StatusBadRequest, "User already exists", "Username taken: "+username)
-			return
-		}
+		lib.ReportError(w, http.StatusBadRequest, "User already exists", "Username taken: "+incomingUsername)
+		return
 	}
 	//Hash incoming password
 	passwordHash, err := bcrypt.GenerateFromPassword([]byte(incomingPassword), bcrypt.MinCost)
-	log.Printf("User created: Name: %s username: %s passwordhash: %s", incomingName, incomingUsername, string(passwordHash))
 	if err != nil {
 		lib.ReportError(w, http.StatusInternalServerError, lib.InternalServerErrorResponse, "Hashing password '"+incomingPassword+"' failed: \n"+err.Error())
 		return
 	}
+	log.Printf("User created: Name: %s username: %s passwordhash: %s", incomingName, incomingUsername, string(passwordHash))
 	//Create user in database
 	_, err = userDB.Exec("INSERT INTO users (Name,Username,PasswordHash)\nValues(?,?,?)", incomingName, incomingUsername, string(passwordHash))
 	if err != nil {
@@ -543,7 +534,7 @@ func handlePostRegisterUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Created a new User account"))
+	w.Write([]byte("Neuer Account angelegt"))
 	log.Println("answered handlePostRegisterUser request successfully")
 }
 

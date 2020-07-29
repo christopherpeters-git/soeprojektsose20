@@ -543,7 +543,7 @@ func handlePostRegisterUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Neuer account angelegt"))
+	w.Write([]byte("Neuer Account angelegt"))
 	log.Println("answered handlePostRegisterUser request successfully")
 }
 

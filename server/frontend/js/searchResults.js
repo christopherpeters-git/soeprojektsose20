@@ -1,10 +1,9 @@
-
+//Function to initialize the result of the search.
 function initSearchResults() {
     sessionStorage.setItem("pageFlag","1");
     checkFlag();
 }
-
-
+// Function to search on the SearchResult page.
 function setSearchTextWithResults(){
     currentPage=1;
     const inputValue = document.getElementById("inputButton");
@@ -27,7 +26,7 @@ function addEventListenerOnSearchPage() {
     searchInput.addEventListener("keydown", searchAgainOnEnter, false);
 
 }
-
+//Function to start the search with enter.
 function searchAgainOnEnter(event) {
     if(event.key ==="Enter") {
         setSearchTextWithResults();

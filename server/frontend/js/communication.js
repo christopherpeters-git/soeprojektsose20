@@ -10,6 +10,7 @@ function createAjaxRequest(){
     return request;
 }
 
+//allows user to choose picture from files and sends picture to server, callback reloads site on success with new profile picture
 function sendPostSaveProfilePicture(callbackFunction){
     const request = createAjaxRequest();
     const profilePicture = document.getElementById("ppUpload").files[0];
@@ -31,7 +32,7 @@ function sendPostSaveProfilePicture(callbackFunction){
     request.open("POST","/setProfilePicture/",true);
     request.send(formData);
 }
-
+//checks with server for existing cookie, callback on success hides login and makes site useable
 function sendGetCookieAuthRequest(callbackFunction, async=true){
     const request = createAjaxRequest();
     request.onreadystatechange = function () {
@@ -42,7 +43,7 @@ function sendGetCookieAuthRequest(callbackFunction, async=true){
     request.open("GET","/cookieAuth/",async);
     request.send();
 }
-
+//opens request for user_favorites from server, callback creates favorites in html
 function sendGetFetchFavoritesRequest(callbackFunction, async = true){
     const request = createAjaxRequest();
     request.onreadystatechange = function () {
@@ -57,7 +58,7 @@ function sendGetFetchFavoritesRequest(callbackFunction, async = true){
     request.open("GET","/getFavorites/",async);
     request.send();
 }
-
+//opens loginrequest for server, callback hides login on success
 function sendPostLoginRequest(callbackFunction){
     const usernameInput = document.getElementById("usernameLogin").value;
     const passwordInput = document.getElementById("passwordLogin").value;
@@ -77,7 +78,7 @@ function sendPostLoginRequest(callbackFunction){
     request.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
     request.send("usernameInput="+usernameInput+"&"+"passwordInput="+passwordInput);
 }
-
+//user is logged out, callback opens login on success
 function sendGetLogoutRequest(callbackFunction){
     const request = createAjaxRequest();
     request.onreadystatechange = function () {
@@ -88,7 +89,7 @@ function sendGetLogoutRequest(callbackFunction){
     request.open("GET",/logout/,true);
     request.send();
 }
-
+//opens registerrequest, callback logs user in and hides login
 function sendPostRegisterRequest(callbackFunction){
     const name = document.getElementById("fullname").value;
     const usernameInput = document.getElementById("usernameReg").value;
@@ -169,7 +170,7 @@ function sendGetClickedVideos(video,async=true){
     request.send();
     return clickNumber;
 }
-
+//visible feedback for user for adding/deleting favorites
 function sendPostFavoriteRequest(video){
     const request = createAjaxRequest();
     request.onreadystatechange = function () {

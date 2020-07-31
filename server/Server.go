@@ -60,6 +60,7 @@ func main() {
 	}
 }
 
+//Sends all favorite videos in a json-array for the authenticated user
 func handleGetFetchFavorites(w http.ResponseWriter, r *http.Request) {
 	log.Println("Answering handleGetFetchFavorites request started...")
 	userDB := dbConnections[lib.UserDBconnectionName]
@@ -88,6 +89,7 @@ func handleGetFetchFavorites(w http.ResponseWriter, r *http.Request) {
 	log.Println("Answered handleGetFetchFavorites request successfully")
 }
 
+//saves the incoming picture in the db for the authenticated user
 func handlePostSaveProfilePicture(w http.ResponseWriter, r *http.Request) {
 	log.Println("Answering handlePostSaveProfilePicture request started...")
 	userDB := dbConnections[lib.UserDBconnectionName]
@@ -149,6 +151,7 @@ func handlePostSaveProfilePicture(w http.ResponseWriter, r *http.Request) {
 	log.Println("Answered handlePostSaveProfilePicture request successfully")
 }
 
+//Sends the profile picture for the authenticated user or the standard profile picture
 func handleGetFetchProfilePicture(w http.ResponseWriter, r *http.Request) {
 	log.Println("Answering handleGetFetchProfilePicture request started...")
 	userDB := dbConnections[lib.UserDBconnectionName]
@@ -199,6 +202,7 @@ func handleGetFetchProfilePicture(w http.ResponseWriter, r *http.Request) {
 	log.Println("Answered handleGetFetchProfilePicture request successfully")
 }
 
+//Removes the incoming video for the authenticated user
 func handlePostRemoveFromFavorites(w http.ResponseWriter, r *http.Request) {
 	log.Println("Answering handlePostRemoveFromFavorites request started...")
 	//Check connection
@@ -244,6 +248,7 @@ func handlePostRemoveFromFavorites(w http.ResponseWriter, r *http.Request) {
 	log.Println("Answered handlePostRemoveFromFavorites request successfully")
 }
 
+//Sends userinformation as a json-object for the authenticated user
 func handleGetCookieAuth(w http.ResponseWriter, r *http.Request) {
 	log.Println("Answering handleGetCookieAuth request started...")
 	userDB := dbConnections[lib.UserDBconnectionName]
@@ -267,6 +272,7 @@ func handleGetCookieAuth(w http.ResponseWriter, r *http.Request) {
 	log.Println("Answered handleGetCookieAuth successfully")
 }
 
+//Sets SessionID to 0 for the authenticated user
 func handleGetLogout(w http.ResponseWriter, r *http.Request) {
 	log.Println("Answering handleGetLogout request started...")
 	userDB := dbConnections[lib.UserDBconnectionName]
@@ -291,6 +297,7 @@ func handleGetLogout(w http.ResponseWriter, r *http.Request) {
 	log.Println("Answered handleGetLogout successfully")
 }
 
+//Returns found videos for a specified channel in as a json
 func handleGetSearchVideos(w http.ResponseWriter, r *http.Request) {
 	log.Println("Answering handleGetSearchVideos request started...")
 	query := r.URL.Query()
@@ -373,6 +380,7 @@ func handleGetSearchVideos(w http.ResponseWriter, r *http.Request) {
 	log.Println("Answered handleGetSearchVideos successfully")
 }
 
+//Increase the viewcount for an incoming videoTitle or creates a new entry for the title. Returns the new view count
 func handleGetVideoClicked(w http.ResponseWriter, r *http.Request) {
 	log.Println("Answering handleGetVideoClicked request started...")
 	viewCount := 1
@@ -424,6 +432,7 @@ func handleGetVideoClicked(w http.ResponseWriter, r *http.Request) {
 	log.Println("Answered handleGetVideoClicked successfully")
 }
 
+//Adds an incoming video to the favorites of the authenticated user
 func handlePostAddVideoToFavorites(w http.ResponseWriter, r *http.Request) {
 	log.Println("Answering handlePostAddVideoToFavorites request started...")
 	//Checking db connection
@@ -461,6 +470,7 @@ func handlePostAddVideoToFavorites(w http.ResponseWriter, r *http.Request) {
 	log.Println("Added video to favorites successfully")
 }
 
+//Sends all videos in an array for an incoming channel
 func handleGetVideosByChannel(w http.ResponseWriter, r *http.Request) {
 	log.Println("Answering handleGetAllVideos request started...")
 	queryResults, ok := r.URL.Query()[lib.ChannelNameParameter]
@@ -480,6 +490,7 @@ func handleGetVideosByChannel(w http.ResponseWriter, r *http.Request) {
 	log.Println("Answered handleGetAllVideos request successfully...")
 }
 
+//creates a new user in the db for the send credentials
 func handlePostRegisterUser(w http.ResponseWriter, r *http.Request) {
 	log.Print("answering handlePostRegisterUser request ...")
 
@@ -538,6 +549,7 @@ func handlePostRegisterUser(w http.ResponseWriter, r *http.Request) {
 	log.Println("answered handlePostRegisterUser request successfully")
 }
 
+//Sends all videos as a json
 func handleGetAllVideos(w http.ResponseWriter, r *http.Request) {
 	log.Print("Answering handleGetAllVideos request...")
 	//Writing the result set to the responseWriter as a json-string
@@ -551,6 +563,7 @@ func handleGetAllVideos(w http.ResponseWriter, r *http.Request) {
 	log.Print("Answered handleGetAllVideos request successfully...")
 }
 
+//Sends userinformation for an authenticated user, places cookie in client if successful
 func handlePostLogin(w http.ResponseWriter, r *http.Request) {
 	log.Print("answering handlePostLogin request ...")
 

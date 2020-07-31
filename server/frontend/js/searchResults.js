@@ -3,7 +3,7 @@ function initSearchResults() {
     sessionStorage.setItem("pageFlag","1");
     checkFlag();
 }
-// Function to search on the SearchResult page.
+//Function to search on the SearchResult page.
 function setSearchTextWithResults(){
     currentPage=1;
     const inputValue = document.getElementById("inputButton");

@@ -34,7 +34,7 @@ function saveProfilePicture(){
         console.log("profile picture set successfully")
     });
 }
-// Load the selected profile picture.
+// Function oad the selected profile picture.
 function loadProfilePicture(){
     const pp = document.getElementById("profilePicture");
     pp.setAttribute("src","/getProfilePicture/");

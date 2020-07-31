@@ -37,9 +37,11 @@ var userColumns = []string{"Id", "Name", "Username", "PasswordHash", "Session_Id
 func TestIsStringLegal(t *testing.T) {
 	legalString := "Hallo123"
 	illegalStrings := [4]string{"Hal<lo", "Hallo>", "hal/lo", "hall.o"}
+	//Tests, if legal string is legal
 	if !IsStringLegal(legalString) {
 		t.Errorf("string '%s' should be legal!", legalString)
 	}
+	//Tests, if illegal strings are legal
 	for _, str := range illegalStrings {
 		if IsStringLegal(str) {
 			t.Errorf("string '%s' should be illegal!", legalString)
@@ -70,10 +72,11 @@ func TestFillUserVideoArray(t *testing.T) {
 	favVideo2 := "{\n  \"channel\": \"NDR\",\n  \"title\": \"Segelschiff statt Jugendknast\",\n  \"show\": \"Letzte Chance an Bord\",\n  \"releaseDate\": \"02.11.2019\",\n  \"duration\": \"00:29:36\",\n  \"link\": \"http://mediandr-a.akamaihd.net/progressive/2018/0412/TV-20180412-1528-4http.StatusBadRequest.hq.mp4\",\n  \"pageLink\": \"https://www.ndr.de/fernsehen/sendungen/die_reportage/Segelschiff-statt-Jugendknast,sendung610984.html\",\n  \"fileName\": \"76|d.mp4\"\n }"
 	resultRows := sqlmock.NewRows(columns).AddRow(givenUser.Username, favVideo1).AddRow(givenUser.Username, favVideo2)
 	mock.ExpectQuery("select (.+) from user_has_favorite_videos where Users_Username = (.+)").WillReturnRows(resultRows)
+	//Tests, if FillUservideoArray throws no error as expected
 	if err := FillUserVideoArray(&givenUser, db); err != nil {
 		t.Error("Unexpected error \n" + err.Error())
 		return
-	} else if !givenUser.Equals(&expectedUser) {
+	} else if !givenUser.Equals(&expectedUser) { //Tests, if user is as expected after the FillUservideoArray call
 		t.Error("Users are not equal!: givenUser: " + givenUser.ToString() + " expectedUser: " + expectedUser.ToString())
 	}
 }
@@ -87,6 +90,7 @@ func TestConvertMapToArray(t *testing.T) {
 	exampleMap["abc"]["ghi"] = append(exampleMap["abc"]["ghi"], exampleVideos[1])
 
 	result := ConvertMapToArray(exampleMap["abc"])
+	//Tests if an the result of ConvertMapToArray is as expected
 	for i, v := range result {
 		if !v.Equals(&exampleVideos[i]) {
 			t.Errorf("Video didnt match: resultVideo: %s expectedVideo: %s\n", v.ToString(), exampleVideos[i].ToString())
@@ -101,6 +105,7 @@ func TestSortByChannelAndShow(t *testing.T) {
 	exampleMap[exampleVideos[0].Channel][exampleVideos[0].Show] = append(exampleMap[exampleVideos[0].Channel][exampleVideos[0].Show], exampleVideos[0])
 	exampleMap[exampleVideos[0].Channel][exampleVideos[1].Show] = make([]Video, 0)
 	exampleMap[exampleVideos[0].Channel][exampleVideos[1].Show] = append(exampleMap[exampleVideos[0].Channel][exampleVideos[1].Show], exampleVideos[1])
+	//Tests, if SortByChannelAndShow creates a sorted map as expected
 	if !reflect.DeepEqual(SortByChannelAndShow(exampleVideos), exampleMap) {
 		t.Error("Maps are not the same")
 	}
@@ -130,16 +135,17 @@ func TestLoginUser(t *testing.T) {
 		sessionId:      "0",
 		FavoriteVideos: nil,
 	}
+	//Tests if LoginUser thorws no error as expected
 	if dErr := LoginUser(db, &givenUser, incomingUsername, incomingPassword); dErr != nil {
 		t.Error("login failed unexpected: " + dErr.Error())
-	} else if !givenUser.Equals(&expectedUser) {
+	} else if !givenUser.Equals(&expectedUser) { //Tests if logged in user is the expecte user
 		t.Errorf("given user didnt match expected user: givenUser: %s expectedUser: %s\n", givenUser.ToString(), expectedUser.ToString())
 	}
-	//Test if user cant log with wrong password in as expected
 	mock.ExpectQuery("select (.+) from users where username = ?").WillReturnRows(sqlmock.NewRows(userColumns).AddRow("0", "Max Mustermann", incomingUsername, string(incomingPasswordHash), givenSessionId))
 	var givenUser2 User
 	wrongPassword := "wrongPassword"
 	dErr := LoginUser(db, &givenUser2, incomingUsername, wrongPassword)
+	//Test if user cant log with wrong password in as expected
 	if dErr == nil {
 		t.Errorf("Error expected!")
 	} else if dErr.Status() != http.StatusForbidden {
@@ -208,8 +214,4 @@ func TestIsUserLoggedInWithACookie(t *testing.T) {
 	if dErr := IsUserLoggedInWithACookie(request, db, &givenUser); dErr == nil {
 		t.Errorf("login was successful unexpectedly!")
 	}
-}
-
-func TestPlaceCookie(t *testing.T) {
-
 }

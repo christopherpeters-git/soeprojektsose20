@@ -7,7 +7,7 @@ sendGetFetchFavoritesRequest((response) => {
 });
 
 
-
+// Function to show the profile informations (Name, Username).
 function displayProfileInformation(){
     const name = document.getElementById("displayName");
     const username = document.getElementById("displayUsername");
@@ -18,7 +18,7 @@ function displayProfileInformation(){
     name.appendChild(nameText);
     username.appendChild(usernameText);
 }
-
+//Button to upload a profile picture.
 function toggleUploadButtons(){
     const uploadButtons = document.getElementById("uploadButtons");
     if (uploadButtons.style.visibility === "visible"){
@@ -27,14 +27,14 @@ function toggleUploadButtons(){
         uploadButtons.style.visibility = "visible";
     }
 }
-
+//Save the selected profile picture.
 function saveProfilePicture(){
     sendPostSaveProfilePicture(()=>{
         loadProfilePicture();
         console.log("profile picture set successfully")
     });
 }
-
+// Function oad the selected profile picture.
 function loadProfilePicture(){
     const pp = document.getElementById("profilePicture");
     pp.setAttribute("src","/getProfilePicture/");
@@ -58,7 +58,7 @@ function callBackFunctionSetUserArray(status) {
     }
 }
 
-
+// Function to create a favorite list.
 function setFavList(){
     const favDiv= document.getElementById("favorites");
     favDiv.innerHTML="";
@@ -95,7 +95,7 @@ function setFavList(){
     favDiv.appendChild(document.createElement("hr"));
 }
 
-
+// Function to select a video, in the favorite list, with a checkbox.
 function appendFav(video,showdiv,i){
     const videoDiv = document.createElement("div");
     const header5 = document.createElement("h5");
@@ -122,14 +122,14 @@ function appendFav(video,showdiv,i){
     videoDiv.value = [video,i];
     showdiv.appendChild(videoDiv);
 }
-
+// Function to open the Videoplayer page.
 function openFavVideoPlayer() {
     sessionStorage.setItem("favFlag","1");
     sessionStorage.setItem('video', JSON.stringify(this.value));
     console.log(this.value);
     window.location.href = "/videoPlayer.html";
 }
-
+// Function to put videos in the favorite list.
 function setFav(event) {
     const favList = document.getElementById("favorites");
     const checkedBtn = document.getElementsByClassName("checkBoxFav");
@@ -150,7 +150,7 @@ function setFav(event) {
     abortBtn.style.display="block";
 
 }
-
+// function for the three favorite list Button (Edit, Safe and Abort).
 function abortFav() {
     const editBtn = document.getElementById("editBtn");
     const safeBtn = document.getElementById("safeBtn");
@@ -164,6 +164,7 @@ function abortFav() {
     }
 
 }
+// Function to delete videos in the favorite list.
 function startDeletingFav() {
     const listFav = document.getElementById("favorites");
     console.log(listFav.children[5].value);
@@ -177,7 +178,7 @@ function startDeletingFav() {
     * */
     setTimeout(() => { location.reload();  }, 200);
 }
-
+// Function to select all videos in the favorite list.
 function selectAllFavorites() {
     const listFav = document.getElementById("favorites");
     console.log(listFav);

@@ -9,13 +9,17 @@ let lastPage;
 
 function loadSenderPage() {
     let wert = this.value;
+    //set pageFlag with 0
     sessionStorage.setItem("pageFlag","0");
+    //Open channel.html
     window.location.href = "/channel.html";
+    //set channelName with value of caller
     channelName = wert;
+    //set channel with value of caller
     sessionStorage.setItem('channel', wert);
-
 }
 
+//sets the Picture of the channel thats calling the channel.html
 function setSenderPagePicture(channel) {
     let img = document.createElement("img");
     img.setAttribute("src","/media/Sender-Logos/"+channel.channel+".png");
@@ -24,13 +28,17 @@ function setSenderPagePicture(channel) {
     senderPagePic.appendChild(img);
 }
 
+//callbackfunction of a Request
 function callBackFunctionGetVideos(status){
     if (200 === status.status) {
         channelJson = JSON.parse(status.responseText);
         if(channelJson===null){
+            //if channel Json == NULL
+                //go back to Mainpage
             window.location.href="/index.html";
         }
         channelName = sessionStorage.getItem("channel");
+        //getting the lastPage of channel
         lastPage = (Math.ceil(channelJson.length/end));
         setPage();
         setSenderPagePicture(channelJson[1]);
@@ -40,6 +48,7 @@ function callBackFunctionGetVideos(status){
     }
 }
 
+//callback Function of a Searchrequest
 function callbackFunctionSetSearchRequest(status) {
     if(200 === status.status){
         channelJson = JSON.parse(status.responseText);
@@ -52,6 +61,8 @@ function callbackFunctionSetSearchRequest(status) {
 }
 
 
+
+//sets the channel.html
 function setPage() {
     if(channelJson.length<1){
        return 0;
@@ -66,6 +77,7 @@ function setPage() {
     vContainer.appendChild(videosDiv);
     let currentVideo = new Videoclass("", "", "", "", "", "", "", "");
     let lastVideo;
+    //checks how many sites are left
     if(currentPage === lastPage){
         if(channelJson.length<30){
             tempEnd=channelJson.length;
@@ -74,6 +86,7 @@ function setPage() {
             tempEnd = (lastPage * 30) - channelJson.length;
         }
     }
+    //adding a div for every show
     let show =  document.createElement("div");
     lastVideo = channelJson[start+((currentPage-1)*30)];
     show.id = lastVideo.show;
@@ -102,6 +115,7 @@ function setPage() {
 
 }
 
+//appending Videolinks from the same Show
 function appendShow(video,showdiv,i){
     const videoDiv = document.createElement("div");
     const header5 = document.createElement("h5");
@@ -148,20 +162,29 @@ function nextPage() {
     }
 }
 
+// open Videoplayer
 function openVideoPlayerWithSearchResults() {
+    //set favFlag = 0
     sessionStorage.setItem("favFlag","0");
+    //set video = value of caller
     sessionStorage.setItem('video', JSON.stringify(this.value));
     console.log(this.value);
+    //open Videoplayer.html
     window.location.href = "/videoPlayer.html";
 }
 
 function openVideoPlayerWithPageResults() {
+    //set favFlag = 0
     sessionStorage.setItem("favFlag","0");
+    //set video = value of caller
     sessionStorage.setItem('video', JSON.stringify(this.value));
     console.log(this.value);
+    //open Videoplayer.html
     window.location.href = "/videoPlayer.html";
 }
 
+
+//call Function depending on Flags
 function checkFlag() {
     const flag = JSON.parse(sessionStorage.getItem("pageFlag"));
     console.log(flag);
@@ -172,6 +195,7 @@ function checkFlag() {
     }
 }
 
+//sets the Searchtext for a search on a Channel
 function setSearchTextWithChannel() {
     console.log(channelName);
     const searchValue = document.getElementById("searchInput").value;
